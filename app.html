@@ -2997,7 +2997,7 @@
 
     function renderFreqChart(p){ destroyChart('freq'); const ctx=document.getElementById('chart-freq'); if(!ctx) return; const c=chartColors(); let labels,data; if(p==='month'){const ws=getMonthWeeks();labels=ws.map(w=>w.label);data=ws.map(w=>workouts.filter(x=>{const d=new Date(x.date);return d>=w.start&&d<=w.end}).length)}else{const ms=getYearMonths();labels=ms.map(m=>m.label);data=ms.map(m=>workouts.filter(x=>{const d=new Date(x.date);return d.getFullYear()===m.year&&d.getMonth()===m.month}).length)}; sportCharts['freq']=new Chart(ctx,{type:'bar',data:{labels,datasets:[{data,backgroundColor:'var(--accent)',borderRadius:5,borderSkipped:false}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:c.grid},ticks:{color:c.text,font:{size:10}}},y:{grid:{color:c.grid},ticks:{color:c.text,stepSize:1,font:{size:10}},beginAtZero:true}}}}) }
 
-    function renderVolChart(p){ destroyChart('volume'); const ctx=document.getElementById('chart-volume'); if(!ctx) return; const c=chartColors(); let labels,data; if(p==='month'){const ws=getMonthWeeks();labels=ws.map(w=>w.label);data=ws.map(w=>Math.round(workouts.filter(x=>{const d=new Date(x.date);return d>=w.start&&d<=w.end}).reduce((t,w)=>t+(w.workout_exercises||[]).reduce((s,ex)=>s+(Array.isArray(ex.sets)?ex.sets:[]).reduce((u,set)=>u+((set.reps||0)*(set.weight||0)),0),0),0))}else{const ms=getYearMonths();labels=ms.map(m=>m.label);data=ms.map(m=>Math.round(workouts.filter(x=>{const d=new Date(x.date);return d.getFullYear()===m.year&&d.getMonth()===m.month}).reduce((t,w)=>t+(w.workout_exercises||[]).reduce((s,ex)=>s+(Array.isArray(ex.sets)?ex.sets:[]).reduce((u,set)=>u+((set.reps||0)*(set.weight||0)),0),0),0))}; sportCharts['volume']=new Chart(ctx,{type:'line',data:{labels,datasets:[{data,borderColor:'var(--accent)',backgroundColor:'transparent',tension:0.4,pointRadius:3,pointBackgroundColor:'var(--accent)'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:c.grid},ticks:{color:c.text,font:{size:10}}},y:{grid:{color:c.grid},ticks:{color:c.text,font:{size:10}},beginAtZero:true}}}}) }
+    function renderVolChart(p){ destroyChart('volume'); const ctx=document.getElementById('chart-volume'); if(!ctx) return; const c=chartColors(); let labels,data; if(p==='month'){const ws=getMonthWeeks();labels=ws.map(w=>w.label);data=ws.map(w=>Math.round(workouts.filter(x=>{const d=new Date(x.date);return d>=w.start&&d<=w.end}).reduce((t,wk)=>t+(wk.workout_exercises||[]).reduce((s,ex)=>s+(Array.isArray(ex.sets)?ex.sets:[]).reduce((u,set)=>u+((set.reps||0)*(set.weight||0)),0),0),0))}else{const ms=getYearMonths();labels=ms.map(m=>m.label);data=ms.map(m=>Math.round(workouts.filter(x=>{const d=new Date(x.date);return d.getFullYear()===m.year&&d.getMonth()===m.month}).reduce((t,wk)=>t+(wk.workout_exercises||[]).reduce((s,ex)=>s+(Array.isArray(ex.sets)?ex.sets:[]).reduce((u,set)=>u+((set.reps||0)*(set.weight||0)),0),0),0))}; sportCharts['volume']=new Chart(ctx,{type:'line',data:{labels,datasets:[{data,borderColor:'var(--accent)',backgroundColor:'transparent',tension:0.4,pointRadius:3,pointBackgroundColor:'var(--accent)'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:c.grid},ticks:{color:c.text,font:{size:10}}},y:{grid:{color:c.grid},ticks:{color:c.text,font:{size:10}},beginAtZero:true}}}}) }
 
     function renderTypesChart(p){ destroyChart('types'); const ctx=document.getElementById('chart-types'); if(!ctx) return; const now=new Date(); let filtered; if(p==='month'){const s=new Date(now.getFullYear(),now.getMonth(),1);filtered=workouts.filter(w=>new Date(w.date)>=s)}else{filtered=workouts.filter(w=>new Date(w.date).getFullYear()===now.getFullYear())}; const tc={};filtered.forEach(w=>{tc[w.type]=(tc[w.type]||0)+1}); const labels=Object.keys(tc),data=Object.values(tc); sportCharts['types']=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:PALETTE.slice(0,labels.length),borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:chartColors().text,padding:8,font:{size:10}}}}}}) }
 
@@ -3033,7 +3033,6 @@
 
     // ── INIT ──
     async function init() {
-      console.log('init started', profile)
       loadTheme()
       renderHeader()
       renderTabs()
@@ -3067,7 +3066,7 @@
       document.head.appendChild(s)
     }
 
-    init().catch(e => console.error('INIT ERROR:', e))
+    init()
   </script>
 </body>
 <!-- tdv -->
