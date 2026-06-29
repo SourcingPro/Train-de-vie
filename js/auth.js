@@ -4,7 +4,6 @@ function getCurrentProfile() {
     name: localStorage.getItem('tdv_profile_name')
   }
 }
-
 function logout() {
   localStorage.removeItem('tdv_profile_id')
   localStorage.removeItem('tdv_profile_name')
