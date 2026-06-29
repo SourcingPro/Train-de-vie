@@ -2997,41 +2997,42 @@
 
     function renderFreqChart(p){ destroyChart('freq'); const ctx=document.getElementById('chart-freq'); if(!ctx) return; const c=chartColors(); let labels,data; if(p==='month'){const ws=getMonthWeeks();labels=ws.map(w=>w.label);data=ws.map(w=>workouts.filter(x=>{const d=new Date(x.date);return d>=w.start&&d<=w.end}).length)}else{const ms=getYearMonths();labels=ms.map(m=>m.label);data=ms.map(m=>workouts.filter(x=>{const d=new Date(x.date);return d.getFullYear()===m.year&&d.getMonth()===m.month}).length)}; sportCharts['freq']=new Chart(ctx,{type:'bar',data:{labels,datasets:[{data,backgroundColor:'var(--accent)',borderRadius:5,borderSkipped:false}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:c.grid},ticks:{color:c.text,font:{size:10}}},y:{grid:{color:c.grid},ticks:{color:c.text,stepSize:1,font:{size:10}},beginAtZero:true}}}}) }
 
-    function calcVol(w) {
-      return (w.workout_exercises||[]).reduce(function(s,ex) {
-        return s + (Array.isArray(ex.sets)?ex.sets:[]).reduce(function(u,set) {
-          return u + ((set.reps||0)*(set.weight||0))
-        }, 0)
-      }, 0)
-    }
     function renderVolChart(p) {
       destroyChart('volume')
       const ctx = document.getElementById('chart-volume')
       if (!ctx) return
       const c = chartColors()
-      let labels, data
+      const labels = []
+      const data = []
+      function volForWorkouts(list) {
+        return Math.round(list.reduce(function(t, wk) {
+          return t + (wk.workout_exercises||[]).reduce(function(s, ex) {
+            return s + (Array.isArray(ex.sets)?ex.sets:[]).reduce(function(u, set) {
+              return u + ((set.reps||0) * (set.weight||0))
+            }, 0)
+          }, 0)
+        }, 0))
+      }
       if (p === 'month') {
-        const ws = getMonthWeeks()
-        labels = ws.map(function(w) { return w.label })
-        data = ws.map(function(w) {
-          return Math.round(workouts.filter(function(x) {
+        getMonthWeeks().forEach(function(w) {
+          labels.push(w.label)
+          data.push(volForWorkouts(workouts.filter(function(x) {
             const d = new Date(x.date)
             return d >= w.start && d <= w.end
-          }).reduce(function(t, wk) { return t + calcVol(wk) }, 0))
+          })))
         })
       } else {
-        const ms = getYearMonths()
-        labels = ms.map(function(m) { return m.label })
-        data = ms.map(function(m) {
-          return Math.round(workouts.filter(function(x) {
+        getYearMonths().forEach(function(m) {
+          labels.push(m.label)
+          data.push(volForWorkouts(workouts.filter(function(x) {
             const d = new Date(x.date)
             return d.getFullYear() === m.year && d.getMonth() === m.month
-          }).reduce(function(t, wk) { return t + calcVol(wk) }, 0))
+          })))
         })
       }
       sportCharts['volume'] = new Chart(ctx, {
         type: 'line',
-        data: { labels, datasets: [{ data, borderColor: 'var(--accent)', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, pointBackgroundColor: 'var(--accent)' }] },
+        data: { labels: labels, datasets: [{ data: data, borderColor: 'var(--accent)', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, pointBackgroundColor: 'var(--accent)' }] },
         options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } }, beginAtZero: true } } }
       })
     }
