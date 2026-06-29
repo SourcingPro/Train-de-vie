@@ -3033,6 +3033,7 @@
 
     // ── INIT ──
     async function init() {
+      console.log('init started', profile)
       loadTheme()
       renderHeader()
       renderTabs()
@@ -3066,7 +3067,7 @@
       document.head.appendChild(s)
     }
 
-    init()
+    init().catch(e => console.error('INIT ERROR:', e))
   </script>
 </body>
 <!-- tdv -->
