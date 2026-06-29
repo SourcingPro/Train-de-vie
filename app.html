@@ -935,8 +935,8 @@
     .muscle-tag { font-size:0.625rem;font-weight:600;padding:0.15rem 0.4rem;border-radius:100px;background:var(--surface-2);color:var(--text-secondary); }
 
     /* Mode séance live */
-    .session-live-overlay { position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity var(--transition); }
-    .session-live-overlay.open { opacity:1;pointer-events:all; }
+    .session-live-overlay { position:fixed;inset:0;background:var(--bg);z-index:200;display:none;flex-direction:column;opacity:0;pointer-events:none;transition:opacity var(--transition); }
+    .session-live-overlay.open { display:flex;opacity:1;pointer-events:all; }
     .session-header { padding:1rem 1.25rem;padding-top:calc(1rem + env(safe-area-inset-top,0px));border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:1rem; }
     .session-title { flex:1;font-size:1.125rem;font-weight:700; }
     .session-timer { font-size:1rem;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text-secondary); }
@@ -1442,8 +1442,6 @@
 
   </main>
 
-  </main>
-
   <nav class="tab-bar" id="tab-bar"></nav>
 
   <button class="fab" id="fab" aria-label="Ajouter">
@@ -1473,10 +1471,7 @@
         <label class="form-label">Couleur</label>
         <div class="color-picker" id="task-color-picker"></div>
       </div>
-      <div class="modal-actions" id="modal-task-actions">
-        <button class="btn-secondary" id="modal-task-cancel">Annuler</button>
-        <button class="btn-primary" id="modal-task-save">Créer</button>
-      </div>
+      <div class="modal-actions" id="modal-task-actions"></div>
     </div>
   </div>
 
@@ -1513,10 +1508,7 @@
         <label class="form-label">Notes</label>
         <input class="form-input" id="sport-notes-input" placeholder="Ressenti…" />
       </div>
-      <div class="modal-actions" id="modal-sport-actions">
-        <button class="btn-secondary" id="modal-sport-cancel">Annuler</button>
-        <button class="btn-primary" id="modal-sport-save">Enregistrer</button>
-      </div>
+      <div class="modal-actions" id="modal-sport-actions"></div>
     </div>
   </div>
 
@@ -1558,10 +1550,7 @@
         <input class="form-input" type="number" id="ex-default-sets" placeholder="3" min="1" max="20" />
       </div>
       <input type="hidden" id="ex-editing-id" />
-      <div class="modal-actions" id="modal-ex-actions">
-        <button class="btn-secondary" id="modal-ex-cancel">Annuler</button>
-        <button class="btn-primary" id="modal-ex-save">Enregistrer</button>
-      </div>
+      <div class="modal-actions" id="modal-ex-actions"></div>
     </div>
   </div>
 
@@ -1604,10 +1593,7 @@
         <button class="btn-add-exercise" id="btn-add-template-ex-free" style="margin-top:0.25rem;">+ Exercice libre</button>
       </div>
       <input type="hidden" id="template-editing-id" />
-      <div class="modal-actions" id="modal-template-actions">
-        <button class="btn-secondary" id="modal-template-cancel">Annuler</button>
-        <button class="btn-primary" id="modal-template-save">Enregistrer</button>
-      </div>
+      <div class="modal-actions" id="modal-template-actions"></div>
     </div>
   </div>
 
@@ -2026,11 +2012,6 @@
     document.getElementById('modal-task').addEventListener('click', e => {
       if (e.target === e.currentTarget) closeTaskModal()
     })
-    document.getElementById('fab').addEventListener('click', () => {
-      if (activeTab === 'tasks') openAddTask()
-      else if (activeTab === 'sport') openAddWorkout()
-    })
-
     // ── THEME PANEL ──
     const THEME_COLORS = ['#1A1814','#DC2626','#EA580C','#D97706','#16A34A','#0891B2','#7C3AED','#DB2777','#64748B','#0F172A']
     let selectedThemeColor = localStorage.getItem('tdv_theme_' + profile.id) || '#1A1814'
