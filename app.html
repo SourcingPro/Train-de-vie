@@ -804,7 +804,414 @@
       .stat-value { font-size: 1.25rem; }
     }
 
-    /* ── SPORT MODULE ── */
+    @media (max-width: 390px) {
+      .stats-row { grid-template-columns: repeat(3, 1fr); }
+      .stat-value { font-size: 1.25rem; }
+    }
+
+    /* ══════════════════════════════════════
+       SPORT MODULE — CSS COMPLET
+    ══════════════════════════════════════ */
+
+    /* Tabs internes sport */
+    .sport-tabs {
+      display: flex;
+      gap: 0;
+      margin: 0 1.25rem 1rem;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+    }
+    .sport-tab {
+      flex: 1;
+      padding: 0.5rem;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sport-tab.active {
+      background: var(--surface);
+      color: var(--text-primary);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .sport-view { display: none; }
+    .sport-view.active { display: block; }
+
+    /* Stats grid */
+    .sport-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.625rem;
+      margin: 0 1.25rem 0.75rem;
+    }
+    .sport-stat-card {
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-card);
+      padding: 1rem;
+    }
+    .sport-stat-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .sport-stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .sport-stat-sub { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.125rem; font-weight: 500; }
+
+    /* Graphiques */
+    .chart-card {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      margin: 0 1.25rem 0.75rem;
+      padding: 1.25rem;
+      overflow: hidden;
+    }
+    .chart-card canvas { width: 100% !important; }
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .chart-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .chart-period {
+      display: flex;
+      gap: 0.25rem;
+    }
+    .period-btn {
+      padding: 0.2rem 0.5rem;
+      border-radius: 100px;
+      border: 0.5px solid var(--border-strong);
+      background: transparent;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all var(--transition);
+    }
+    .period-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+    /* Muscle map */
+    .muscle-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+    .muscle-bar-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .muscle-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+    }
+    .muscle-bar-name { font-weight: 500; }
+    .muscle-bar-pct { color: var(--text-muted); }
+    .muscle-bar-track {
+      height: 6px;
+      background: var(--surface-2);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .muscle-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: var(--accent);
+      transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* Agenda / Calendrier */
+    .agenda-week {
+      margin: 0 1.25rem 0.75rem;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.375rem;
+    }
+    .agenda-day {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .agenda-day-label {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .agenda-day-cell {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 0.5px dashed var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.5625rem;
+      font-weight: 600;
+      text-align: center;
+      color: var(--text-muted);
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      padding: 2px;
+      line-height: 1.2;
+      overflow: hidden;
+    }
+    .agenda-day-cell.has-planned {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+      border-style: solid;
+    }
+    .agenda-day-cell.has-done {
+      background: #16A34A;
+      color: white;
+      border-color: #16A34A;
+      border-style: solid;
+    }
+    .agenda-day-cell.is-today {
+      border-color: var(--accent);
+      border-style: solid;
+      color: var(--accent);
+    }
+    .agenda-week-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 1.25rem 0.75rem;
+      padding: 0.5rem 0;
+    }
+    .agenda-week-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+    }
+    .btn-week-nav {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 0.5px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-week-nav svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
+    /* Séances types */
+    .template-card {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      margin: 0 1.25rem 0.625rem;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .template-badge {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .template-info { flex: 1; }
+    .template-name { font-size: 0.9375rem; font-weight: 600; }
+    .template-detail { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.125rem; }
+    .template-actions { display: flex; gap: 0.375rem; }
+
+    /* Mode séance en cours */
+    .session-live-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+    }
+    .session-live-overlay.open { opacity: 1; pointer-events: all; }
+    .session-header {
+      padding: 1rem 1.25rem;
+      padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+      border-bottom: 0.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .session-title { flex: 1; font-size: 1.125rem; font-weight: 700; }
+    .session-timer {
+      font-size: 1rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-secondary);
+    }
+    .session-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 0;
+    }
+    .session-footer {
+      padding: 1rem 1.25rem;
+      padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+      border-top: 0.5px solid var(--border);
+      display: flex;
+      gap: 0.625rem;
+    }
+    .session-view-toggle {
+      display: flex;
+      gap: 0;
+      margin: 0 1.25rem 1rem;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+    }
+    .session-view-btn {
+      flex: 1; padding: 0.5rem; border: none;
+      background: transparent; border-radius: 8px;
+      font-size: 0.8125rem; font-weight: 500; font-family: inherit;
+      cursor: pointer; color: var(--text-muted);
+      transition: all var(--transition);
+    }
+    .session-view-btn.active { background: var(--surface); color: var(--text-primary); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+    /* Vue liste séance */
+    .session-exercise-block {
+      margin: 0 1.25rem 1rem;
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+    .session-ex-header {
+      padding: 0.875rem 1.25rem;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      border-bottom: 0.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .session-ex-progress { font-size: 0.75rem; color: var(--text-muted); }
+    .session-set-row {
+      display: grid;
+      grid-template-columns: 28px 1fr 1fr 36px;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.625rem 1.25rem;
+      border-bottom: 0.5px solid var(--border);
+      transition: background var(--transition);
+    }
+    .session-set-row:last-child { border-bottom: none; }
+    .session-set-row.done { background: rgba(22,163,74,0.06); }
+    .session-set-num { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+    .session-set-input {
+      padding: 0.375rem 0.5rem;
+      border-radius: 6px;
+      border: 0.5px solid var(--border-strong);
+      background: var(--bg);
+      color: var(--text-primary);
+      font-size: 0.9375rem;
+      font-family: inherit;
+      text-align: center;
+      width: 100%;
+      font-variant-numeric: tabular-nums;
+    }
+    .session-set-input:focus { outline: none; border-color: var(--accent); }
+    .session-set-check {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-strong);
+      background: transparent;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .session-set-check.done { background: #16A34A; border-color: #16A34A; }
+    .session-set-check svg { width: 14px; height: 14px; fill: none; stroke: white; stroke-width: 2.5; stroke-linecap: round; opacity: 0; transition: opacity var(--transition); }
+    .session-set-check.done svg { opacity: 1; }
+
+    /* Vue focus */
+    .focus-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1.25rem;
+    }
+    .focus-ex-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .focus-ex-progress { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 2rem; }
+    .focus-set-display {
+      width: 100%;
+      max-width: 280px;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-float);
+      margin-bottom: 1.5rem;
+    }
+    .focus-set-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .focus-set-value { font-size: 3rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+    .focus-set-unit { font-size: 1rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .focus-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      width: 100%;
+      max-width: 280px;
+      margin-bottom: 1.5rem;
+    }
+    .focus-input-group { display: flex; flex-direction: column; gap: 0.375rem; }
+    .focus-input-label { font-size: 0.75rem; color: var(--text-muted); text-align: center; }
+    .focus-input {
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      border: 0.5px solid var(--border-strong);
+      background: var(--bg);
+      color: var(--text-primary);
+      font-size: 1.25rem;
+      font-weight: 600;
+      font-family: inherit;
+      text-align: center;
+      width: 100%;
+    }
+    .focus-input:focus { outline: none; border-color: var(--accent); }
+    .focus-nav {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      width: 100%;
+      max-width: 280px;
+    }
+
+    /* Workout card dans historique */
     .workout-card {
       background: var(--surface);
       border-radius: var(--radius-md);
@@ -812,7 +1219,6 @@
       margin: 0 1.25rem 0.75rem;
       overflow: hidden;
     }
-
     .workout-card-header {
       padding: 1rem 1.25rem;
       display: flex;
@@ -821,7 +1227,6 @@
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
     }
-
     .workout-type-badge {
       padding: 0.25rem 0.75rem;
       border-radius: 100px;
@@ -831,101 +1236,29 @@
       color: var(--bg);
       flex-shrink: 0;
     }
-
-    .workout-meta {
-      flex: 1;
-    }
-
-    .workout-date {
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-
-    .workout-duration {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 0.125rem;
-    }
-
-    .workout-expand-icon {
-      color: var(--text-muted);
-      transition: transform var(--transition);
-    }
-
+    .workout-meta { flex: 1; }
+    .workout-date { font-size: 0.875rem; font-weight: 600; }
+    .workout-duration { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.125rem; }
+    .workout-expand-icon { color: var(--text-muted); transition: transform var(--transition); }
     .workout-expand-icon.open { transform: rotate(180deg); }
-
-    .workout-expand-icon svg {
-      width: 16px;
-      height: 16px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-    }
-
-    .workout-exercises {
-      border-top: 0.5px solid var(--border);
-      padding: 0.875rem 1.25rem;
-      display: none;
-    }
-
-    .workout-exercises.open { display: block; }
-
-    .exercise-row {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.5rem 0;
-      border-bottom: 0.5px solid var(--border);
-    }
-
+    .workout-expand-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+    .workout-exercises-detail { border-top: 0.5px solid var(--border); padding: 0.875rem 1.25rem; display: none; }
+    .workout-exercises-detail.open { display: block; }
+    .exercise-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 0.5px solid var(--border); }
     .exercise-row:last-child { border-bottom: none; }
+    .exercise-name { flex: 1; font-size: 0.875rem; font-weight: 500; }
+    .exercise-sets { display: flex; gap: 0.375rem; flex-wrap: wrap; justify-content: flex-end; }
+    .set-pill { font-size: 0.6875rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 100px; background: var(--surface-2); color: var(--text-secondary); white-space: nowrap; }
+    .workout-notes-text { font-size: 0.8125rem; color: var(--text-muted); margin-top: 0.75rem; font-style: italic; }
+    .workout-card-actions { display: flex; gap: 0.5rem; margin-top: 0.875rem; padding-top: 0.875rem; border-top: 0.5px solid var(--border); }
 
-    .exercise-name {
-      flex: 1;
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-
-    .exercise-sets {
-      display: flex;
-      gap: 0.375rem;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .set-pill {
-      font-size: 0.6875rem;
-      font-weight: 600;
-      padding: 0.2rem 0.5rem;
-      border-radius: 100px;
-      background: var(--surface-2);
-      color: var(--text-secondary);
-      white-space: nowrap;
-    }
-
-    .workout-notes {
-      font-size: 0.8125rem;
-      color: var(--text-muted);
-      margin-top: 0.75rem;
-      font-style: italic;
-    }
-
-    .workout-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.875rem;
-      padding-top: 0.875rem;
-      border-top: 0.5px solid var(--border);
-    }
-
+    /* Modal séance type */
     .sport-type-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 0.5rem;
       margin-bottom: 1rem;
     }
-
     .sport-type-btn {
       padding: 0.625rem 0.5rem;
       border-radius: var(--radius-sm);
@@ -940,145 +1273,18 @@
       transition: all var(--transition);
       -webkit-tap-highlight-color: transparent;
     }
-
-    .sport-type-btn.selected {
-      background: var(--accent);
-      color: var(--bg);
-      border-color: var(--accent);
-    }
-
-    .exercise-builder {
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      margin-bottom: 0.75rem;
-    }
-
-    .exercise-builder-header {
-      display: flex;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      background: var(--surface-2);
-      gap: 0.5rem;
-    }
-
-    .exercise-builder-name {
-      flex: 1;
-      font-size: 0.9375rem;
-      font-weight: 500;
-    }
-
-    .sets-list {
-      padding: 0.5rem 1rem;
-    }
-
-    .set-row {
-      display: grid;
-      grid-template-columns: auto 1fr 1fr auto;
-      gap: 0.5rem;
-      align-items: center;
-      padding: 0.375rem 0;
-      border-bottom: 0.5px solid var(--border);
-    }
-
+    .sport-type-btn.selected { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .exercise-builder { border: 0.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 0.75rem; }
+    .exercise-builder-header { display: flex; align-items: center; padding: 0.75rem 1rem; background: var(--surface-2); gap: 0.5rem; }
+    .sets-list { padding: 0.5rem 1rem; }
+    .set-row { display: grid; grid-template-columns: auto 1fr 1fr auto; gap: 0.5rem; align-items: center; padding: 0.375rem 0; border-bottom: 0.5px solid var(--border); }
     .set-row:last-child { border-bottom: none; }
-
-    .set-num {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-weight: 600;
-      min-width: 20px;
-    }
-
-    .set-input {
-      padding: 0.375rem 0.5rem;
-      border-radius: 6px;
-      border: 0.5px solid var(--border-strong);
-      background: var(--bg);
-      color: var(--text-primary);
-      font-size: 0.875rem;
-      font-family: inherit;
-      text-align: center;
-      width: 100%;
-    }
-
+    .set-num { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; min-width: 20px; }
+    .set-input { padding: 0.375rem 0.5rem; border-radius: 6px; border: 0.5px solid var(--border-strong); background: var(--bg); color: var(--text-primary); font-size: 0.875rem; font-family: inherit; text-align: center; width: 100%; }
     .set-input:focus { outline: none; border-color: var(--accent); }
-
-    .btn-remove-set {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      line-height: 1;
-    }
-
-    .btn-add-set {
-      width: 100%;
-      padding: 0.5rem;
-      border: none;
-      background: transparent;
-      color: var(--text-accent, var(--accent));
-      font-size: 0.8125rem;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      text-align: left;
-      padding: 0.625rem 1rem;
-    }
-
-    .btn-add-exercise {
-      width: 100%;
-      padding: 0.75rem;
-      border-radius: var(--radius-sm);
-      border: 0.5px dashed var(--border-strong);
-      background: transparent;
-      color: var(--text-secondary);
-      font-size: 0.9375rem;
-      font-family: inherit;
-      cursor: pointer;
-      margin-bottom: 1rem;
-    }
-
-    .sport-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.625rem;
-      margin: 0 1.25rem 0.75rem;
-    }
-
-    .sport-stat-card {
-      background: var(--surface);
-      border-radius: var(--radius-sm);
-      box-shadow: var(--shadow-card);
-      padding: 1rem;
-    }
-
-    .sport-stat-value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1;
-    }
-
-    .sport-stat-label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 0.25rem;
-    }
-
-    .sport-stat-sub {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      margin-top: 0.25rem;
-      font-weight: 500;
-    }
+    .btn-remove-set { width: 24px; height: 24px; border-radius: 50%; border: none; background: transparent; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; line-height: 1; }
+    .btn-add-set { width: 100%; padding: 0.625rem 1rem; border: none; background: transparent; color: var(--accent); font-size: 0.8125rem; font-weight: 600; font-family: inherit; cursor: pointer; text-align: left; }
+    .btn-add-exercise { width: 100%; padding: 0.75rem; border-radius: var(--radius-sm); border: 0.5px dashed var(--border-strong); background: transparent; color: var(--text-secondary); font-size: 0.9375rem; font-family: inherit; cursor: pointer; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
@@ -1154,34 +1360,143 @@
         <div class="page-title">Sport</div>
         <div class="page-subtitle" id="sport-subtitle">Chargement…</div>
       </div>
-      <div class="sport-stats-grid">
-        <div class="sport-stat-card">
-          <div class="sport-stat-value" id="sport-stat-total">0</div>
-          <div class="sport-stat-label">Séances total</div>
-          <div class="sport-stat-sub" id="sport-stat-month">ce mois</div>
+
+      <!-- Tabs internes -->
+      <div class="sport-tabs">
+        <button class="sport-tab active" data-sport-tab="agenda">Agenda</button>
+        <button class="sport-tab" data-sport-tab="historique">Historique</button>
+        <button class="sport-tab" data-sport-tab="templates">Programmes</button>
+        <button class="sport-tab" data-sport-tab="stats">Stats</button>
+      </div>
+
+      <!-- VUE AGENDA -->
+      <div class="sport-view active" id="sport-view-agenda">
+        <div class="agenda-week-nav">
+          <button class="btn-week-nav" id="btn-week-prev"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <span class="agenda-week-title" id="agenda-week-title"></span>
+          <button class="btn-week-nav" id="btn-week-next"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
         </div>
-        <div class="sport-stat-card">
-          <div class="sport-stat-value" id="sport-stat-week">0</div>
-          <div class="sport-stat-label">Cette semaine</div>
-          <div class="sport-stat-sub" id="sport-stat-best-type">—</div>
-        </div>
-        <div class="sport-stat-card">
-          <div class="sport-stat-value" id="sport-stat-duration">0</div>
-          <div class="sport-stat-label">Minutes ce mois</div>
-          <div class="sport-stat-sub">durée totale</div>
-        </div>
-        <div class="sport-stat-card">
-          <div class="sport-stat-value" id="sport-stat-streak">0</div>
-          <div class="sport-stat-label">Jours actifs</div>
-          <div class="sport-stat-sub">sur 30 jours</div>
+        <div class="agenda-week" id="agenda-week-grid"></div>
+        <div class="card" style="margin-top:0.75rem;">
+          <div class="card-title" id="agenda-day-label">Aujourd'hui</div>
+          <div id="agenda-day-detail"></div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title">Séances récentes</div>
-        <div id="workouts-list"></div>
+
+      <!-- VUE HISTORIQUE -->
+      <div class="sport-view" id="sport-view-historique">
+        <div class="sport-stats-grid">
+          <div class="sport-stat-card">
+            <div class="sport-stat-value" id="sport-stat-total">0</div>
+            <div class="sport-stat-label">Séances ce mois</div>
+            <div class="sport-stat-sub" id="sport-stat-best-type">—</div>
+          </div>
+          <div class="sport-stat-card">
+            <div class="sport-stat-value" id="sport-stat-week">0</div>
+            <div class="sport-stat-label">Cette semaine</div>
+            <div class="sport-stat-sub">séances</div>
+          </div>
+          <div class="sport-stat-card">
+            <div class="sport-stat-value" id="sport-stat-duration">0</div>
+            <div class="sport-stat-label">Minutes ce mois</div>
+            <div class="sport-stat-sub">durée totale</div>
+          </div>
+          <div class="sport-stat-card">
+            <div class="sport-stat-value" id="sport-stat-streak">0</div>
+            <div class="sport-stat-label">Jours actifs</div>
+            <div class="sport-stat-sub">sur 30 jours</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Séances récentes</div>
+          <div id="workouts-list"></div>
+        </div>
+      </div>
+
+      <!-- VUE PROGRAMMES -->
+      <div class="sport-view" id="sport-view-templates">
+        <div style="padding:0 1.25rem 0.75rem;display:flex;justify-content:flex-end;">
+          <button class="btn-primary" style="padding:0.5rem 1rem;border-radius:var(--radius-sm);font-size:0.875rem;" id="btn-new-template">+ Nouveau programme</button>
+        </div>
+        <div id="templates-list"></div>
+      </div>
+
+      <!-- VUE STATS -->
+      <div class="sport-view" id="sport-view-stats">
+        <!-- Fréquence -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">Fréquence des séances</span>
+            <div class="chart-period">
+              <button class="period-btn active" data-chart="freq" data-period="month">Mois</button>
+              <button class="period-btn" data-chart="freq" data-period="year">Année</button>
+            </div>
+          </div>
+          <canvas id="chart-freq" height="160"></canvas>
+        </div>
+
+        <!-- Volume total -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">Volume total (kg)</span>
+            <div class="chart-period">
+              <button class="period-btn active" data-chart="volume" data-period="month">Mois</button>
+              <button class="period-btn" data-chart="volume" data-period="year">Année</button>
+            </div>
+          </div>
+          <canvas id="chart-volume" height="160"></canvas>
+        </div>
+
+        <!-- Répartition types -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">Répartition des séances</span>
+            <div class="chart-period">
+              <button class="period-btn active" data-chart="types" data-period="month">Mois</button>
+              <button class="period-btn" data-chart="types" data-period="year">Année</button>
+            </div>
+          </div>
+          <canvas id="chart-types" height="200"></canvas>
+        </div>
+
+        <!-- Durée moyenne -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">Durée moyenne (min)</span>
+            <div class="chart-period">
+              <button class="period-btn active" data-chart="duration" data-period="month">Mois</button>
+              <button class="period-btn" data-chart="duration" data-period="year">Année</button>
+            </div>
+          </div>
+          <canvas id="chart-duration" height="160"></canvas>
+        </div>
+
+        <!-- Progression poids par exercice -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">Progression par exercice</span>
+          </div>
+          <div class="form-group">
+            <select class="form-select" id="chart-exercise-select">
+              <option value="">Choisir un exercice…</option>
+            </select>
+          </div>
+          <canvas id="chart-progress" height="160"></canvas>
+        </div>
+
+        <!-- Muscles travaillés -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">Muscles travaillés</span>
+            <div class="chart-period">
+              <button class="period-btn active" data-chart="muscles" data-period="week">Semaine</button>
+              <button class="period-btn" data-chart="muscles" data-period="month">Mois</button>
+            </div>
+          </div>
+          <div class="muscle-grid" id="muscle-grid"></div>
+        </div>
       </div>
     </div>
-    <div class="module" id="module-reading">
       <div class="coming-soon"><div class="coming-soon-icon">📚</div><h2>Lecture & Médias</h2><p>Livres, podcasts, vidéos<br/>et livres audio.</p></div>
     </div>
     <div class="module" id="module-plants">
@@ -1256,6 +1571,51 @@
   </div>
 
   <!-- MODAL SÉANCE SPORT -->
+
+  </main>
+
+  <!-- TAB BAR -->
+  <nav class="tab-bar" id="tab-bar"></nav>
+
+  <!-- FAB -->
+  <button class="fab" id="fab" aria-label="Ajouter">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+
+  <!-- MODAL TÂCHE -->
+  <div class="modal-overlay" id="modal-task">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-task-title">Nouvelle tâche</div>
+        <button class="modal-close" id="modal-task-close">
+          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nom de la tâche</label>
+        <input class="form-input" id="task-name-input" placeholder="Ex : Méditer, Lire, Sport…" maxlength="60" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fréquence</label>
+        <select class="form-select" id="task-freq-input">
+          <option value="daily">Tous les jours</option>
+          <option value="weekly">Hebdomadaire</option>
+          <option value="monthly">Mensuel</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Couleur</label>
+        <div class="color-picker" id="task-color-picker"></div>
+      </div>
+      <input type="hidden" id="task-editing-id" />
+      <div class="modal-actions" id="modal-task-actions">
+        <button class="btn-secondary" id="modal-task-cancel">Annuler</button>
+        <button class="btn-primary" id="modal-task-save">Créer la tâche</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL SÉANCE (nouvelle/édition) -->
   <div class="modal-overlay" id="modal-sport">
     <div class="modal" style="max-height:90dvh;overflow-y:auto;">
       <div class="modal-header">
@@ -1269,7 +1629,13 @@
         <input class="form-input" type="date" id="sport-date-input" />
       </div>
       <div class="form-group">
-        <label class="form-label">Type de séance</label>
+        <label class="form-label">Programme de base (optionnel)</label>
+        <select class="form-select" id="sport-template-select">
+          <option value="">Aucun (séance libre)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
         <div class="sport-type-grid" id="sport-type-grid"></div>
       </div>
       <div class="form-group">
@@ -1290,6 +1656,74 @@
         <button class="btn-secondary" id="modal-sport-cancel">Annuler</button>
         <button class="btn-primary" id="modal-sport-save">Enregistrer</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL PROGRAMME TYPE -->
+  <div class="modal-overlay" id="modal-template">
+    <div class="modal" style="max-height:90dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-template-title">Nouveau programme</div>
+        <button class="modal-close" id="modal-template-close">
+          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nom du programme</label>
+        <input class="form-input" id="template-name-input" placeholder="Ex : Push, Pull, Jambes…" maxlength="40" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <div class="sport-type-grid" id="template-type-grid"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Emoji</label>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;" id="template-emoji-picker">
+          <span style="cursor:pointer;font-size:1.5rem;padding:4px;" data-emoji="💪">💪</span>
+          <span style="cursor:pointer;font-size:1.5rem;padding:4px;" data-emoji="🏋️">🏋️</span>
+          <span style="cursor:pointer;font-size:1.5rem;padding:4px;" data-emoji="🦵">🦵</span>
+          <span style="cursor:pointer;font-size:1.5rem;padding:4px;" data-emoji="🏃">🏃</span>
+          <span style="cursor:pointer;font-size:1.5rem;padding:4px;" data-emoji="🚴">🚴</span>
+          <span style="cursor:pointer;font-size:1.5rem;padding:4px;" data-emoji="🧘">🧘</span>
+          <span style="cursor:pointer;font-size:1.5rem;padding:4px;" data-emoji="🥊">🥊</span>
+          <span style="cursor:pointer;font-size:1.5rem;padding:4px;" data-emoji="🏊">🏊</span>
+          <span style="cursor:pointer;font-size:1.5rem;padding:4px;" data-emoji="⚡">⚡</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Exercices par défaut</label>
+        <div id="template-exercises-builder"></div>
+        <button class="btn-add-exercise" id="btn-add-template-exercise">+ Ajouter un exercice</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Muscles ciblés</label>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;" id="template-muscles-picker"></div>
+      </div>
+      <input type="hidden" id="template-editing-id" />
+      <div class="modal-actions" id="modal-template-actions">
+        <button class="btn-secondary" id="modal-template-cancel">Annuler</button>
+        <button class="btn-primary" id="modal-template-save">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODE SÉANCE EN COURS -->
+  <div class="session-live-overlay" id="session-live">
+    <div class="session-header">
+      <button class="btn-icon" id="session-close-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="session-title" id="session-live-title"></div>
+      <div class="session-timer" id="session-timer">0:00</div>
+    </div>
+    <div class="session-view-toggle">
+      <button class="session-view-btn active" id="btn-session-list">Liste</button>
+      <button class="session-view-btn" id="btn-session-focus">Focus</button>
+    </div>
+    <div class="session-body" id="session-body"></div>
+    <div class="session-footer">
+      <button class="btn-secondary" style="flex:1;" id="session-cancel-btn">Annuler</button>
+      <button class="btn-primary" style="flex:2;" id="session-finish-btn">Terminer la séance</button>
     </div>
   </div>
 
@@ -1315,7 +1749,6 @@
 
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
-
   <script>
     const SUPABASE_URL = 'https://dfvkklbeudhuqopdliyj.supabase.co'
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmdmtrbGJldWRodXFvcGRsaXlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MzUwOTUsImV4cCI6MjA5ODMxMTA5NX0.nLtbF1WddqmeIHE38Ow6Np7Lj-4ypoBZsmIMu8tSjfE'
@@ -1730,26 +2163,103 @@
       showToast('Thème enregistré')
     })
 
-    // ── SPORT MODULE ──
-    const SPORT_TYPES = ['Musculation','Cardio','Yoga','Running','Vélo','Natation','HIIT','Crossfit','Marche','Escalade','Tennis','Autre']
-    let workouts = []
-    let sportExercises = []
-    let selectedSportType = 'Musculation'
-    let editingSportId = null
 
-    function toDateStrLocal(d) {
-      return d.toISOString().split('T')[0]
+    // ══════════════════════════════════════
+    // SPORT MODULE — JS COMPLET
+    // ══════════════════════════════════════
+
+    const SPORT_TYPES = ['Musculation','Cardio','Yoga','Running','Vélo','Natation','HIIT','Crossfit','Marche','Escalade','Tennis','Autre']
+    const MUSCLE_GROUPS = ['Pectoraux','Dos','Épaules','Biceps','Triceps','Jambes','Abdos','Fessiers','Mollets','Full Body']
+    const MUSCLE_TYPE_MAP = {
+      'Musculation': ['Pectoraux','Dos','Épaules','Biceps','Triceps','Jambes'],
+      'Cardio': ['Full Body','Mollets','Jambes'],
+      'HIIT': ['Full Body','Abdos'],
+      'Yoga': ['Full Body'],
+      'Running': ['Jambes','Mollets'],
+      'Crossfit': ['Full Body','Épaules'],
+      'Natation': ['Dos','Épaules','Full Body'],
     }
 
+    let workouts = []
+    let sportTemplates = []
+    let sportExercises = []
+    let templateExercises = []
+    let selectedSportType = 'Musculation'
+    let selectedTemplateType = 'Musculation'
+    let selectedTemplateEmoji = '💪'
+    let selectedTemplateMuscles = []
+    let editingSportId = null
+    let editingTemplateId = null
+    let agendaWeekOffset = 0
+    let agendaSelectedDate = toDateStr(new Date())
+    let sportCharts = {}
+    let freqPeriod = 'month', volumePeriod = 'month', typesPeriod = 'month', durationPeriod = 'month', musclesPeriod = 'week'
+    let sessionActive = false
+    let sessionStartTime = null
+    let sessionTimerInterval = null
+    let sessionData = { workoutId: null, title: '', exercises: [] }
+    let sessionViewMode = 'list'
+    let focusExIdx = 0, focusSetIdx = 0
+
+    // ── Chargement données sport ──
     async function loadWorkouts() {
       const { data } = await db.from('workouts')
         .select('*, workout_exercises(*)')
         .eq('profile_id', profile.id)
         .order('date', { ascending: false })
-        .limit(50)
+        .limit(100)
       workouts = data || []
     }
 
+    async function loadSportTemplates() {
+      const key = 'tdv_sport_templates_' + profile.id
+      const saved = localStorage.getItem(key)
+      if (saved) { sportTemplates = JSON.parse(saved); return }
+      sportTemplates = []
+    }
+
+    function saveSportTemplates() {
+      localStorage.setItem('tdv_sport_templates_' + profile.id, JSON.stringify(sportTemplates))
+    }
+
+    // ── Tabs internes sport ──
+    function initSportTabs() {
+      document.querySelectorAll('[data-sport-tab]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tab = btn.dataset.sportTab
+          document.querySelectorAll('[data-sport-tab]').forEach(b => b.classList.remove('active'))
+          btn.classList.add('active')
+          document.querySelectorAll('.sport-view').forEach(v => v.classList.remove('active'))
+          document.getElementById('sport-view-' + tab).classList.add('active')
+          if (tab === 'stats') { setTimeout(renderAllCharts, 100) }
+          if (tab === 'agenda') renderAgenda()
+          if (tab === 'templates') renderTemplatesList()
+        })
+      })
+    }
+
+    // ── Stats rapides historique ──
+    function updateSportStats() {
+      const now = new Date()
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+      const weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay())
+      const thisMonth = workouts.filter(w => new Date(w.date) >= monthStart)
+      const thisWeek = workouts.filter(w => new Date(w.date) >= weekStart)
+      document.getElementById('sport-stat-total').textContent = thisMonth.length
+      document.getElementById('sport-stat-week').textContent = thisWeek.length
+      document.getElementById('sport-stat-duration').textContent = thisMonth.reduce((s, w) => s + (w.duration_minutes || 0), 0)
+      const activeDays = new Set(workouts.filter(w => (now - new Date(w.date)) / 86400000 <= 30).map(w => w.date))
+      document.getElementById('sport-stat-streak').textContent = activeDays.size
+      if (workouts.length > 0) {
+        const typeCounts = {}
+        workouts.forEach(w => { typeCounts[w.type] = (typeCounts[w.type] || 0) + 1 })
+        const best = Object.entries(typeCounts).sort((a,b) => b[1]-a[1])[0]
+        document.getElementById('sport-stat-best-type').textContent = best ? '+ fréquent : ' + best[0] : '—'
+      }
+      document.getElementById('sport-subtitle').textContent = workouts.length + ' séance' + (workouts.length > 1 ? 's' : '') + ' enregistrée' + (workouts.length > 1 ? 's' : '')
+    }
+
+    // ── Historique séances ──
     function renderWorkoutsList() {
       const list = document.getElementById('workouts-list')
       if (!list) return
@@ -1758,78 +2268,543 @@
         return
       }
       list.innerHTML = ''
-      workouts.forEach(w => {
+      workouts.slice(0, 20).forEach(w => {
         const exs = w.workout_exercises || []
-        const card = document.createElement('div')
-        card.className = 'workout-card'
         const dateObj = new Date(w.date + 'T12:00:00')
         const dateStr = dateObj.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })
+        const vol = exs.reduce((total, ex) => {
+          const sets = Array.isArray(ex.sets) ? ex.sets : []
+          return total + sets.reduce((s, set) => s + ((set.reps || 0) * (set.weight || 0)), 0)
+        }, 0)
+        const card = document.createElement('div')
+        card.className = 'workout-card'
         card.innerHTML = `
           <div class="workout-card-header">
             <span class="workout-type-badge">${w.type}</span>
             <div class="workout-meta">
               <div class="workout-date">${dateStr}</div>
-              <div class="workout-duration">${w.duration_minutes ? w.duration_minutes + ' min' : ''}${exs.length ? ' · ' + exs.length + ' exercice' + (exs.length > 1 ? 's' : '') : ''}</div>
+              <div class="workout-duration">${w.duration_minutes ? w.duration_minutes + ' min' : ''}${exs.length ? ' · ' + exs.length + ' ex.' : ''}${vol ? ' · ' + Math.round(vol) + ' kg' : ''}</div>
             </div>
             <div class="workout-expand-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>
           </div>
-          <div class="workout-exercises">
+          <div class="workout-exercises-detail">
             ${exs.map(ex => {
-              const sets = Array.isArray(ex.sets) ? ex.sets : (ex.sets ? JSON.parse(ex.sets) : [])
+              const sets = Array.isArray(ex.sets) ? ex.sets : []
               return `<div class="exercise-row">
                 <div class="exercise-name">${ex.name}</div>
-                <div class="exercise-sets">${sets.map(s => `<span class="set-pill">${s.reps ? s.reps + ' reps' : ''}${s.reps && s.weight ? ' · ' : ''}${s.weight ? s.weight + ' kg' : ''}</span>`).join('')}</div>
+                <div class="exercise-sets">${sets.map(s => `<span class="set-pill">${s.reps ? s.reps + 'r' : ''}${s.reps && s.weight ? '·' : ''}${s.weight ? s.weight + 'kg' : ''}</span>`).join('')}</div>
               </div>`
             }).join('')}
-            ${w.notes ? `<div class="workout-notes">${w.notes}</div>` : ''}
-            <div class="workout-actions">
+            ${w.notes ? `<div class="workout-notes-text">${w.notes}</div>` : ''}
+            <div class="workout-card-actions">
               <button class="btn-secondary" style="flex:1;font-size:0.8125rem;" onclick="openEditWorkout('${w.id}')">Modifier</button>
               <button class="btn-danger" style="font-size:0.8125rem;" onclick="deleteWorkout('${w.id}')">Supprimer</button>
             </div>
           </div>
         `
         const header = card.querySelector('.workout-card-header')
-        const body = card.querySelector('.workout-exercises')
+        const body = card.querySelector('.workout-exercises-detail')
         const icon = card.querySelector('.workout-expand-icon')
-        header.addEventListener('click', () => {
-          body.classList.toggle('open')
-          icon.classList.toggle('open')
-        })
+        header.addEventListener('click', () => { body.classList.toggle('open'); icon.classList.toggle('open') })
         list.appendChild(card)
       })
     }
 
-    function updateSportStats() {
+    // ── AGENDA ──
+    function renderAgenda() {
       const now = new Date()
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
       const weekStart = new Date(now)
-      weekStart.setDate(now.getDate() - now.getDay())
-
-      const thisMonth = workouts.filter(w => new Date(w.date) >= monthStart)
-      const thisWeek = workouts.filter(w => new Date(w.date) >= weekStart)
-
-      document.getElementById('sport-stat-total').textContent = thisMonth.length
-      document.getElementById('sport-stat-week').textContent = thisWeek.length
-      document.getElementById('sport-stat-duration').textContent = thisMonth.reduce((s, w) => s + (w.duration_minutes || 0), 0)
-
-      const activeDays = new Set()
-      workouts.filter(w => {
-        const d = new Date(w.date)
-        return (now - d) / 86400000 <= 30
-      }).forEach(w => activeDays.add(w.date))
-      document.getElementById('sport-stat-streak').textContent = activeDays.size
-
-      if (workouts.length > 0) {
-        const typeCounts = {}
-        workouts.forEach(w => { typeCounts[w.type] = (typeCounts[w.type] || 0) + 1 })
-        const best = Object.entries(typeCounts).sort((a,b) => b[1]-a[1])[0]
-        document.getElementById('sport-stat-best-type').textContent = best ? best[0] : '—'
+      weekStart.setDate(now.getDate() - now.getDay() + (agendaWeekOffset * 7))
+      const days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
+      const grid = document.getElementById('agenda-week-grid')
+      const title = document.getElementById('agenda-week-title')
+      if (!grid) return
+      const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6)
+      title.textContent = weekStart.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' — ' + weekEnd.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      grid.innerHTML = ''
+      const planned = JSON.parse(localStorage.getItem('tdv_sport_planned_' + profile.id) || '{}')
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(weekStart); d.setDate(weekStart.getDate() + i)
+        const str = toDateStr(d)
+        const isToday = str === toDateStr(new Date())
+        const hasWorkout = workouts.some(w => w.date === str)
+        const hasPlanned = planned[str]
+        const col = document.createElement('div')
+        col.className = 'agenda-day'
+        const label = days[d.getDay()]
+        let cellClass = 'agenda-day-cell'
+        if (hasWorkout) cellClass += ' has-done'
+        else if (hasPlanned) cellClass += ' has-planned'
+        else if (isToday) cellClass += ' is-today'
+        const cellText = hasWorkout ? (workouts.find(w => w.date === str)?.type?.slice(0,4) || '✓') : (hasPlanned ? (hasPlanned.slice(0,4)) : (isToday ? 'Auj.' : d.getDate()))
+        col.innerHTML = `<div class="agenda-day-label">${label}</div><div class="${cellClass}" data-date="${str}">${cellText}</div>`
+        col.querySelector('.agenda-day-cell').addEventListener('click', () => {
+          agendaSelectedDate = str
+          renderAgendaDayDetail()
+        })
+        grid.appendChild(col)
       }
-
-      document.getElementById('sport-subtitle').textContent =
-        workouts.length + ' séance' + (workouts.length > 1 ? 's' : '') + ' enregistrée' + (workouts.length > 1 ? 's' : '')
+      renderAgendaDayDetail()
     }
 
+    function renderAgendaDayDetail() {
+      const label = document.getElementById('agenda-day-label')
+      const detail = document.getElementById('agenda-day-detail')
+      if (!label || !detail) return
+      const d = new Date(agendaSelectedDate + 'T12:00:00')
+      const isToday = agendaSelectedDate === toDateStr(new Date())
+      label.textContent = isToday ? 'Aujourd\'hui' : d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+      const dayWorkouts = workouts.filter(w => w.date === agendaSelectedDate)
+      const planned = JSON.parse(localStorage.getItem('tdv_sport_planned_' + profile.id) || '{}')
+      const plannedSession = planned[agendaSelectedDate]
+      let html = ''
+      if (dayWorkouts.length > 0) {
+        dayWorkouts.forEach(w => {
+          const exs = w.workout_exercises || []
+          html += `<div style="padding:0.5rem 0;border-bottom:0.5px solid var(--border);">
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">
+              <span class="workout-type-badge" style="background:#16A34A;">${w.type}</span>
+              <span style="font-size:0.8125rem;color:var(--text-muted);">${w.duration_minutes ? w.duration_minutes + ' min' : ''}</span>
+              <button onclick="startLiveSession('${w.id}')" style="margin-left:auto;padding:0.375rem 0.75rem;border-radius:var(--radius-sm);border:0.5px solid var(--border-strong);background:transparent;font-size:0.75rem;font-family:inherit;cursor:pointer;color:var(--text-secondary);">Reprendre</button>
+            </div>
+            ${exs.map(ex => `<div style="font-size:0.8125rem;padding:0.2rem 0;color:var(--text-secondary);">· ${ex.name}</div>`).join('')}
+          </div>`
+        })
+      } else if (plannedSession) {
+        html += `<div style="padding:0.75rem 0;">
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">
+            <span class="workout-type-badge">${plannedSession}</span>
+            <span style="font-size:0.8125rem;color:var(--text-muted);">Planifiée</span>
+            <button onclick="startPlannedSession('${agendaSelectedDate}','${plannedSession}')" style="margin-left:auto;padding:0.375rem 0.75rem;border-radius:var(--radius-sm);border:none;background:var(--accent);color:var(--bg);font-size:0.75rem;font-family:inherit;cursor:pointer;font-weight:600;">Démarrer</button>
+          </div>
+        </div>`
+      } else {
+        html = `<div style="padding:0.75rem 0;display:flex;gap:0.625rem;">
+          <button onclick="openAddWorkout('${agendaSelectedDate}')" style="flex:1;padding:0.625rem;border-radius:var(--radius-sm);border:0.5px solid var(--border-strong);background:transparent;font-size:0.875rem;font-family:inherit;cursor:pointer;color:var(--text-secondary);">+ Séance libre</button>
+          <button onclick="openPlanSession('${agendaSelectedDate}')" style="flex:1;padding:0.625rem;border-radius:var(--radius-sm);border:0.5px solid var(--border-strong);background:transparent;font-size:0.875rem;font-family:inherit;cursor:pointer;color:var(--text-secondary);">📅 Planifier</button>
+        </div>`
+      }
+      detail.innerHTML = html
+    }
+
+    window.openPlanSession = function(date) {
+      const type = prompt('Quel type de séance planifier ?\n' + SPORT_TYPES.join(', '))
+      if (!type) return
+      const planned = JSON.parse(localStorage.getItem('tdv_sport_planned_' + profile.id) || '{}')
+      planned[date] = type
+      localStorage.setItem('tdv_sport_planned_' + profile.id, JSON.stringify(planned))
+      renderAgenda()
+      showToast('Séance planifiée')
+    }
+
+    document.getElementById('btn-week-prev').addEventListener('click', () => { agendaWeekOffset--; renderAgenda() })
+    document.getElementById('btn-week-next').addEventListener('click', () => { agendaWeekOffset++; renderAgenda() })
+
+    // ── MODE SÉANCE EN COURS ──
+    window.startLiveSession = function(workoutId) {
+      const w = workouts.find(x => x.id === workoutId)
+      if (!w) return
+      sessionData = {
+        workoutId,
+        title: w.type,
+        exercises: (w.workout_exercises || []).map(ex => ({
+          name: ex.name,
+          sets: (Array.isArray(ex.sets) ? ex.sets : []).map(s => ({ ...s, done: false, reps: s.reps || '', weight: s.weight || '' }))
+        }))
+      }
+      openLiveSession()
+    }
+
+    window.startPlannedSession = function(date, type) {
+      const tmpl = sportTemplates.find(t => t.type === type)
+      sessionData = {
+        workoutId: null,
+        title: type,
+        date,
+        exercises: tmpl ? tmpl.exercises.map(ex => ({
+          name: ex.name,
+          sets: (ex.sets || [{ reps: '', weight: '' }]).map(s => ({ ...s, done: false }))
+        })) : []
+      }
+      openLiveSession()
+    }
+
+    function openLiveSession() {
+      sessionActive = true
+      sessionStartTime = Date.now()
+      focusExIdx = 0; focusSetIdx = 0
+      document.getElementById('session-live-title').textContent = sessionData.title
+      document.getElementById('session-live').classList.add('open')
+      sessionViewMode = 'list'
+      document.getElementById('btn-session-list').classList.add('active')
+      document.getElementById('btn-session-focus').classList.remove('active')
+      renderSessionBody()
+      sessionTimerInterval = setInterval(updateSessionTimer, 1000)
+    }
+
+    function updateSessionTimer() {
+      if (!sessionStartTime) return
+      const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000)
+      const m = Math.floor(elapsed / 60), s = elapsed % 60
+      document.getElementById('session-timer').textContent = m + ':' + String(s).padStart(2, '0')
+    }
+
+    function renderSessionBody() {
+      const body = document.getElementById('session-body')
+      if (!body) return
+      if (sessionViewMode === 'list') {
+        body.innerHTML = ''
+        if (sessionData.exercises.length === 0) {
+          body.innerHTML = `<div style="padding:2rem;text-align:center;color:var(--text-muted);">Aucun exercice.<br/><button onclick="addSessionExercise()" style="margin-top:1rem;padding:0.5rem 1rem;border-radius:var(--radius-sm);border:0.5px dashed var(--border-strong);background:transparent;cursor:pointer;font-family:inherit;color:var(--text-secondary);">+ Ajouter un exercice</button></div>`
+          return
+        }
+        sessionData.exercises.forEach((ex, exIdx) => {
+          const block = document.createElement('div')
+          block.className = 'session-exercise-block'
+          const doneSets = ex.sets.filter(s => s.done).length
+          block.innerHTML = `
+            <div class="session-ex-header">
+              <span>${ex.name}</span>
+              <span class="session-ex-progress">${doneSets}/${ex.sets.length} séries</span>
+            </div>
+            ${ex.sets.map((set, setIdx) => `
+              <div class="session-set-row${set.done ? ' done' : ''}" id="set-${exIdx}-${setIdx}">
+                <span class="session-set-num">${setIdx + 1}</span>
+                <input class="session-set-input" type="number" value="${set.reps || ''}" placeholder="Reps" min="0" onchange="updateSessionSet(${exIdx},${setIdx},'reps',this.value)" />
+                <input class="session-set-input" type="number" value="${set.weight || ''}" placeholder="kg" min="0" step="0.5" onchange="updateSessionSet(${exIdx},${setIdx},'weight',this.value)" />
+                <button class="session-set-check${set.done ? ' done' : ''}" onclick="toggleSessionSet(${exIdx},${setIdx})">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </button>
+              </div>
+            `).join('')}
+            <div style="padding:0.5rem 1.25rem;border-top:0.5px solid var(--border);">
+              <button onclick="addSessionSet(${exIdx})" style="font-size:0.8125rem;color:var(--accent);font-weight:600;background:transparent;border:none;cursor:pointer;font-family:inherit;padding:0.25rem 0;">+ Série</button>
+            </div>
+          `
+          body.appendChild(block)
+        })
+        const addBtn = document.createElement('div')
+        addBtn.style.cssText = 'padding:0.5rem 1.25rem 1rem;'
+        addBtn.innerHTML = `<button onclick="addSessionExercise()" style="width:100%;padding:0.75rem;border-radius:var(--radius-sm);border:0.5px dashed var(--border-strong);background:transparent;cursor:pointer;font-family:inherit;color:var(--text-secondary);">+ Ajouter un exercice</button>`
+        body.appendChild(addBtn)
+      } else {
+        renderFocusView()
+      }
+    }
+
+    window.updateSessionSet = function(exIdx, setIdx, field, val) {
+      sessionData.exercises[exIdx].sets[setIdx][field] = field === 'reps' ? parseInt(val) || 0 : parseFloat(val) || 0
+    }
+
+    window.toggleSessionSet = function(exIdx, setIdx) {
+      sessionData.exercises[exIdx].sets[setIdx].done = !sessionData.exercises[exIdx].sets[setIdx].done
+      renderSessionBody()
+    }
+
+    window.addSessionSet = function(exIdx) {
+      const lastSet = sessionData.exercises[exIdx].sets.slice(-1)[0] || {}
+      sessionData.exercises[exIdx].sets.push({ reps: lastSet.reps || '', weight: lastSet.weight || '', done: false })
+      renderSessionBody()
+    }
+
+    window.addSessionExercise = function() {
+      const name = prompt('Nom de l\'exercice ?')
+      if (!name) return
+      sessionData.exercises.push({ name, sets: [{ reps: '', weight: '', done: false }] })
+      renderSessionBody()
+    }
+
+    function renderFocusView() {
+      const body = document.getElementById('session-body')
+      if (!body || sessionData.exercises.length === 0) { body.innerHTML = `<div style="padding:2rem;text-align:center;color:var(--text-muted);">Aucun exercice.</div>`; return }
+      const ex = sessionData.exercises[focusExIdx]
+      if (!ex) return
+      const set = ex.sets[focusSetIdx] || {}
+      const totalSets = sessionData.exercises.reduce((s,e) => s + e.sets.length, 0)
+      const doneSets = sessionData.exercises.reduce((s,e) => s + e.sets.filter(x=>x.done).length, 0)
+      body.innerHTML = `
+        <div class="focus-view">
+          <div class="focus-ex-name">${ex.name}</div>
+          <div class="focus-ex-progress">Exercice ${focusExIdx+1}/${sessionData.exercises.length} · Série ${focusSetIdx+1}/${ex.sets.length} · ${doneSets}/${totalSets} total</div>
+          <div class="focus-set-display">
+            <div class="focus-set-label">Dernière fois</div>
+            <div class="focus-set-value">${set.weight || '—'}</div>
+            <div class="focus-set-unit">${set.weight ? 'kg' : ''}</div>
+          </div>
+          <div class="focus-inputs">
+            <div class="focus-input-group">
+              <label class="focus-input-label">Répétitions</label>
+              <input class="focus-input" type="number" value="${set.reps||''}" placeholder="0" id="focus-reps" min="0" onchange="updateSessionSet(${focusExIdx},${focusSetIdx},'reps',this.value)" />
+            </div>
+            <div class="focus-input-group">
+              <label class="focus-input-label">Poids (kg)</label>
+              <input class="focus-input" type="number" value="${set.weight||''}" placeholder="0" id="focus-weight" min="0" step="0.5" onchange="updateSessionSet(${focusExIdx},${focusSetIdx},'weight',this.value)" />
+            </div>
+          </div>
+          <div class="focus-nav">
+            <button onclick="focusPrev()" style="flex:1;padding:0.75rem;border-radius:var(--radius-sm);border:0.5px solid var(--border-strong);background:transparent;font-family:inherit;cursor:pointer;color:var(--text-secondary);">← Préc.</button>
+            <button onclick="focusDoneAndNext()" style="flex:2;padding:0.75rem;border-radius:var(--radius-sm);border:none;background:${set.done?'#16A34A':'var(--accent)'};color:var(--bg);font-weight:600;font-family:inherit;cursor:pointer;">${set.done ? '✓ Faite' : 'Valider →'}</button>
+          </div>
+        </div>
+      `
+    }
+
+    window.focusDoneAndNext = function() {
+      sessionData.exercises[focusExIdx].sets[focusSetIdx].done = true
+      const repsEl = document.getElementById('focus-reps')
+      const weightEl = document.getElementById('focus-weight')
+      if (repsEl) sessionData.exercises[focusExIdx].sets[focusSetIdx].reps = parseInt(repsEl.value) || 0
+      if (weightEl) sessionData.exercises[focusExIdx].sets[focusSetIdx].weight = parseFloat(weightEl.value) || 0
+      focusSetIdx++
+      if (focusSetIdx >= sessionData.exercises[focusExIdx].sets.length) {
+        focusExIdx++; focusSetIdx = 0
+        if (focusExIdx >= sessionData.exercises.length) { focusExIdx = sessionData.exercises.length - 1; focusSetIdx = sessionData.exercises[focusExIdx].sets.length - 1 }
+      }
+      renderFocusView()
+    }
+
+    window.focusPrev = function() {
+      focusSetIdx--
+      if (focusSetIdx < 0) { focusExIdx = Math.max(0, focusExIdx - 1); focusSetIdx = Math.max(0, sessionData.exercises[focusExIdx].sets.length - 1) }
+      renderFocusView()
+    }
+
+    document.getElementById('btn-session-list').addEventListener('click', () => {
+      sessionViewMode = 'list'
+      document.getElementById('btn-session-list').classList.add('active')
+      document.getElementById('btn-session-focus').classList.remove('active')
+      renderSessionBody()
+    })
+
+    document.getElementById('btn-session-focus').addEventListener('click', () => {
+      sessionViewMode = 'focus'
+      document.getElementById('btn-session-focus').classList.add('active')
+      document.getElementById('btn-session-list').classList.remove('active')
+      renderFocusView()
+    })
+
+    async function finishSession() {
+      clearInterval(sessionTimerInterval)
+      const elapsed = sessionStartTime ? Math.floor((Date.now() - sessionStartTime) / 60000) : null
+      const exercises = sessionData.exercises.filter(e => e.name)
+      if (sessionData.workoutId) {
+        await db.from('workouts').update({ duration_minutes: elapsed }).eq('id', sessionData.workoutId)
+        await db.from('workout_exercises').delete().eq('workout_id', sessionData.workoutId)
+        if (exercises.length) await db.from('workout_exercises').insert(exercises.map((e,i) => ({
+          workout_id: sessionData.workoutId, name: e.name,
+          sets: e.sets.map(s => ({ reps: s.reps, weight: s.weight })), order_index: i
+        })))
+      } else {
+        const { data: w } = await db.from('workouts').insert({
+          profile_id: profile.id, type: sessionData.title,
+          date: sessionData.date || toDateStr(new Date()), duration_minutes: elapsed
+        }).select().single()
+        if (w && exercises.length) await db.from('workout_exercises').insert(exercises.map((e,i) => ({
+          workout_id: w.id, name: e.name,
+          sets: e.sets.map(s => ({ reps: s.reps, weight: s.weight })), order_index: i
+        })))
+        if (sessionData.date) {
+          const planned = JSON.parse(localStorage.getItem('tdv_sport_planned_' + profile.id) || '{}')
+          delete planned[sessionData.date]
+          localStorage.setItem('tdv_sport_planned_' + profile.id, JSON.stringify(planned))
+        }
+      }
+      document.getElementById('session-live').classList.remove('open')
+      sessionActive = false
+      await loadWorkouts()
+      renderWorkoutsList()
+      updateSportStats()
+      renderAgenda()
+      showToast('Séance terminée 💪')
+    }
+
+    document.getElementById('session-finish-btn').addEventListener('click', finishSession)
+    document.getElementById('session-cancel-btn').addEventListener('click', () => {
+      clearInterval(sessionTimerInterval)
+      document.getElementById('session-live').classList.remove('open')
+      sessionActive = false
+    })
+    document.getElementById('session-close-btn').addEventListener('click', () => {
+      clearInterval(sessionTimerInterval)
+      document.getElementById('session-live').classList.remove('open')
+      sessionActive = false
+    })
+
+    // ── PROGRAMMES TYPES ──
+    function renderTemplatesList() {
+      const list = document.getElementById('templates-list')
+      if (!list) return
+      if (sportTemplates.length === 0) {
+        list.innerHTML = `<div class="empty-state"><p>Aucun programme.<br/>Crée ton premier programme type.</p></div>`
+        return
+      }
+      list.innerHTML = ''
+      sportTemplates.forEach((t, idx) => {
+        const card = document.createElement('div')
+        card.className = 'template-card'
+        card.innerHTML = `
+          <div class="template-badge" style="background:var(--surface-2);">${t.emoji || '💪'}</div>
+          <div class="template-info">
+            <div class="template-name">${t.name}</div>
+            <div class="template-detail">${t.type} · ${t.exercises?.length || 0} exercices${t.muscles?.length ? ' · ' + t.muscles.join(', ') : ''}</div>
+          </div>
+          <div class="template-actions">
+            <button class="btn-icon" onclick="openEditTemplate(${idx})" style="width:32px;height:32px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="btn-icon" onclick="deleteTemplate(${idx})" style="width:32px;height:32px;color:#DC2626;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+            </button>
+          </div>
+        `
+        list.appendChild(card)
+      })
+    }
+
+    window.deleteTemplate = function(idx) {
+      sportTemplates.splice(idx, 1)
+      saveSportTemplates()
+      renderTemplatesList()
+      showToast('Programme supprimé')
+    }
+
+    window.openEditTemplate = function(idx) {
+      const t = sportTemplates[idx]
+      editingTemplateId = idx
+      selectedTemplateType = t.type
+      selectedTemplateEmoji = t.emoji || '💪'
+      selectedTemplateMuscles = [...(t.muscles || [])]
+      templateExercises = t.exercises ? t.exercises.map(e => ({ ...e, sets: (e.sets || []).map(s => ({ ...s })) })) : []
+      document.getElementById('modal-template-title').textContent = 'Modifier le programme'
+      document.getElementById('template-name-input').value = t.name
+      document.getElementById('modal-template-actions').innerHTML = `
+        <button class="btn-danger" id="modal-template-delete">Supprimer</button>
+        <button class="btn-primary" id="modal-template-save">Enregistrer</button>
+      `
+      bindTemplateModalButtons()
+      renderTemplateTypeGrid(selectedTemplateType)
+      renderTemplateMusclesPicker()
+      renderTemplateExercisesBuilder()
+      document.getElementById('modal-template').classList.add('open')
+    }
+
+    function openNewTemplate() {
+      editingTemplateId = null
+      selectedTemplateType = 'Musculation'
+      selectedTemplateEmoji = '💪'
+      selectedTemplateMuscles = []
+      templateExercises = []
+      document.getElementById('modal-template-title').textContent = 'Nouveau programme'
+      document.getElementById('template-name-input').value = ''
+      document.getElementById('modal-template-actions').innerHTML = `
+        <button class="btn-secondary" id="modal-template-cancel">Annuler</button>
+        <button class="btn-primary" id="modal-template-save">Enregistrer</button>
+      `
+      bindTemplateModalButtons()
+      renderTemplateTypeGrid(selectedTemplateType)
+      renderTemplateMusclesPicker()
+      renderTemplateExercisesBuilder()
+      document.getElementById('modal-template').classList.add('open')
+    }
+
+    function closeTemplateModal() { document.getElementById('modal-template').classList.remove('open') }
+
+    function bindTemplateModalButtons() {
+      document.getElementById('modal-template-cancel')?.addEventListener('click', closeTemplateModal)
+      document.getElementById('modal-template-delete')?.addEventListener('click', () => {
+        if (editingTemplateId !== null) { deleteTemplate(editingTemplateId); closeTemplateModal() }
+      })
+      document.getElementById('modal-template-save').addEventListener('click', saveTemplate)
+    }
+
+    function renderTemplateTypeGrid(selected) {
+      const grid = document.getElementById('template-type-grid')
+      if (!grid) return
+      grid.innerHTML = ''
+      SPORT_TYPES.forEach(t => {
+        const btn = document.createElement('button')
+        btn.className = 'sport-type-btn' + (t === selected ? ' selected' : '')
+        btn.textContent = t
+        btn.addEventListener('click', () => { selectedTemplateType = t; renderTemplateTypeGrid(t) })
+        grid.appendChild(btn)
+      })
+    }
+
+    function renderTemplateMusclesPicker() {
+      const picker = document.getElementById('template-muscles-picker')
+      if (!picker) return
+      picker.innerHTML = ''
+      MUSCLE_GROUPS.forEach(m => {
+        const btn = document.createElement('button')
+        const sel = selectedTemplateMuscles.includes(m)
+        btn.style.cssText = `padding:0.3rem 0.75rem;border-radius:100px;border:0.5px solid ${sel ? 'var(--accent)' : 'var(--border-strong)'};background:${sel ? 'var(--accent)' : 'transparent'};color:${sel ? 'var(--bg)' : 'var(--text-secondary)'};font-size:0.8125rem;font-family:inherit;cursor:pointer;`
+        btn.textContent = m
+        btn.addEventListener('click', () => {
+          if (selectedTemplateMuscles.includes(m)) selectedTemplateMuscles = selectedTemplateMuscles.filter(x => x !== m)
+          else selectedTemplateMuscles.push(m)
+          renderTemplateMusclesPicker()
+        })
+        picker.appendChild(btn)
+      })
+    }
+
+    function renderTemplateExercisesBuilder() {
+      const builder = document.getElementById('template-exercises-builder')
+      if (!builder) return
+      builder.innerHTML = ''
+      templateExercises.forEach((ex, exIdx) => {
+        const div = document.createElement('div')
+        div.className = 'exercise-builder'
+        div.innerHTML = `
+          <div class="exercise-builder-header">
+            <input class="form-input" style="flex:1;padding:0.375rem 0.5rem;font-weight:500;" placeholder="Nom de l'exercice" value="${ex.name}" />
+            <button class="btn-remove-set" data-remove="${exIdx}">×</button>
+          </div>
+          <div class="sets-list">
+            ${ex.sets.map((s, sIdx) => `
+              <div class="set-row">
+                <span class="set-num">${sIdx+1}</span>
+                <input class="set-input" type="number" placeholder="Reps" value="${s.reps||''}" data-ex="${exIdx}" data-set="${sIdx}" data-field="reps" />
+                <input class="set-input" type="number" placeholder="kg" value="${s.weight||''}" data-ex="${exIdx}" data-set="${sIdx}" data-field="weight" step="0.5" />
+                <button class="btn-remove-set" data-rmset="${sIdx}" data-ex="${exIdx}">×</button>
+              </div>
+            `).join('')}
+          </div>
+          <button class="btn-add-set" data-addset="${exIdx}">+ Série</button>
+        `
+        div.querySelector('input').addEventListener('input', e => { templateExercises[exIdx].name = e.target.value })
+        div.querySelectorAll('[data-field]').forEach(inp => { inp.addEventListener('input', e => { templateExercises[+e.target.dataset.ex].sets[+e.target.dataset.set][e.target.dataset.field] = +e.target.value }) })
+        div.querySelectorAll('[data-rmset]').forEach(btn => { btn.addEventListener('click', () => { templateExercises[+btn.dataset.ex].sets.splice(+btn.dataset.rmset, 1); renderTemplateExercisesBuilder() }) })
+        div.querySelectorAll('[data-remove]').forEach(btn => { btn.addEventListener('click', () => { templateExercises.splice(+btn.dataset.remove, 1); renderTemplateExercisesBuilder() }) })
+        div.querySelectorAll('[data-addset]').forEach(btn => { btn.addEventListener('click', () => { templateExercises[+btn.dataset.addset].sets.push({ reps:'', weight:'' }); renderTemplateExercisesBuilder() }) })
+        builder.appendChild(div)
+      })
+    }
+
+    function saveTemplate() {
+      const name = document.getElementById('template-name-input').value.trim()
+      if (!name) return
+      const t = { name, type: selectedTemplateType, emoji: selectedTemplateEmoji, muscles: [...selectedTemplateMuscles], exercises: templateExercises.filter(e => e.name) }
+      if (editingTemplateId !== null) sportTemplates[editingTemplateId] = t
+      else sportTemplates.push(t)
+      saveSportTemplates()
+      closeTemplateModal()
+      renderTemplatesList()
+      showToast('Programme enregistré')
+    }
+
+    document.getElementById('modal-template-close').addEventListener('click', closeTemplateModal)
+    document.getElementById('modal-template').addEventListener('click', e => { if (e.target === e.currentTarget) closeTemplateModal() })
+    document.getElementById('btn-add-template-exercise').addEventListener('click', () => {
+      templateExercises.push({ name: '', sets: [{ reps: '', weight: '' }] })
+      renderTemplateExercisesBuilder()
+    })
+    document.getElementById('template-emoji-picker').querySelectorAll('[data-emoji]').forEach(el => {
+      el.addEventListener('click', () => { selectedTemplateEmoji = el.dataset.emoji; showToast('Emoji : ' + el.dataset.emoji) })
+    })
+    document.getElementById('btn-new-template').addEventListener('click', openNewTemplate)
+
+    // ── MODAL SÉANCE (ajout/édition) ──
     function renderSportTypeGrid(selected) {
       const grid = document.getElementById('sport-type-grid')
       if (!grid) return
@@ -1838,10 +2813,7 @@
         const btn = document.createElement('button')
         btn.className = 'sport-type-btn' + (t === selected ? ' selected' : '')
         btn.textContent = t
-        btn.addEventListener('click', () => {
-          selectedSportType = t
-          renderSportTypeGrid(t)
-        })
+        btn.addEventListener('click', () => { selectedSportType = t; renderSportTypeGrid(t) })
         grid.appendChild(btn)
       })
     }
@@ -1855,60 +2827,51 @@
         div.className = 'exercise-builder'
         div.innerHTML = `
           <div class="exercise-builder-header">
-            <input class="form-input" style="flex:1;padding:0.375rem 0.5rem;font-weight:500;" placeholder="Nom de l'exercice" value="${ex.name}" data-ex="${exIdx}" data-field="name" />
-            <button class="btn-remove-set" data-remove-ex="${exIdx}" style="color:var(--text-muted);font-size:1.1rem;">×</button>
+            <input class="form-input" style="flex:1;padding:0.375rem 0.5rem;font-weight:500;" placeholder="Nom de l'exercice" value="${ex.name}" />
+            <button class="btn-remove-set" data-remove="${exIdx}">×</button>
           </div>
           <div class="sets-list">
             ${ex.sets.map((s, sIdx) => `
               <div class="set-row">
-                <span class="set-num">${sIdx + 1}</span>
-                <input class="set-input" type="number" placeholder="Reps" value="${s.reps || ''}" data-ex="${exIdx}" data-set="${sIdx}" data-field="reps" min="1" />
-                <input class="set-input" type="number" placeholder="kg" value="${s.weight || ''}" data-ex="${exIdx}" data-set="${sIdx}" data-field="weight" min="0" step="0.5" />
-                <button class="btn-remove-set" data-remove-set="${sIdx}" data-ex="${exIdx}">×</button>
+                <span class="set-num">${sIdx+1}</span>
+                <input class="set-input" type="number" placeholder="Reps" value="${s.reps||''}" data-ex="${exIdx}" data-set="${sIdx}" data-field="reps" />
+                <input class="set-input" type="number" placeholder="kg" value="${s.weight||''}" data-ex="${exIdx}" data-set="${sIdx}" data-field="weight" step="0.5" />
+                <button class="btn-remove-set" data-rmset="${sIdx}" data-ex="${exIdx}">×</button>
               </div>
             `).join('')}
           </div>
-          <button class="btn-add-set" data-add-set="${exIdx}">+ Série</button>
+          <button class="btn-add-set" data-addset="${exIdx}">+ Série</button>
         `
-        div.querySelectorAll('input[data-field="name"]').forEach(inp => {
-          inp.addEventListener('input', e => { sportExercises[exIdx].name = e.target.value })
-        })
-        div.querySelectorAll('input[data-field="reps"]').forEach(inp => {
-          inp.addEventListener('input', e => { sportExercises[+e.target.dataset.ex].sets[+e.target.dataset.set].reps = +e.target.value })
-        })
-        div.querySelectorAll('input[data-field="weight"]').forEach(inp => {
-          inp.addEventListener('input', e => { sportExercises[+e.target.dataset.ex].sets[+e.target.dataset.set].weight = +e.target.value })
-        })
-        div.querySelectorAll('[data-remove-set]').forEach(btn => {
-          btn.addEventListener('click', () => {
-            sportExercises[+btn.dataset.ex].sets.splice(+btn.dataset.removeSet, 1)
-            renderExercisesBuilder()
-          })
-        })
-        div.querySelectorAll('[data-remove-ex]').forEach(btn => {
-          btn.addEventListener('click', () => {
-            sportExercises.splice(+btn.dataset.removeEx, 1)
-            renderExercisesBuilder()
-          })
-        })
-        div.querySelectorAll('[data-add-set]').forEach(btn => {
-          btn.addEventListener('click', () => {
-            sportExercises[+btn.dataset.addSet].sets.push({ reps: '', weight: '' })
-            renderExercisesBuilder()
-          })
-        })
+        div.querySelector('input').addEventListener('input', e => { sportExercises[exIdx].name = e.target.value })
+        div.querySelectorAll('[data-field]').forEach(inp => { inp.addEventListener('input', e => { sportExercises[+e.target.dataset.ex].sets[+e.target.dataset.set][e.target.dataset.field] = +e.target.value }) })
+        div.querySelectorAll('[data-rmset]').forEach(btn => { btn.addEventListener('click', () => { sportExercises[+btn.dataset.ex].sets.splice(+btn.dataset.rmset, 1); renderExercisesBuilder() }) })
+        div.querySelectorAll('[data-remove]').forEach(btn => { btn.addEventListener('click', () => { sportExercises.splice(+btn.dataset.remove, 1); renderExercisesBuilder() }) })
+        div.querySelectorAll('[data-addset]').forEach(btn => { btn.addEventListener('click', () => { sportExercises[+btn.dataset.addset].sets.push({ reps:'', weight:'' }); renderExercisesBuilder() }) })
         builder.appendChild(div)
       })
     }
 
-    function openAddWorkout() {
+    window.openAddWorkout = function(date) {
       editingSportId = null
       selectedSportType = 'Musculation'
       sportExercises = []
       document.getElementById('modal-sport-title').textContent = 'Nouvelle séance'
-      document.getElementById('sport-date-input').value = toDateStrLocal(new Date())
+      document.getElementById('sport-date-input').value = date || toDateStr(new Date())
       document.getElementById('sport-duration-input').value = ''
       document.getElementById('sport-notes-input').value = ''
+      const sel = document.getElementById('sport-template-select')
+      sel.innerHTML = '<option value="">Aucun (séance libre)</option>'
+      sportTemplates.forEach((t, i) => { sel.innerHTML += `<option value="${i}">${t.emoji || ''} ${t.name}</option>` })
+      sel.onchange = () => {
+        const idx = parseInt(sel.value)
+        if (!isNaN(idx) && sportTemplates[idx]) {
+          const t = sportTemplates[idx]
+          selectedSportType = t.type
+          renderSportTypeGrid(t.type)
+          sportExercises = t.exercises.map(e => ({ name: e.name, sets: (e.sets || [{ reps:'', weight:'' }]).map(s => ({ ...s })) }))
+          renderExercisesBuilder()
+        }
+      }
       document.getElementById('modal-sport-actions').innerHTML = `
         <button class="btn-secondary" id="modal-sport-cancel">Annuler</button>
         <button class="btn-primary" id="modal-sport-save">Enregistrer</button>
@@ -1926,7 +2889,7 @@
       selectedSportType = w.type
       sportExercises = (w.workout_exercises || []).map(ex => ({
         name: ex.name,
-        sets: Array.isArray(ex.sets) ? ex.sets : (ex.sets ? JSON.parse(ex.sets) : [{ reps: '', weight: '' }])
+        sets: Array.isArray(ex.sets) ? ex.sets.map(s => ({ ...s })) : [{ reps:'', weight:'' }]
       }))
       document.getElementById('modal-sport-title').textContent = 'Modifier la séance'
       document.getElementById('sport-date-input').value = w.date
@@ -1942,9 +2905,7 @@
       document.getElementById('modal-sport').classList.add('open')
     }
 
-    function closeSportModal() {
-      document.getElementById('modal-sport').classList.remove('open')
-    }
+    function closeSportModal() { document.getElementById('modal-sport').classList.remove('open') }
 
     function bindSportModalButtons() {
       document.getElementById('modal-sport-cancel')?.addEventListener('click', closeSportModal)
@@ -1961,30 +2922,22 @@
       if (!date) return
       const btn = document.getElementById('modal-sport-save')
       btn.disabled = true
-
+      const exData = sportExercises.filter(e => e.name)
       if (editingSportId) {
         await db.from('workouts').update({ type: selectedSportType, date, duration_minutes: duration, notes }).eq('id', editingSportId)
         await db.from('workout_exercises').delete().eq('workout_id', editingSportId)
-        if (sportExercises.length > 0) {
-          await db.from('workout_exercises').insert(sportExercises.filter(e => e.name).map((e, i) => ({
-            workout_id: editingSportId, name: e.name, sets: e.sets, order_index: i
-          })))
-        }
+        if (exData.length) await db.from('workout_exercises').insert(exData.map((e,i) => ({ workout_id: editingSportId, name: e.name, sets: e.sets, order_index: i })))
         showToast('Séance modifiée')
       } else {
         const { data: w } = await db.from('workouts').insert({ profile_id: profile.id, type: selectedSportType, date, duration_minutes: duration, notes }).select().single()
-        if (w && sportExercises.length > 0) {
-          await db.from('workout_exercises').insert(sportExercises.filter(e => e.name).map((e, i) => ({
-            workout_id: w.id, name: e.name, sets: e.sets, order_index: i
-          })))
-        }
+        if (w && exData.length) await db.from('workout_exercises').insert(exData.map((e,i) => ({ workout_id: w.id, name: e.name, sets: e.sets, order_index: i })))
         showToast('Séance enregistrée')
       }
-
       closeSportModal()
       await loadWorkouts()
       renderWorkoutsList()
       updateSportStats()
+      renderAgenda()
       btn.disabled = false
     }
 
@@ -1994,16 +2947,249 @@
       workouts = workouts.filter(w => w.id !== id)
       renderWorkoutsList()
       updateSportStats()
+      renderAgenda()
       showToast('Séance supprimée')
     }
 
     document.getElementById('modal-sport-close').addEventListener('click', closeSportModal)
-    document.getElementById('modal-sport').addEventListener('click', e => {
-      if (e.target === e.currentTarget) closeSportModal()
-    })
+    document.getElementById('modal-sport').addEventListener('click', e => { if (e.target === e.currentTarget) closeSportModal() })
     document.getElementById('btn-add-exercise').addEventListener('click', () => {
-      sportExercises.push({ name: '', sets: [{ reps: '', weight: '' }] })
+      sportExercises.push({ name: '', sets: [{ reps:'', weight:'' }] })
       renderExercisesBuilder()
+    })
+
+    // ── GRAPHIQUES ──
+    function getWeekLabels(n) {
+      const labels = []
+      for (let i = n-1; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i * 7)
+        labels.push('S' + getWeekNumber(d))
+      }
+      return labels
+    }
+
+    function getWeekNumber(d) {
+      const date = new Date(d)
+      date.setHours(0,0,0,0)
+      date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7)
+      const week1 = new Date(date.getFullYear(), 0, 4)
+      return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7)
+    }
+
+    function getChartColors() {
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      return { grid: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', text: isDark ? '#8A8782' : '#7A7670' }
+    }
+
+    function destroyChart(id) { if (sportCharts[id]) { sportCharts[id].destroy(); delete sportCharts[id] } }
+
+    function renderFreqChart(period) {
+      destroyChart('freq')
+      const ctx = document.getElementById('chart-freq')
+      if (!ctx) return
+      const colors = getChartColors()
+      let labels, data
+      if (period === 'month') {
+        const days = 28
+        labels = []; data = []
+        for (let w = 3; w >= 0; w--) {
+          const start = new Date(); start.setDate(start.getDate() - w*7 - 6)
+          const end = new Date(); end.setDate(end.getDate() - w*7)
+          labels.push('S' + getWeekNumber(start))
+          data.push(workouts.filter(x => { const d = new Date(x.date); return d >= start && d <= end }).length)
+        }
+      } else {
+        labels = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc']
+        const now = new Date()
+        data = labels.map((_,i) => workouts.filter(x => { const d = new Date(x.date); return d.getFullYear() === now.getFullYear() && d.getMonth() === i }).length)
+      }
+      sportCharts['freq'] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ data, backgroundColor: 'var(--accent)', borderRadius: 6, borderSkipped: false }] },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: colors.grid }, ticks: { color: colors.text } }, y: { grid: { color: colors.grid }, ticks: { color: colors.text, stepSize: 1 }, beginAtZero: true } } }
+      })
+    }
+
+    function renderVolumeChart(period) {
+      destroyChart('volume')
+      const ctx = document.getElementById('chart-volume')
+      if (!ctx) return
+      const colors = getChartColors()
+      let labels, data
+      if (period === 'month') {
+        labels = []; data = []
+        for (let w = 3; w >= 0; w--) {
+          const start = new Date(); start.setDate(start.getDate() - w*7 - 6)
+          const end = new Date(); end.setDate(end.getDate() - w*7)
+          labels.push('S' + getWeekNumber(start))
+          const vol = workouts.filter(x => { const d = new Date(x.date); return d >= start && d <= end })
+            .reduce((total, w) => total + (w.workout_exercises||[]).reduce((s, ex) => s + (Array.isArray(ex.sets)?ex.sets:[]).reduce((t, set) => t + ((set.reps||0)*(set.weight||0)), 0), 0), 0)
+          data.push(Math.round(vol))
+        }
+      } else {
+        const now = new Date()
+        labels = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc']
+        data = labels.map((_,i) => {
+          return Math.round(workouts.filter(x => { const d = new Date(x.date); return d.getFullYear()===now.getFullYear()&&d.getMonth()===i })
+            .reduce((total, w) => total + (w.workout_exercises||[]).reduce((s, ex) => s + (Array.isArray(ex.sets)?ex.sets:[]).reduce((t, set) => t + ((set.reps||0)*(set.weight||0)), 0), 0), 0))
+        })
+      }
+      sportCharts['volume'] = new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets: [{ data, borderColor: 'var(--accent)', backgroundColor: 'transparent', tension: 0.4, pointRadius: 4, pointBackgroundColor: 'var(--accent)' }] },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: colors.grid }, ticks: { color: colors.text } }, y: { grid: { color: colors.grid }, ticks: { color: colors.text }, beginAtZero: true } } }
+      })
+    }
+
+    function renderTypesChart(period) {
+      destroyChart('types')
+      const ctx = document.getElementById('chart-types')
+      if (!ctx) return
+      const now = new Date()
+      let filtered
+      if (period === 'month') {
+        const start = new Date(now.getFullYear(), now.getMonth(), 1)
+        filtered = workouts.filter(w => new Date(w.date) >= start)
+      } else {
+        filtered = workouts.filter(w => new Date(w.date).getFullYear() === now.getFullYear())
+      }
+      const typeCounts = {}
+      filtered.forEach(w => { typeCounts[w.type] = (typeCounts[w.type] || 0) + 1 })
+      const labels = Object.keys(typeCounts)
+      const data = Object.values(typeCounts)
+      const palette = ['#1A1814','#DC2626','#EA580C','#D97706','#16A34A','#0891B2','#7C3AED','#DB2777','#64748B','#0F172A','#059669','#8B5CF6']
+      sportCharts['types'] = new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels, datasets: [{ data, backgroundColor: palette.slice(0, labels.length), borderWidth: 0 }] },
+        options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: getChartColors().text, padding: 12, font: { size: 12 } } } } }
+      })
+    }
+
+    function renderDurationChart(period) {
+      destroyChart('duration')
+      const ctx = document.getElementById('chart-duration')
+      if (!ctx) return
+      const colors = getChartColors()
+      const now = new Date()
+      let labels, data
+      if (period === 'month') {
+        labels = []; data = []
+        for (let w = 3; w >= 0; w--) {
+          const start = new Date(); start.setDate(start.getDate() - w*7 - 6)
+          const end = new Date(); end.setDate(end.getDate() - w*7)
+          labels.push('S' + getWeekNumber(start))
+          const group = workouts.filter(x => { const d = new Date(x.date); return d >= start && d <= end && x.duration_minutes })
+          data.push(group.length ? Math.round(group.reduce((s,w) => s+(w.duration_minutes||0), 0) / group.length) : 0)
+        }
+      } else {
+        labels = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc']
+        data = labels.map((_,i) => {
+          const group = workouts.filter(x => { const d = new Date(x.date); return d.getFullYear()===now.getFullYear()&&d.getMonth()===i&&x.duration_minutes })
+          return group.length ? Math.round(group.reduce((s,w) => s+(w.duration_minutes||0), 0) / group.length) : 0
+        })
+      }
+      sportCharts['duration'] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ data, backgroundColor: '#0891B2', borderRadius: 6, borderSkipped: false }] },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: colors.grid }, ticks: { color: colors.text } }, y: { grid: { color: colors.grid }, ticks: { color: colors.text }, beginAtZero: true } } }
+      })
+    }
+
+    function renderProgressChart(exerciseName) {
+      destroyChart('progress')
+      const ctx = document.getElementById('chart-progress')
+      if (!ctx || !exerciseName) return
+      const colors = getChartColors()
+      const points = []
+      workouts.forEach(w => {
+        const ex = (w.workout_exercises||[]).find(e => e.name.toLowerCase() === exerciseName.toLowerCase())
+        if (ex) {
+          const sets = Array.isArray(ex.sets) ? ex.sets : []
+          const maxWeight = Math.max(...sets.map(s => s.weight || 0))
+          if (maxWeight > 0) points.push({ date: w.date, weight: maxWeight })
+        }
+      })
+      points.sort((a,b) => a.date.localeCompare(b.date))
+      sportCharts['progress'] = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: points.map(p => new Date(p.date+'T12:00:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })),
+          datasets: [{ data: points.map(p => p.weight), borderColor: '#7C3AED', backgroundColor: 'transparent', tension: 0.4, pointRadius: 5, pointBackgroundColor: '#7C3AED' }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: colors.grid }, ticks: { color: colors.text } }, y: { grid: { color: colors.grid }, ticks: { color: colors.text, callback: v => v+'kg' }, beginAtZero: false } } }
+      })
+    }
+
+    function renderMuscleGrid(period) {
+      const grid = document.getElementById('muscle-grid')
+      if (!grid) return
+      const now = new Date()
+      let filtered
+      if (period === 'week') {
+        const start = new Date(now); start.setDate(now.getDate() - 7)
+        filtered = workouts.filter(w => new Date(w.date) >= start)
+      } else {
+        const start = new Date(now.getFullYear(), now.getMonth(), 1)
+        filtered = workouts.filter(w => new Date(w.date) >= start)
+      }
+      const muscleCounts = {}
+      MUSCLE_GROUPS.forEach(m => { muscleCounts[m] = 0 })
+      filtered.forEach(w => {
+        const muscles = MUSCLE_TYPE_MAP[w.type] || []
+        const tmpl = sportTemplates.find(t => t.type === w.type)
+        const tmplMuscles = tmpl?.muscles || []
+        const allMuscles = [...new Set([...muscles, ...tmplMuscles])]
+        allMuscles.forEach(m => { if (muscleCounts[m] !== undefined) muscleCounts[m]++ })
+      })
+      const maxVal = Math.max(1, ...Object.values(muscleCounts))
+      grid.innerHTML = ''
+      Object.entries(muscleCounts).sort((a,b) => b[1]-a[1]).forEach(([muscle, count]) => {
+        const pct = Math.round((count / maxVal) * 100)
+        const div = document.createElement('div')
+        div.className = 'muscle-bar-row'
+        div.innerHTML = `
+          <div class="muscle-bar-label">
+            <span class="muscle-bar-name">${muscle}</span>
+            <span class="muscle-bar-pct">${count}x</span>
+          </div>
+          <div class="muscle-bar-track"><div class="muscle-bar-fill" style="width:${pct}%"></div></div>
+        `
+        grid.appendChild(div)
+      })
+    }
+
+    function populateExerciseSelect() {
+      const sel = document.getElementById('chart-exercise-select')
+      if (!sel) return
+      const exercises = new Set()
+      workouts.forEach(w => (w.workout_exercises||[]).forEach(ex => exercises.add(ex.name)))
+      sel.innerHTML = '<option value="">Choisir un exercice…</option>'
+      exercises.forEach(e => { sel.innerHTML += `<option value="${e}">${e}</option>` })
+      sel.onchange = () => renderProgressChart(sel.value)
+    }
+
+    function renderAllCharts() {
+      if (typeof Chart === 'undefined') return
+      renderFreqChart(freqPeriod)
+      renderVolumeChart(volumePeriod)
+      renderTypesChart(typesPeriod)
+      renderDurationChart(durationPeriod)
+      renderMuscleGrid(musclesPeriod)
+      populateExerciseSelect()
+    }
+
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const chart = btn.dataset.chart
+        const period = btn.dataset.period
+        btn.closest('.chart-period').querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+        if (chart === 'freq') { freqPeriod = period; renderFreqChart(period) }
+        else if (chart === 'volume') { volumePeriod = period; renderVolumeChart(period) }
+        else if (chart === 'types') { typesPeriod = period; renderTypesChart(period) }
+        else if (chart === 'duration') { durationPeriod = period; renderDurationChart(period) }
+        else if (chart === 'muscles') { musclesPeriod = period; renderMuscleGrid(period) }
+      })
     })
 
     // ── LOGOUT ──
@@ -2026,9 +3212,23 @@
       updateProgress()
       updateDateTitle()
       updateStats()
+      await loadSportTemplates()
       await loadWorkouts()
       renderWorkoutsList()
       updateSportStats()
+      initSportTabs()
+      renderAgenda()
+
+      // FAB
+      document.getElementById('fab').addEventListener('click', () => {
+        if (activeTab === 'tasks') openAddTask()
+        else if (activeTab === 'sport') openAddWorkout()
+      })
+
+      // Charger Chart.js pour les stats
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'
+      document.head.appendChild(script)
     }
 
     init()
