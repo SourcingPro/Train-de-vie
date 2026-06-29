@@ -11,7 +11,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #F7F5F2;
+      --bg: #FAFAF8;
       --surface: #FFFFFF;
       --surface-2: #F0EDE8;
       --text-primary: #1A1814;
@@ -34,7 +34,7 @@
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #141210;
+        --bg: #131211;
         --surface: #1E1C19;
         --surface-2: #252320;
         --text-primary: #F0EDE8;
@@ -935,62 +935,52 @@
       transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
     }
 
-    /* Agenda / Calendrier */
-    .agenda-week {
-      margin: 0 1.25rem 0.75rem;
+    /* Agenda / Calendrier mensuel */
+    .agenda-month-header {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 0.375rem;
-    }
-    .agenda-day {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      margin: 0 1.25rem 0.25rem;
       gap: 0.25rem;
     }
-    .agenda-day-label {
+    .agenda-month-day-label {
       font-size: 0.625rem;
       font-weight: 600;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.04em;
+      text-align: center;
+      padding: 0.25rem 0;
+    }
+    .agenda-month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.25rem;
+      margin: 0 1.25rem 0.75rem;
     }
     .agenda-day-cell {
-      width: 100%;
       aspect-ratio: 1;
       border-radius: 8px;
-      border: 0.5px dashed var(--border-strong);
+      border: 0.5px solid transparent;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 0.5625rem;
-      font-weight: 600;
+      font-size: 0.8125rem;
+      font-weight: 500;
       text-align: center;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       transition: all var(--transition);
       -webkit-tap-highlight-color: transparent;
-      padding: 2px;
-      line-height: 1.2;
-      overflow: hidden;
+      position: relative;
     }
-    .agenda-day-cell.has-planned {
-      background: var(--accent);
-      color: var(--bg);
-      border-color: var(--accent);
-      border-style: solid;
-    }
-    .agenda-day-cell.has-done {
-      background: #16A34A;
-      color: white;
-      border-color: #16A34A;
-      border-style: solid;
-    }
-    .agenda-day-cell.is-today {
-      border-color: var(--accent);
-      border-style: solid;
-      color: var(--accent);
-    }
+    .agenda-day-cell.other-month { color: var(--text-muted); opacity: 0.4; }
+    .agenda-day-cell.is-today { font-weight: 700; color: var(--accent); border-color: var(--accent); }
+    .agenda-day-cell.is-selected { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 700; }
+    .agenda-day-cell.has-done::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: #16A34A; }
+    .agenda-day-cell.is-selected.has-done::after { background: rgba(255,255,255,0.8); }
+    .agenda-day-cell.has-planned::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+    .agenda-day-cell.is-selected.has-planned::after { background: rgba(255,255,255,0.8); }
+    .agenda-day-cell:hover:not(.is-selected) { background: var(--surface-2); }
     .agenda-week-nav {
       display: flex;
       align-items: center;
@@ -1376,8 +1366,17 @@
           <span class="agenda-week-title" id="agenda-week-title"></span>
           <button class="btn-week-nav" id="btn-week-next"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
         </div>
-        <div class="agenda-week" id="agenda-week-grid"></div>
-        <div class="card" style="margin-top:0.75rem;">
+        <div class="agenda-month-header">
+          <div class="agenda-month-day-label">Lun</div>
+          <div class="agenda-month-day-label">Mar</div>
+          <div class="agenda-month-day-label">Mer</div>
+          <div class="agenda-month-day-label">Jeu</div>
+          <div class="agenda-month-day-label">Ven</div>
+          <div class="agenda-month-day-label">Sam</div>
+          <div class="agenda-month-day-label">Dim</div>
+        </div>
+        <div class="agenda-month-grid" id="agenda-month-grid"></div>
+        <div class="card" style="margin-top:0.5rem;">
           <div class="card-title" id="agenda-day-label">Aujourd'hui</div>
           <div id="agenda-day-detail"></div>
         </div>
@@ -2269,36 +2268,46 @@
     // ── AGENDA ──
     function renderAgenda() {
       const now = new Date()
-      const weekStart = new Date(now)
-      weekStart.setDate(now.getDate() - now.getDay() + (agendaWeekOffset * 7))
-      const days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
-      const grid = document.getElementById('agenda-week-grid')
+      // agendaWeekOffset utilisé comme offset de mois
+      const displayMonth = new Date(now.getFullYear(), now.getMonth() + agendaWeekOffset, 1)
       const title = document.getElementById('agenda-week-title')
+      const grid = document.getElementById('agenda-month-grid')
       if (!grid) return
-      const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6)
-      title.textContent = weekStart.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' — ' + weekEnd.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      title.textContent = displayMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
       grid.innerHTML = ''
       const planned = JSON.parse(localStorage.getItem('tdv_sport_planned_' + profile.id) || '{}')
-      for (let i = 0; i < 7; i++) {
-        const d = new Date(weekStart); d.setDate(weekStart.getDate() + i)
+      const todayStr = toDateStr(new Date())
+      // Premier jour du mois (lundi=1, on veut que la grille commence lundi)
+      const firstDay = new Date(displayMonth.getFullYear(), displayMonth.getMonth(), 1)
+      // Décalage lundi (0=lun, 6=dim)
+      let startOffset = (firstDay.getDay() + 6) % 7
+      // Dernier jour du mois
+      const lastDay = new Date(displayMonth.getFullYear(), displayMonth.getMonth() + 1, 0)
+      // Total de cellules (jours du mois précédent + jours du mois + jours suivants)
+      const totalCells = Math.ceil((startOffset + lastDay.getDate()) / 7) * 7
+      for (let i = 0; i < totalCells; i++) {
+        const d = new Date(displayMonth.getFullYear(), displayMonth.getMonth(), 1 - startOffset + i)
         const str = toDateStr(d)
-        const isToday = str === toDateStr(new Date())
+        const isCurrentMonth = d.getMonth() === displayMonth.getMonth()
+        const isToday = str === todayStr
+        const isSelected = str === agendaSelectedDate
         const hasWorkout = workouts.some(w => w.date === str)
-        const hasPlanned = planned[str]
-        const col = document.createElement('div')
-        col.className = 'agenda-day'
-        const label = days[d.getDay()]
+        const hasPlanned = !!planned[str]
         let cellClass = 'agenda-day-cell'
+        if (!isCurrentMonth) cellClass += ' other-month'
+        if (isToday && !isSelected) cellClass += ' is-today'
+        if (isSelected) cellClass += ' is-selected'
         if (hasWorkout) cellClass += ' has-done'
         else if (hasPlanned) cellClass += ' has-planned'
-        else if (isToday) cellClass += ' is-today'
-        const cellText = hasWorkout ? (workouts.find(w => w.date === str)?.type?.slice(0,4) || '✓') : (hasPlanned ? (hasPlanned.slice(0,4)) : (isToday ? 'Auj.' : d.getDate()))
-        col.innerHTML = `<div class="agenda-day-label">${label}</div><div class="${cellClass}" data-date="${str}">${cellText}</div>`
-        col.querySelector('.agenda-day-cell').addEventListener('click', () => {
+        const cell = document.createElement('div')
+        cell.className = cellClass
+        cell.textContent = d.getDate()
+        cell.addEventListener('click', () => {
           agendaSelectedDate = str
+          renderAgenda()
           renderAgendaDayDetail()
         })
-        grid.appendChild(col)
+        grid.appendChild(cell)
       }
       renderAgendaDayDetail()
     }
