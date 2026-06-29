@@ -1,1 +1,1 @@
-// Module séries & films
+// Module series
