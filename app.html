@@ -1672,10 +1672,6 @@
         <input class="form-input" id="ex-nom" placeholder="Ex : Développé couché" maxlength="50" />
       </div>
       <div class="form-group" style="display:flex;gap:0.75rem;align-items:flex-end;">
-        <div style="flex:0 0 80px;">
-          <label class="form-label">Emoji</label>
-          <input class="form-input" id="ex-emoji" placeholder="🏋️" maxlength="4" style="font-size:1.5rem;text-align:center;" />
-        </div>
         <div style="flex:1;">
           <label class="form-label">Catégorie</label>
           <select class="form-select" id="ex-cat">
@@ -1686,6 +1682,11 @@
             <option value="Autre">Autre</option>
           </select>
         </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Emoji</label>
+        <div class="emoji-selected-display" id="ex-emoji-display">🏋️</div>
+        <div class="emoji-picker-grid" id="ex-emoji-picker"></div>
       </div>
       <div class="form-group">
         <label class="form-label">Équipement</label>
@@ -2723,6 +2724,7 @@
     let selectedExMuscles = []
     let selectedExSubmuscles = []
     let selectedExMetrics = []
+    let selectedExEmoji = '🏋️'
     let exFilterCat = 'Tous'
     let exFilterMuscle = 'Tous'
     let exSearch = ''
@@ -2906,15 +2908,16 @@
       selectedExMuscles = []
       selectedExSubmuscles = []
       selectedExMetrics = ['reps']
+      selectedExEmoji = '🏋️'
       document.getElementById('modal-ex-title').textContent = 'Nouvel exercice'
       document.getElementById('ex-nom').value = ''
-      document.getElementById('ex-emoji').value = ''
       document.getElementById('ex-cat').value = 'Musculation'
       document.getElementById('ex-equip').value = 'Barre'
       document.getElementById('ex-usual-weight').value = ''
       document.getElementById('ex-def-sets').value = '3'
       document.getElementById('ex-actions').innerHTML = '<button class="btn-secondary" id="ex-cancel">Annuler</button><button class="btn-primary" id="ex-save">Enregistrer</button>'
       bindExModalButtons()
+      renderEmojiPicker('ex-emoji-picker', 'ex-emoji-display', selectedExEmoji, function(e) { selectedExEmoji = e }, SPORT_EMOJI_LIST)
       renderMetricsPicker()
       renderMusclesPicker()
       renderSubmusclesPicker()
@@ -2926,15 +2929,16 @@
       selectedExMuscles = (ex.muscles || []).slice()
       selectedExSubmuscles = (ex.submuscles || []).slice()
       selectedExMetrics = (ex.metrics && ex.metrics.length) ? ex.metrics.slice() : ['reps']
+      selectedExEmoji = ex.emoji || '🏋️'
       document.getElementById('modal-ex-title').textContent = 'Modifier l\'exercice'
       document.getElementById('ex-nom').value = ex.name
-      document.getElementById('ex-emoji').value = ex.emoji || ''
       document.getElementById('ex-cat').value = ex.cat || 'Musculation'
       document.getElementById('ex-equip').value = ex.equip || 'Barre'
       document.getElementById('ex-usual-weight').value = ex.usualWeight || ''
       document.getElementById('ex-def-sets').value = ex.defaultSets || 3
       document.getElementById('ex-actions').innerHTML = '<button class="btn-danger" id="ex-delete">Supprimer</button><button class="btn-primary" id="ex-save">Enregistrer</button>'
       bindExModalButtons()
+      renderEmojiPicker('ex-emoji-picker', 'ex-emoji-display', selectedExEmoji, function(e) { selectedExEmoji = e }, SPORT_EMOJI_LIST)
       renderMetricsPicker()
       renderMusclesPicker()
       renderSubmusclesPicker()
@@ -2958,7 +2962,7 @@
       const ex = {
         id: editingExId || ('ex' + Date.now()),
         name: name,
-        emoji: document.getElementById('ex-emoji').value.trim() || '•',
+        emoji: selectedExEmoji,
         cat: document.getElementById('ex-cat').value,
         equip: document.getElementById('ex-equip').value,
         muscles: selectedExMuscles.slice(),
