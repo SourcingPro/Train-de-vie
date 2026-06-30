@@ -991,6 +991,33 @@
     .week-check.done svg { opacity: 1; }
     .week-table-empty { padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.875rem; }
 
+    /* Sélecteur jours de semaine */
+    .weekday-picker {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.375rem;
+    }
+    .weekday-btn {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-strong);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .weekday-btn.selected {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+    }
 </style>
 </head>
 <body>
@@ -1166,7 +1193,17 @@
           <option value="daily">Tous les jours</option>
           <option value="weekly">Hebdomadaire</option>
           <option value="monthly">Mensuel</option>
+          <option value="interval">Tous les X jours</option>
+          <option value="weekdays">Jours spécifiques</option>
         </select>
+      </div>
+      <div class="form-group" id="freq-interval-group" style="display:none;">
+        <label class="form-label">Intervalle (en jours)</label>
+        <input class="form-input" type="number" id="task-freq-interval" min="1" max="365" placeholder="Ex : 3" />
+      </div>
+      <div class="form-group" id="freq-weekdays-group" style="display:none;">
+        <label class="form-label">Jours de la semaine</label>
+        <div class="weekday-picker" id="task-freq-weekdays"></div>
       </div>
       <div class="form-group">
         <label class="form-label">Emoji</label>
@@ -1313,8 +1350,14 @@
       setTimeout(() => t.classList.remove('show'), 2000)
     }
 
-    function freqLabel(f) {
-      return { daily: 'Quotidien', weekly: 'Hebdomadaire', monthly: 'Mensuel' }[f] || f
+    function freqLabel(f, task) {
+      if (f === 'interval' && task) return 'Tous les ' + (task.freq_interval || 1) + ' jours'
+      if (f === 'weekdays' && task) {
+        const names = ['', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
+        const days = (task.freq_days || []).slice().sort()
+        return days.map(function(d) { return names[d] }).join(', ') || 'Jours spécifiques'
+      }
+      return { daily: 'Quotidien', weekly: 'Hebdomadaire', monthly: 'Mensuel', interval: 'Tous les X jours', weekdays: 'Jours spécifiques' }[f] || f
     }
 
     // ── THEME ──
@@ -1554,12 +1597,33 @@
 
     // Retourne la liste des tâches à afficher pour une date donnée,
     // en tenant compte des reports (in/out) pour CE jour précis.
+    // Détermine si une tâche doit apparaître à une date donnée selon sa fréquence
+    function taskMatchesDate(task, dateStr) {
+      if (task.frequency === 'daily') return true
+      if (task.frequency === 'weekly' || task.frequency === 'monthly') return true // comportement historique : toujours visible
+      const d = new Date(dateStr + 'T12:00:00')
+      if (task.frequency === 'interval') {
+        const interval = task.freq_interval || 1
+        const created = new Date((task.created_at || dateStr).split('T')[0] + 'T12:00:00')
+        const diffDays = Math.floor((d - created) / 86400000)
+        return diffDays >= 0 && diffDays % interval === 0
+      }
+      if (task.frequency === 'weekdays') {
+        const days = task.freq_days || []
+        const jsDay = d.getDay() // 0=dim ... 6=sam
+        const isoDay = jsDay === 0 ? 7 : jsDay // 1=lun ... 7=dim
+        return days.includes(isoDay)
+      }
+      return true
+    }
+
     function getTasksForDate(dateStr) {
       const result = []
       tasks.forEach(function(task) {
         const outKey = task.id + '_' + dateStr
         // Si cette tâche a été reportée DEPUIS ce jour vers un autre, ne pas l'afficher ici
         if (taskReschedules[outKey]) return
+        if (!taskMatchesDate(task, dateStr)) return
         result.push(task)
       })
       // Ajouter les tâches reportées VERS ce jour (depuis n'importe quel autre jour)
@@ -1858,7 +1922,7 @@
           </div>
           <div class="task-info">
             <div class="task-name">${task.name}</div>
-            <div class="task-freq">${freqLabel(task.frequency)}</div>
+            <div class="task-freq">${freqLabel(task.frequency, task)}</div>
             ${tagBadges ? `<div class="task-tags-display">${tagBadges}</div>` : ''}
           </div>
           <div class="task-color" style="background:${task.color || 'var(--text-muted)'}"></div>
@@ -1910,6 +1974,7 @@
 
     // ── TASK MODAL ──
     let selectedTaskColor = TASK_COLORS[0]
+    let selectedTaskWeekdays = []
 
     function renderColorPicker(containerId, selected, onSelect) {
       const el = document.getElementById(containerId)
@@ -1927,14 +1992,42 @@
       })
     }
 
+    function renderWeekdayPicker() {
+      const el = document.getElementById('task-freq-weekdays')
+      const names = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
+      el.innerHTML = names.map(function(n, i) {
+        const dayNum = i + 1
+        const sel = selectedTaskWeekdays.includes(dayNum)
+        return '<button type="button" class="weekday-btn' + (sel ? ' selected' : '') + '" data-day="' + dayNum + '">' + n + '</button>'
+      }).join('')
+      el.querySelectorAll('.weekday-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const day = parseInt(btn.dataset.day)
+          if (selectedTaskWeekdays.includes(day)) selectedTaskWeekdays = selectedTaskWeekdays.filter(function(d) { return d !== day })
+          else selectedTaskWeekdays.push(day)
+          renderWeekdayPicker()
+        })
+      })
+    }
+
+    function updateFreqFieldsVisibility() {
+      const val = document.getElementById('task-freq-input').value
+      document.getElementById('freq-interval-group').style.display = val === 'interval' ? '' : 'none'
+      document.getElementById('freq-weekdays-group').style.display = val === 'weekdays' ? '' : 'none'
+      if (val === 'weekdays') renderWeekdayPicker()
+    }
+    document.getElementById('task-freq-input').addEventListener('change', updateFreqFieldsVisibility)
+
     function openAddTask() {
       editingTaskId = null
       selectedTaskColor = TASK_COLORS[0]
       selectedTaskTagIds = []
       selectedTaskEmoji = '✓'
+      selectedTaskWeekdays = []
       document.getElementById('modal-task-title').textContent = 'Nouvelle tâche'
       document.getElementById('task-name-input').value = ''
       document.getElementById('task-freq-input').value = 'daily'
+      document.getElementById('task-freq-interval').value = ''
       document.getElementById('modal-task-actions').innerHTML = `
         <button class="btn-secondary" id="modal-task-cancel">Annuler</button>
         <button class="btn-primary" id="modal-task-save">Créer la tâche</button>
@@ -1943,6 +2036,7 @@
       renderColorPicker('task-color-picker', selectedTaskColor, c => selectedTaskColor = c)
       renderEmojiPicker('task-emoji-picker', 'task-emoji-display', selectedTaskEmoji, e => selectedTaskEmoji = e)
       renderTaskTagPicker()
+      updateFreqFieldsVisibility()
       document.getElementById('modal-task').classList.add('open')
       setTimeout(() => document.getElementById('task-name-input').focus(), 100)
     }
@@ -1952,9 +2046,11 @@
       selectedTaskColor = task.color || TASK_COLORS[0]
       selectedTaskTagIds = [...(task.tag_ids || [])]
       selectedTaskEmoji = task.emoji || '✓'
+      selectedTaskWeekdays = [...(task.freq_days || [])]
       document.getElementById('modal-task-title').textContent = 'Modifier la tâche'
       document.getElementById('task-name-input').value = task.name
       document.getElementById('task-freq-input').value = task.frequency
+      document.getElementById('task-freq-interval').value = task.freq_interval || ''
       document.getElementById('modal-task-actions').innerHTML = `
         <button class="btn-danger" id="modal-task-delete">Supprimer</button>
         <button class="btn-primary" id="modal-task-save">Enregistrer</button>
@@ -1963,6 +2059,7 @@
       renderColorPicker('task-color-picker', selectedTaskColor, c => selectedTaskColor = c)
       renderEmojiPicker('task-emoji-picker', 'task-emoji-display', selectedTaskEmoji, e => selectedTaskEmoji = e)
       renderTaskTagPicker()
+      updateFreqFieldsVisibility()
       document.getElementById('modal-task').classList.add('open')
     }
 
@@ -1985,22 +2082,25 @@
       const name = document.getElementById('task-name-input').value.trim()
       if (!name) return
       const freq = document.getElementById('task-freq-input').value
+      const freqInterval = freq === 'interval' ? (parseInt(document.getElementById('task-freq-interval').value) || 1) : null
+      const freqDays = freq === 'weekdays' ? [...selectedTaskWeekdays] : []
       const btn = document.getElementById('modal-task-save')
       btn.disabled = true
       const tagIds = [...selectedTaskTagIds]
 
       if (editingTaskId) {
-        await db.from('tasks').update({ name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji }).eq('id', editingTaskId)
+        await db.from('tasks').update({ name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays }).eq('id', editingTaskId)
         const idx = tasks.findIndex(t => t.id === editingTaskId)
-        if (idx !== -1) tasks[idx] = { ...tasks[idx], name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji }
+        if (idx !== -1) tasks[idx] = { ...tasks[idx], name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays }
         showToast('Tâche modifiée')
       } else {
-        const { data } = await db.from('tasks').insert({ profile_id: profile.id, name, frequency: freq, color: selectedTaskColor, active: true, tag_ids: tagIds, emoji: selectedTaskEmoji }).select().single()
+        const { data } = await db.from('tasks').insert({ profile_id: profile.id, name, frequency: freq, color: selectedTaskColor, active: true, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays }).select().single()
         if (data) tasks.push(data)
         showToast('Tâche créée')
       }
 
       closeTaskModal()
+      renderWeekBig()
       renderTasksList()
       updateProgress()
       updateDateTitle()
