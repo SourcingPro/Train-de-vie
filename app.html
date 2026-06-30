@@ -1672,7 +1672,7 @@
         days.forEach(function(d) {
           const key = d.str + '_' + task.id
           const isDone = !!completions[key]
-          tbody += '<td><button class="week-check' + (isDone ? ' done' : '') + '" style="' + (isDone ? 'background:' + (task.color || 'var(--accent)') + ';border-color:' + (task.color || 'var(--accent)') + ';' : '') + '" onclick="toggleTaskForDate(\\'' + task.id + '\\',\\'' + d.str + '\\')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button></td>'
+          tbody += '<td><button class="week-check' + (isDone ? ' done' : '') + '" style="' + (isDone ? 'background:' + (task.color || 'var(--accent)') + ';border-color:' + (task.color || 'var(--accent)') + ';' : '') + '" data-task-id="' + task.id + '" data-date="' + d.str + '" onclick="toggleTaskForDate(this.dataset.taskId,this.dataset.date)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button></td>'
         })
         tbody += '</tr>'
       })
