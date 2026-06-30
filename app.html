@@ -1056,11 +1056,11 @@
         <div class="stats-grid-4">
           <div class="stat-card-sm">
             <div class="stat-value-sm" id="stat-avg-day">0</div>
-            <div class="stat-label-sm">Moyenne / jour</div>
+            <div class="stat-label-sm">Aujourd'hui</div>
           </div>
           <div class="stat-card-sm">
             <div class="stat-value-sm" id="stat-avg-week">0</div>
-            <div class="stat-label-sm">Moyenne / semaine</div>
+            <div class="stat-label-sm">Cette semaine</div>
           </div>
           <div class="stat-card-sm">
             <div class="stat-value-sm" id="stat-avg-month">0</div>
@@ -1501,14 +1501,18 @@
         document.getElementById('stat-streak').textContent = '0'
         return
       }
-      // Moyenne / jour (sur 7 derniers jours)
+      // Tâches faites aujourd'hui
+      const todayStr0 = toDateStr(new Date())
+      const doneToday = tasks.filter(function(t) { return t.active && completions[todayStr0 + '_' + t.id] }).length
+      document.getElementById('stat-avg-day').textContent = doneToday
+
+      // Moyenne / jour sur 7 derniers jours (arrondie à l'entier)
       let sum7 = 0
       for (let i = 0; i < 7; i++) {
         const d = new Date(); d.setDate(d.getDate() - i)
         const str = toDateStr(d)
         sum7 += tasks.filter(function(t) { return t.active && completions[str + '_' + t.id] }).length
       }
-      document.getElementById('stat-avg-day').textContent = (sum7 / 7).toFixed(1)
       document.getElementById('stat-avg-week').textContent = sum7
 
       // Moyenne / mois (extrapolation sur 30j)
