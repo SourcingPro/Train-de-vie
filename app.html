@@ -2198,15 +2198,24 @@
     let selectedTaskTagIds = []
     let editingRescheduleTaskId = null
 
-    function loadTaskTags() {
-      const s = localStorage.getItem('tdv_tags_' + profile.id)
-      taskTags = s ? JSON.parse(s) : [
-        { id: 't1', emoji: '💪', name: 'Santé', color: '#16A34A' },
-        { id: 't2', emoji: '💼', name: 'Travail', color: '#0891B2' },
-        { id: 't3', emoji: '🏠', name: 'Maison', color: '#D97706' }
-      ]
+    async function loadTaskTags() {
+      const { data } = await db.from('task_tags').select('*').eq('profile_id', profile.id).order('created_at')
+      taskTags = (data || []).map(function(t) { return { id: t.id, emoji: t.emoji, name: t.name, color: t.color } })
+      if (!taskTags.length) {
+        const defaults = [
+          { id: 't1', emoji: '💪', name: 'Santé', color: '#16A34A' },
+          { id: 't2', emoji: '💼', name: 'Travail', color: '#0891B2' },
+          { id: 't3', emoji: '🏠', name: 'Maison', color: '#D97706' }
+        ]
+        for (const t of defaults) {
+          await db.from('task_tags').insert({ id: t.id, profile_id: profile.id, emoji: t.emoji, name: t.name, color: t.color })
+        }
+        taskTags = defaults
+      }
     }
-    function saveTaskTags() { localStorage.setItem('tdv_tags_' + profile.id, JSON.stringify(taskTags)) }
+    async function saveTaskTag(t) {
+      await db.from('task_tags').upsert({ id: t.id, profile_id: profile.id, emoji: t.emoji, name: t.name, color: t.color })
+    }
 
     function tagById(id) { return taskTags.find(function(t) { return t.id === id }) }
 
@@ -2239,9 +2248,9 @@
       }).join('')
     }
 
-    window.deleteTag = function(id) {
+    window.deleteTag = async function(id) {
+      await db.from('task_tags').delete().eq('id', id)
       taskTags = taskTags.filter(function(t) { return t.id !== id })
-      saveTaskTags()
       renderTagsManageList()
       renderTasksList()
       updateTagStats()
@@ -2267,11 +2276,12 @@
     }
     window.selectNewTagColor = function(c) { newTagColor = c; renderNewTagColorPicker() }
 
-    document.getElementById('btn-add-tag').addEventListener('click', function() {
+    document.getElementById('btn-add-tag').addEventListener('click', async function() {
       const name = document.getElementById('new-tag-name').value.trim()
       if (!name) return
-      taskTags.push({ id: 'tag' + Date.now(), emoji: selectedTagEmoji, name: name, color: newTagColor })
-      saveTaskTags()
+      const newTag = { id: 'tag' + Date.now(), emoji: selectedTagEmoji, name: name, color: newTagColor }
+      await saveTaskTag(newTag)
+      taskTags.push(newTag)
       document.getElementById('new-tag-name').value = ''
       selectedTagEmoji = '🏷️'
       renderEmojiPicker('tag-emoji-picker', 'tag-emoji-display', selectedTagEmoji, e => selectedTagEmoji = e)
@@ -2401,12 +2411,12 @@
     // ══════════════════════════════════════
     let taskReschedules = {}
 
-    function loadTaskReschedules() {
-      const s = localStorage.getItem('tdv_reschedules_' + profile.id)
-      taskReschedules = s ? JSON.parse(s) : {}
-    }
-    function saveTaskReschedules() {
-      localStorage.setItem('tdv_reschedules_' + profile.id, JSON.stringify(taskReschedules))
+    async function loadTaskReschedules() {
+      const { data } = await db.from('task_reschedules').select('*').eq('profile_id', profile.id)
+      taskReschedules = {}
+      ;(data || []).forEach(function(r) {
+        taskReschedules[r.task_id + '_' + r.origin_date] = r.target_date
+      })
     }
 
     // Retourne la liste des tâches à afficher pour une date donnée,
@@ -2491,7 +2501,7 @@
       }
       // Enregistre le report : ce taskId, depuis selectedDate, va vers newDate
       taskReschedules[taskId + '_' + selectedDate] = newDate
-      saveTaskReschedules()
+      await db.from('task_reschedules').upsert({ profile_id: profile.id, task_id: taskId, origin_date: selectedDate, target_date: newDate }, { onConflict: 'task_id,origin_date' })
       document.getElementById('modal-reschedule').classList.remove('open')
       renderWeekBig()
       renderTasksList()
@@ -4459,11 +4469,10 @@
     let taskLibFilterCat = 'Tous'
     let taskLibSearch = ''
 
-    function loadTaskTemplates() {
-      const s = localStorage.getItem('tdv_tasktemplates_' + profile.id)
-      taskTemplates = s ? JSON.parse(s) : []
+    async function loadTaskTemplates() {
+      const { data } = await db.from('task_templates').select('*').eq('profile_id', profile.id).order('created_at')
+      taskTemplates = (data || []).map(function(t) { return { id: t.id, name: t.name, emoji: t.emoji, freq: t.freq, tagIds: t.tag_ids || [] } })
     }
-    function saveTaskTemplates() { localStorage.setItem('tdv_tasktemplates_' + profile.id, JSON.stringify(taskTemplates)) }
 
     function findOrCreateTagByName(name, emoji) {
       let tag = taskTags.find(function(t) { return t.name === name })
@@ -4471,7 +4480,7 @@
         const colorPool = ['#16A34A', '#0891B2', '#D97706', '#7C3AED', '#DB2777', '#1A1814']
         tag = { id: 'tag' + Date.now() + Math.floor(Math.random()*1000), emoji: emoji, name: name, color: colorPool[taskTags.length % colorPool.length] }
         taskTags.push(tag)
-        saveTaskTags()
+        saveTaskTag(tag)
       }
       return tag
     }
@@ -4628,13 +4637,14 @@
     function closeTlibEditModal() { document.getElementById('modal-tlib-edit').classList.remove('open') }
     function bindTlibEditButtons() {
       document.getElementById('tlib-cancel')?.addEventListener('click', closeTlibEditModal)
-      document.getElementById('tlib-delete')?.addEventListener('click', function() {
+      document.getElementById('tlib-delete')?.addEventListener('click', async function() {
+        await db.from('task_templates').delete().eq('id', editingTlibId)
         taskTemplates = taskTemplates.filter(function(t) { return t.id !== editingTlibId })
-        saveTaskTemplates(); closeTlibEditModal(); renderTlibList(); showToast('Modèle supprimé')
+        closeTlibEditModal(); renderTlibList(); showToast('Modèle supprimé')
       })
       document.getElementById('tlib-save').addEventListener('click', saveTlib)
     }
-    function saveTlib() {
+    async function saveTlib() {
       const name = document.getElementById('tlib-name-input').value.trim()
       if (!name) return
       const tpl = {
@@ -4644,9 +4654,10 @@
         freq: document.getElementById('tlib-freq-input').value,
         tagIds: selectedTlibTagIds.slice()
       }
+      await db.from('task_templates').upsert({ id: tpl.id, profile_id: profile.id, name: tpl.name, emoji: tpl.emoji, freq: tpl.freq, tag_ids: tpl.tagIds })
       if (editingTlibId) taskTemplates = taskTemplates.map(function(t) { return t.id === editingTlibId ? tpl : t })
       else taskTemplates.push(tpl)
-      saveTaskTemplates(); closeTlibEditModal(); renderTlibList(); showToast('Modèle enregistré')
+      closeTlibEditModal(); renderTlibList(); showToast('Modèle enregistré')
     }
     document.getElementById('modal-tlib-edit-close').addEventListener('click', closeTlibEditModal)
     document.getElementById('modal-tlib-edit').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeTlibEditModal() })
@@ -5005,9 +5016,9 @@
     // ── INIT ──
     async function init() {
       loadTheme()
-      loadTaskTags()
-      loadTaskReschedules()
-      loadTaskTemplates()
+      await loadTaskTags()
+      await loadTaskReschedules()
+      await loadTaskTemplates()
       loadExLibrary()
       loadSportPrograms()
       loadWorkoutHistory()
