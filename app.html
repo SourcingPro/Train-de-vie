@@ -2226,7 +2226,7 @@
         social:'Proches', media:'Séries & Films', cooking:'Cuisine', activities:'Sorties'
       }
       document.getElementById('header-title').textContent = titles[id] || id
-      document.getElementById('fab').style.display = (id === 'tasks' || id === 'sport') ? 'flex' : 'none'
+      document.getElementById('fab').style.display = (id === 'tasks') ? 'flex' : 'none'
     }
 
     // (renderDateStrip remplacé par renderWeekBig, voir plus bas)
