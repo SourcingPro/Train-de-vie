@@ -1018,6 +1018,52 @@
       border-color: var(--accent);
       color: var(--bg);
     }
+    /* ══════════════════════════════════════
+       STATS TÂCHES
+    ══════════════════════════════════════ */
+    .task-stats-period-toggle {
+      display: flex;
+      margin: 0 1.25rem 1rem;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+    }
+    .task-stats-period-btn {
+      flex: 1; padding: 0.5rem; border: none; background: transparent;
+      border-radius: 8px; font-size: 0.8125rem; font-weight: 500;
+      font-family: inherit; cursor: pointer; color: var(--text-muted);
+      transition: all var(--transition);
+    }
+    .task-stats-period-btn.active { background: var(--surface); color: var(--text-primary); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+    .heatmap-cell {
+      aspect-ratio: 1;
+      border-radius: 3px;
+      background: var(--surface-2);
+    }
+    .heatmap-cell[data-level="1"] { background: color-mix(in srgb, var(--accent) 25%, var(--surface-2)); }
+    .heatmap-cell[data-level="2"] { background: color-mix(in srgb, var(--accent) 50%, var(--surface-2)); }
+    .heatmap-cell[data-level="3"] { background: color-mix(in srgb, var(--accent) 75%, var(--surface-2)); }
+    .heatmap-cell[data-level="4"] { background: var(--accent); }
+    .heatmap-legend {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; margin-top: 0.75rem;
+      font-size: 0.6875rem; color: var(--text-muted);
+    }
+    .heatmap-legend-dots { display: flex; gap: 3px; }
+    .heatmap-dot {
+      width: 10px; height: 10px; border-radius: 2px;
+      background: var(--surface-2);
+    }
+    .heatmap-dot[data-level="1"] { background: color-mix(in srgb, var(--accent) 25%, var(--surface-2)); }
+    .heatmap-dot[data-level="2"] { background: color-mix(in srgb, var(--accent) 50%, var(--surface-2)); }
+    .heatmap-dot[data-level="3"] { background: color-mix(in srgb, var(--accent) 75%, var(--surface-2)); }
+    .heatmap-dot[data-level="4"] { background: var(--accent); }
 </style>
 </head>
 <body>
@@ -1049,10 +1095,11 @@
         <div class="page-subtitle" id="tasks-subtitle"></div>
       </div>
 
-      <!-- Toggle Jour / Semaine -->
+      <!-- Toggle Jour / Semaine / Stats -->
       <div class="task-view-toggle">
         <button class="task-view-btn active" id="btn-tv-day">Jour</button>
         <button class="task-view-btn" id="btn-tv-week">Semaine</button>
+        <button class="task-view-btn" id="btn-tv-stats">Stats</button>
       </div>
 
       <!-- ── VUE JOUR ── -->
@@ -1122,6 +1169,56 @@
         </div>
         <div class="week-table-wrap">
           <table class="week-table" id="week-table"></table>
+        </div>
+      </div>
+
+      <!-- ── VUE STATS ── -->
+      <div class="task-view" id="tv-stats">
+        <div class="task-stats-period-toggle">
+          <button class="task-stats-period-btn active" data-tstat-period="week">Semaine</button>
+          <button class="task-stats-period-btn" data-tstat-period="month">Mois</button>
+          <button class="task-stats-period-btn" data-tstat-period="year">Année</button>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Tâches réalisées / jour</span></div>
+          <div class="chart-canvas-wrap"><canvas id="chart-tasks-day"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">% de tâches accomplies / jour</span></div>
+          <div class="chart-canvas-wrap"><canvas id="chart-tasks-pct"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Répartition par catégorie</span></div>
+          <div class="chart-canvas-wrap" style="height:160px;"><canvas id="chart-tasks-cat"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Comparaison des tâches</span></div>
+          <div class="chart-canvas-wrap"><canvas id="chart-tasks-compare"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Évolution des jours consécutifs</span></div>
+          <div class="chart-canvas-wrap"><canvas id="chart-tasks-streak"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Calendrier d'activité</span></div>
+          <div class="heatmap-grid" id="task-heatmap"></div>
+          <div class="heatmap-legend">
+            <span>Moins</span>
+            <div class="heatmap-legend-dots">
+              <span class="heatmap-dot" data-level="0"></span>
+              <span class="heatmap-dot" data-level="1"></span>
+              <span class="heatmap-dot" data-level="2"></span>
+              <span class="heatmap-dot" data-level="3"></span>
+              <span class="heatmap-dot" data-level="4"></span>
+            </div>
+            <span>Plus</span>
+          </div>
         </div>
       </div>
 
@@ -1195,12 +1292,7 @@
           <option value="monthly">Mensuel</option>
           <option value="interval">Tous les X jours</option>
           <option value="weekdays">Jours spécifiques</option>
-          <option value="once">Ponctuelle (un seul jour)</option>
         </select>
-      </div>
-      <div class="form-group" id="freq-once-group" style="display:none;">
-        <label class="form-label">Date</label>
-        <input class="form-input" type="date" id="task-freq-once-date" />
       </div>
       <div class="form-group" id="freq-interval-group" style="display:none;">
         <label class="form-label">Intervalle (en jours)</label>
@@ -1362,11 +1454,7 @@
         const days = (task.freq_days || []).slice().sort()
         return days.map(function(d) { return names[d] }).join(', ') || 'Jours spécifiques'
       }
-      if (f === 'once' && task && task.freq_once_date) {
-        const d = new Date(task.freq_once_date + 'T12:00:00')
-        return 'Le ' + d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
-      }
-      return { daily: 'Quotidien', weekly: 'Hebdomadaire', monthly: 'Mensuel', interval: 'Tous les X jours', weekdays: 'Jours spécifiques', once: 'Ponctuelle' }[f] || f
+      return { daily: 'Quotidien', weekly: 'Hebdomadaire', monthly: 'Mensuel', interval: 'Tous les X jours', weekdays: 'Jours spécifiques' }[f] || f
     }
 
     // ── THEME ──
@@ -1623,9 +1711,6 @@
         const isoDay = jsDay === 0 ? 7 : jsDay // 1=lun ... 7=dim
         return days.includes(isoDay)
       }
-      if (task.frequency === 'once') {
-        return task.freq_once_date === dateStr
-      }
       return true
     }
 
@@ -1741,15 +1826,28 @@
     document.getElementById('btn-tv-day').addEventListener('click', function() {
       document.getElementById('btn-tv-day').classList.add('active')
       document.getElementById('btn-tv-week').classList.remove('active')
+      document.getElementById('btn-tv-stats').classList.remove('active')
       document.getElementById('tv-day').classList.add('active')
       document.getElementById('tv-week').classList.remove('active')
+      document.getElementById('tv-stats').classList.remove('active')
     })
     document.getElementById('btn-tv-week').addEventListener('click', function() {
       document.getElementById('btn-tv-week').classList.add('active')
       document.getElementById('btn-tv-day').classList.remove('active')
+      document.getElementById('btn-tv-stats').classList.remove('active')
       document.getElementById('tv-week').classList.add('active')
       document.getElementById('tv-day').classList.remove('active')
+      document.getElementById('tv-stats').classList.remove('active')
       renderWeekTable()
+    })
+    document.getElementById('btn-tv-stats').addEventListener('click', function() {
+      document.getElementById('btn-tv-stats').classList.add('active')
+      document.getElementById('btn-tv-day').classList.remove('active')
+      document.getElementById('btn-tv-week').classList.remove('active')
+      document.getElementById('tv-stats').classList.add('active')
+      document.getElementById('tv-day').classList.remove('active')
+      document.getElementById('tv-week').classList.remove('active')
+      setTimeout(renderAllTaskStats, 100)
     })
 
     document.getElementById('btn-wtable-prev').addEventListener('click', function() { weekTableOffset--; renderWeekTable() })
@@ -1817,6 +1915,241 @@
         renderWeekBig()
       }
       updateExtendedStats()
+    }
+
+
+
+    // ══════════════════════════════════════
+    // STATS TÂCHES — GRAPHIQUES
+    // ══════════════════════════════════════
+    let taskStatsPeriod = 'week'
+    let taskCharts = {}
+
+    document.querySelectorAll('[data-tstat-period]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-tstat-period]').forEach(function(b) { b.classList.remove('active') })
+        btn.classList.add('active')
+        taskStatsPeriod = btn.dataset.tstatPeriod
+        renderAllTaskStats()
+      })
+    })
+
+    function getStatsDayRange(period) {
+      if (period === 'week') return 7
+      if (period === 'month') return 30
+      return 365
+    }
+
+    function tcc() { return { grid: 'rgba(0,0,0,0.06)', text: '#9A9795' } }
+    function dtc(id) { if (taskCharts[id]) { taskCharts[id].destroy(); delete taskCharts[id] } }
+
+    function buildDateRangeLabels(days) {
+      const result = []
+      for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i)
+        result.push({ date: toDateStr(d), dateObj: d })
+      }
+      return result
+    }
+
+    function formatStatLabel(dateObj, period) {
+      if (period === 'year') return dateObj.toLocaleDateString('fr-FR', { month: 'short' })
+      return dateObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+    }
+
+    // 1. Tâches réalisées / jour
+    function renderTasksPerDayChart() {
+      dtc('tasksDay')
+      const ctx = document.getElementById('chart-tasks-day')
+      if (!ctx) return
+      const c = tcc()
+      const days = getStatsDayRange(taskStatsPeriod)
+      const range = buildDateRangeLabels(days)
+      let labels, data
+      if (taskStatsPeriod === 'year') {
+        // Agréger par mois
+        const monthMap = {}
+        range.forEach(function(r) {
+          const mKey = r.dateObj.getFullYear() + '-' + r.dateObj.getMonth()
+          if (!monthMap[mKey]) monthMap[mKey] = { label: r.dateObj.toLocaleDateString('fr-FR', { month: 'short' }), count: 0 }
+          const dayTasks = getTasksForDate(r.date).filter(function(t) { return t.active })
+          const done = dayTasks.filter(function(t) { return completions[r.date + '_' + t.id] }).length
+          monthMap[mKey].count += done
+        })
+        const entries = Object.values(monthMap)
+        labels = entries.map(function(e) { return e.label })
+        data = entries.map(function(e) { return e.count })
+      } else {
+        labels = range.map(function(r) { return formatStatLabel(r.dateObj, taskStatsPeriod) })
+        data = range.map(function(r) {
+          const dayTasks = getTasksForDate(r.date).filter(function(t) { return t.active })
+          return dayTasks.filter(function(t) { return completions[r.date + '_' + t.id] }).length
+        })
+      }
+      taskCharts['tasksDay'] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: labels, datasets: [{ data: data, backgroundColor: 'var(--accent)', borderRadius: 5, borderSkipped: false }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, stepSize: 1, font: { size: 10 } }, beginAtZero: true } } }
+      })
+    }
+
+    // 2. % de tâches accomplies / jour
+    function renderTasksPctChart() {
+      dtc('tasksPct')
+      const ctx = document.getElementById('chart-tasks-pct')
+      if (!ctx) return
+      const c = tcc()
+      const days = getStatsDayRange(taskStatsPeriod)
+      const range = buildDateRangeLabels(days)
+      let labels, data
+      if (taskStatsPeriod === 'year') {
+        const monthMap = {}
+        range.forEach(function(r) {
+          const mKey = r.dateObj.getFullYear() + '-' + r.dateObj.getMonth()
+          if (!monthMap[mKey]) monthMap[mKey] = { label: r.dateObj.toLocaleDateString('fr-FR', { month: 'short' }), sum: 0, n: 0 }
+          const dayTasks = getTasksForDate(r.date).filter(function(t) { return t.active })
+          const done = dayTasks.filter(function(t) { return completions[r.date + '_' + t.id] }).length
+          const pct = dayTasks.length > 0 ? (done / dayTasks.length) * 100 : 0
+          monthMap[mKey].sum += pct
+          monthMap[mKey].n++
+        })
+        const entries = Object.values(monthMap)
+        labels = entries.map(function(e) { return e.label })
+        data = entries.map(function(e) { return e.n > 0 ? Math.round(e.sum / e.n) : 0 })
+      } else {
+        labels = range.map(function(r) { return formatStatLabel(r.dateObj, taskStatsPeriod) })
+        data = range.map(function(r) {
+          const dayTasks = getTasksForDate(r.date).filter(function(t) { return t.active })
+          const done = dayTasks.filter(function(t) { return completions[r.date + '_' + t.id] }).length
+          return dayTasks.length > 0 ? Math.round((done / dayTasks.length) * 100) : 0
+        })
+      }
+      taskCharts['tasksPct'] = new Chart(ctx, {
+        type: 'line',
+        data: { labels: labels, datasets: [{ data: data, borderColor: 'var(--accent)', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, pointBackgroundColor: 'var(--accent)' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, callback: function(v) { return v + '%' } }, min: 0, max: 100 } } }
+      })
+    }
+
+    // 3. Répartition par catégorie
+    function renderTasksCatChart() {
+      dtc('tasksCat')
+      const ctx = document.getElementById('chart-tasks-cat')
+      if (!ctx) return
+      const days = getStatsDayRange(taskStatsPeriod)
+      const range = buildDateRangeLabels(days)
+      const counts = {}
+      taskTags.forEach(function(tag) { counts[tag.id] = 0 })
+      let untagged = 0
+      range.forEach(function(r) {
+        tasks.forEach(function(t) {
+          if (!t.active) return
+          if (!completions[r.date + '_' + t.id]) return
+          const ids = t.tag_ids || []
+          if (!ids.length) { untagged++; return }
+          ids.forEach(function(id) { if (counts[id] !== undefined) counts[id]++ })
+        })
+      })
+      const labels = []
+      const data = []
+      const colors = []
+      taskTags.forEach(function(tag) {
+        if (counts[tag.id] > 0) { labels.push(tag.emoji + ' ' + tag.name); data.push(counts[tag.id]); colors.push(tag.color) }
+      })
+      if (untagged > 0) { labels.push('Sans catégorie'); data.push(untagged); colors.push('#9CA3AF') }
+      if (!data.length) { taskCharts['tasksCat'] = null; ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height); return }
+      taskCharts['tasksCat'] = new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: tcc().text, padding: 8, font: { size: 10 } } } } }
+      })
+    }
+
+    // 4. Comparaison des tâches
+    function renderTasksCompareChart() {
+      dtc('tasksCompare')
+      const ctx = document.getElementById('chart-tasks-compare')
+      if (!ctx) return
+      const c = tcc()
+      const days = getStatsDayRange(taskStatsPeriod)
+      const range = buildDateRangeLabels(days)
+      const counts = {}
+      tasks.forEach(function(t) { if (t.active) counts[t.id] = { name: t.emoji + ' ' + t.name, count: 0 } })
+      range.forEach(function(r) {
+        tasks.forEach(function(t) {
+          if (!t.active) return
+          if (completions[r.date + '_' + t.id]) counts[t.id].count++
+        })
+      })
+      const entries = Object.values(counts).sort(function(a, b) { return b.count - a.count }).slice(0, 8)
+      const labels = entries.map(function(e) { return e.name })
+      const data = entries.map(function(e) { return e.count })
+      taskCharts['tasksCompare'] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: labels, datasets: [{ data: data, backgroundColor: 'var(--accent)', borderRadius: 5, borderSkipped: false }] },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, stepSize: 1, font: { size: 10 } }, beginAtZero: true }, y: { grid: { display: false }, ticks: { color: c.text, font: { size: 10 } } } } }
+      })
+    }
+
+    // 5. Évolution du streak
+    function renderStreakChart() {
+      dtc('tasksStreak')
+      const ctx = document.getElementById('chart-tasks-streak')
+      if (!ctx) return
+      const c = tcc()
+      const days = getStatsDayRange(taskStatsPeriod)
+      const range = buildDateRangeLabels(days)
+      const labels = []
+      const data = []
+      let currentStreak = 0
+      range.forEach(function(r) {
+        const dayTasks = getTasksForDate(r.date).filter(function(t) { return t.active })
+        const done = dayTasks.filter(function(t) { return completions[r.date + '_' + t.id] }).length
+        if (done > 0) currentStreak++
+        else currentStreak = 0
+        labels.push(formatStatLabel(r.dateObj, taskStatsPeriod === 'year' ? 'week' : taskStatsPeriod))
+        data.push(currentStreak)
+      })
+      // Pour l'année, on sous-échantillonne pour rester lisible
+      let finalLabels = labels, finalData = data
+      if (taskStatsPeriod === 'year') {
+        finalLabels = []; finalData = []
+        for (let i = 0; i < labels.length; i += 7) { finalLabels.push(labels[i]); finalData.push(data[i]) }
+      }
+      taskCharts['tasksStreak'] = new Chart(ctx, {
+        type: 'line',
+        data: { labels: finalLabels, datasets: [{ data: finalData, borderColor: '#7C3AED', backgroundColor: 'transparent', tension: 0.3, pointRadius: 2, pointBackgroundColor: '#7C3AED' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, stepSize: 1, font: { size: 10 } }, beginAtZero: true } } }
+      })
+    }
+
+    // 6. Heatmap calendrier d'activité
+    function renderTaskHeatmap() {
+      const el = document.getElementById('task-heatmap')
+      if (!el) return
+      const days = getStatsDayRange(taskStatsPeriod)
+      const range = buildDateRangeLabels(Math.min(days, 91)) // max ~13 semaines affichées
+      let maxCount = 1
+      const counts = range.map(function(r) {
+        const dayTasks = getTasksForDate(r.date).filter(function(t) { return t.active })
+        const done = dayTasks.filter(function(t) { return completions[r.date + '_' + t.id] }).length
+        if (done > maxCount) maxCount = done
+        return { date: r.date, count: done }
+      })
+      el.innerHTML = counts.map(function(c) {
+        const level = c.count === 0 ? 0 : Math.min(4, Math.ceil((c.count / maxCount) * 4))
+        return '<div class="heatmap-cell" data-level="' + level + '" title="' + c.date + ' : ' + c.count + '"></div>'
+      }).join('')
+    }
+
+    function renderAllTaskStats() {
+      if (typeof Chart === 'undefined') { setTimeout(renderAllTaskStats, 300); return }
+      renderTasksPerDayChart()
+      renderTasksPctChart()
+      renderTasksCatChart()
+      renderTasksCompareChart()
+      renderStreakChart()
+      renderTaskHeatmap()
     }
 
 
@@ -2026,7 +2359,6 @@
       const val = document.getElementById('task-freq-input').value
       document.getElementById('freq-interval-group').style.display = val === 'interval' ? '' : 'none'
       document.getElementById('freq-weekdays-group').style.display = val === 'weekdays' ? '' : 'none'
-      document.getElementById('freq-once-group').style.display = val === 'once' ? '' : 'none'
       if (val === 'weekdays') renderWeekdayPicker()
     }
     document.getElementById('task-freq-input').addEventListener('change', updateFreqFieldsVisibility)
@@ -2041,7 +2373,6 @@
       document.getElementById('task-name-input').value = ''
       document.getElementById('task-freq-input').value = 'daily'
       document.getElementById('task-freq-interval').value = ''
-      document.getElementById('task-freq-once-date').value = toDateStr(new Date())
       document.getElementById('modal-task-actions').innerHTML = `
         <button class="btn-secondary" id="modal-task-cancel">Annuler</button>
         <button class="btn-primary" id="modal-task-save">Créer la tâche</button>
@@ -2065,7 +2396,6 @@
       document.getElementById('task-name-input').value = task.name
       document.getElementById('task-freq-input').value = task.frequency
       document.getElementById('task-freq-interval').value = task.freq_interval || ''
-      document.getElementById('task-freq-once-date').value = task.freq_once_date || toDateStr(new Date())
       document.getElementById('modal-task-actions').innerHTML = `
         <button class="btn-danger" id="modal-task-delete">Supprimer</button>
         <button class="btn-primary" id="modal-task-save">Enregistrer</button>
@@ -2099,18 +2429,17 @@
       const freq = document.getElementById('task-freq-input').value
       const freqInterval = freq === 'interval' ? (parseInt(document.getElementById('task-freq-interval').value) || 1) : null
       const freqDays = freq === 'weekdays' ? [...selectedTaskWeekdays] : []
-      const freqOnceDate = freq === 'once' ? document.getElementById('task-freq-once-date').value : null
       const btn = document.getElementById('modal-task-save')
       btn.disabled = true
       const tagIds = [...selectedTaskTagIds]
 
       if (editingTaskId) {
-        await db.from('tasks').update({ name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays, freq_once_date: freqOnceDate }).eq('id', editingTaskId)
+        await db.from('tasks').update({ name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays }).eq('id', editingTaskId)
         const idx = tasks.findIndex(t => t.id === editingTaskId)
-        if (idx !== -1) tasks[idx] = { ...tasks[idx], name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays, freq_once_date: freqOnceDate }
+        if (idx !== -1) tasks[idx] = { ...tasks[idx], name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays }
         showToast('Tâche modifiée')
       } else {
-        const { data } = await db.from('tasks').insert({ profile_id: profile.id, name, frequency: freq, color: selectedTaskColor, active: true, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays, freq_once_date: freqOnceDate }).select().single()
+        const { data } = await db.from('tasks').insert({ profile_id: profile.id, name, frequency: freq, color: selectedTaskColor, active: true, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays }).select().single()
         if (data) tasks.push(data)
         showToast('Tâche créée')
       }
