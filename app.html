@@ -1295,6 +1295,84 @@
     .muscle-heat-bar-wrap { flex: 1; height: 8px; background: var(--surface-2); border-radius: 100px; overflow: hidden; }
     .muscle-heat-bar { height: 100%; border-radius: 100px; background: var(--accent); }
     .muscle-heat-count { flex: 0 0 32px; text-align: right; font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+
+    /* ══════════════════════════════════════
+       SPORT — SÉANCE DU JOUR
+    ══════════════════════════════════════ */
+    .sday-empty {
+      text-align: center; padding: 3rem 1.5rem; color: var(--text-muted);
+    }
+    .sday-prog-group {
+      margin: 0 1.25rem 1rem;
+    }
+    .sday-prog-label {
+      font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .sday-ex-card {
+      background: var(--surface); border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card); margin-bottom: 0.625rem; overflow: hidden;
+    }
+    .sday-ex-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.875rem 1rem; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sday-ex-check {
+      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+      border: 1.5px solid var(--border-strong); background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition); cursor: pointer;
+    }
+    .sday-ex-check.done { background: var(--pastel-green); border-color: var(--pastel-green); }
+    .sday-ex-check svg { width: 13px; height: 13px; fill: none; stroke: var(--pastel-green-text); stroke-width: 3; stroke-linecap: round; opacity: 0; }
+    .sday-ex-check.done svg { opacity: 1; }
+    .sday-ex-emoji { font-size: 1.25rem; }
+    .sday-ex-info { flex: 1; min-width: 0; }
+    .sday-ex-name { font-size: 0.9375rem; font-weight: 600; }
+    .sday-ex-name.done-text { text-decoration: line-through; color: var(--text-muted); }
+    .sday-ex-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem; }
+    .sday-ex-expand {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      border: none; background: var(--surface-2); color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      transition: transform var(--transition);
+    }
+    .sday-ex-expand.open { transform: rotate(180deg); }
+    .sday-ex-expand svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+    .sday-sets-wrap { display: none; padding: 0 1rem 1rem; }
+    .sday-sets-wrap.open { display: block; }
+    .sday-set-row {
+      display: flex; align-items: center; gap: 0.625rem;
+      padding: 0.5rem 0; border-top: 0.5px solid var(--border);
+    }
+    .sday-set-num {
+      width: 22px; height: 22px; border-radius: 50%; background: var(--surface-2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6875rem; font-weight: 700; color: var(--text-secondary); flex-shrink: 0;
+    }
+    .sday-set-label { flex: 1; font-size: 0.8125rem; color: var(--text-secondary); }
+    .sday-set-check {
+      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+      border: 1.5px solid var(--border-strong); background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all var(--transition);
+    }
+    .sday-set-check.done { background: var(--pastel-green); border-color: var(--pastel-green); color: var(--pastel-green-text); }
+    .sday-set-check svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; opacity: 0; }
+    .sday-set-check.done svg { opacity: 1; }
+
+    .plan-item-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 1rem; border-bottom: 0.5px solid var(--border);
+      cursor: pointer; transition: background var(--transition);
+    }
+    .plan-item-row:hover { background: var(--surface-2); }
+    .plan-item-row:last-child { border-bottom: none; }
+
+    .quick-log-field { margin-bottom: 0.875rem; }
+    .quick-log-field label { display: block; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.3rem; }
 </style>
 </head>
 <body>
@@ -1464,19 +1542,64 @@
 <!-- MODULE : SPORT -->
     <div class="module" id="module-sport">
       <div class="page-header">
-        <div class="page-title">Sport</div>
-        <div class="page-subtitle" id="sport-subtitle">Bibliothèque & programmes</div>
+        <div class="page-title" id="sport-page-title">Sport</div>
+        <div class="page-subtitle" id="sport-subtitle">Séance du jour</div>
       </div>
 
-      <!-- Toggle Exercices / Programmes / Stats -->
+      <!-- Toggle principal -->
       <div class="task-view-toggle">
-        <button class="task-view-btn active" id="btn-sv-ex">Exercices</button>
-        <button class="task-view-btn" id="btn-sv-prog">Programmes</button>
+        <button class="task-view-btn active" id="btn-sv-day">Jour</button>
+        <button class="task-view-btn" id="btn-sv-week">Semaine</button>
         <button class="task-view-btn" id="btn-sv-stats">Stats</button>
       </div>
 
-      <!-- ── VUE EXERCICES ── -->
-      <div class="task-view active" id="sv-ex">
+      <!-- ── VUE JOUR (Séance du jour) ── -->
+      <div class="task-view active" id="sv-day">
+        <div class="week-nav-row">
+          <button class="btn-icon" id="btn-sday-prev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <span class="week-nav-title" id="sday-title"></span>
+          <button class="btn-icon" id="btn-sday-next"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-header">
+            <span class="progress-label">Progression du jour</span>
+            <span class="progress-pct" id="sday-progress-pct">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="sday-progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div id="sday-content"></div>
+
+        <div style="display:flex;gap:0.625rem;padding:0 1.25rem 0.625rem;">
+          <button class="btn-secondary" style="flex:1;" id="btn-goto-ex">📚 Exercices</button>
+          <button class="btn-secondary" style="flex:1;" id="btn-goto-prog">📋 Programmes</button>
+        </div>
+        <div style="padding:0 1.25rem 1rem;">
+          <button class="btn-secondary" style="width:100%;" id="btn-sday-plan">📅 Planifier ce jour</button>
+        </div>
+      </div>
+
+      <!-- ── VUE SEMAINE (Calendrier planification) ── -->
+      <div class="task-view" id="sv-week">
+        <div class="week-nav-row">
+          <button class="btn-icon" id="btn-sweek-prev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <span class="week-nav-title" id="sweek-title"></span>
+          <button class="btn-icon" id="btn-sweek-next"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+        <div class="week-big-grid" id="sweek-grid"></div>
+        <div class="card" id="sweek-day-card" style="display:none;">
+          <div class="card-title" id="sweek-day-title">Jour</div>
+          <div id="sweek-day-list"></div>
+          <button class="btn-secondary" style="width:100%;margin-top:0.75rem;" id="btn-sweek-add">+ Planifier quelque chose</button>
+        </div>
+      </div>
+
+
+      <!-- Toggle secondaire Exercices / Programmes -->
+      <div class="task-view" id="sv-ex" style="display:none;">
         <div class="ex-lib-search-row">
           <input class="form-input" style="flex:1;" placeholder="Rechercher un exercice…" id="ex-search" />
           <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-ex">+ Ajouter</button>
@@ -1801,6 +1924,44 @@
       <button class="btn-danger" style="width:100%;margin-top:0.625rem;" id="btn-prog-detail-delete">Supprimer le programme</button>
     </div>
   </div>
+
+  <!-- MODAL PLANIFIER -->
+  <div class="modal-overlay" id="modal-plan">
+    <div class="modal" style="max-height:90dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title">Planifier <span id="plan-date-label"></span></div>
+        <button class="modal-close" id="modal-plan-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="task-view-toggle">
+        <button class="task-view-btn active" id="btn-plan-prog">Programme</button>
+        <button class="task-view-btn" id="btn-plan-ex">Exercice seul</button>
+      </div>
+      <div class="task-view active" id="plan-tab-prog">
+        <div id="plan-prog-list"></div>
+      </div>
+      <div class="task-view" id="plan-tab-ex">
+        <input class="form-input" placeholder="Rechercher un exercice…" id="plan-ex-search" style="margin-bottom:0.75rem;" />
+        <div id="plan-ex-list" style="max-height:40dvh;overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VALEURS PAR DÉFAUT (si exercice coché sans données) -->
+  <div class="modal-overlay" id="modal-quick-log">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Renseigner l'exercice</div>
+        <button class="modal-close" id="modal-quick-log-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:1rem;" id="quick-log-ex-name"></p>
+      <div id="quick-log-fields"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="quick-log-cancel">Annuler</button>
+        <button class="btn-primary" id="quick-log-confirm">Valider</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- SESSION EN COURS (séance live) -->
   <div class="session-overlay" id="session-overlay">
@@ -2796,7 +2957,7 @@
           '<div class="ex-lib-meta">' + ex.cat + (ex.equip ? ' · ' + ex.equip : '') + '</div>' +
           (tagsHtml ? '<div class="ex-lib-tags">' + tagsHtml + '</div>' : '') +
           '</div>' +
-          '<div class="ex-lib-pr">' + (pr ? pr.weight + ' kg' : '—') + '<div class="ex-lib-pr-label">PR</div></div>'
+          '<div class="ex-lib-pr">' + (pr ? (Math.round(pr.weight * 10) / 10) + ' kg' : '—') + '<div class="ex-lib-pr-label">PR</div></div>'
         div.addEventListener('click', function() { openExDetail(ex.id) })
         listEl.appendChild(div)
       })
@@ -2826,7 +2987,7 @@
       }
       html += '<div class="ex-detail-section"><div class="ex-detail-label">Record personnel (PR)</div>'
       if (pr) {
-        html += '<div class="ex-detail-pr-card"><div class="ex-detail-pr-value">' + pr.weight + ' kg</div><div class="ex-detail-pr-sub">' + (pr.reps ? pr.reps + ' répétitions · ' : '') + new Date(pr.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div></div>'
+        html += '<div class="ex-detail-pr-card"><div class="ex-detail-pr-value">' + (Math.round(pr.weight * 10) / 10) + ' kg</div><div class="ex-detail-pr-sub">' + (pr.reps ? Math.round(pr.reps) + ' répétitions · ' : '') + new Date(pr.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div></div>'
       } else {
         html += '<div class="ex-detail-pr-empty">Aucun PR enregistré pour l\'instant.<br/>Il se calculera automatiquement dès que tu logueras des séances avec cet exercice.</div>'
       }
@@ -2998,20 +3159,7 @@
     }
     function saveSportPrograms() { localStorage.setItem('tdv_progs_' + profile.id, JSON.stringify(sportPrograms)) }
 
-    // ── Toggle Exercices / Programmes ──
-    document.getElementById('btn-sv-ex').addEventListener('click', function() {
-      document.getElementById('btn-sv-ex').classList.add('active')
-      document.getElementById('btn-sv-prog').classList.remove('active')
-      document.getElementById('sv-ex').classList.add('active')
-      document.getElementById('sv-prog').classList.remove('active')
-    })
-    document.getElementById('btn-sv-prog').addEventListener('click', function() {
-      document.getElementById('btn-sv-prog').classList.add('active')
-      document.getElementById('btn-sv-ex').classList.remove('active')
-      document.getElementById('sv-prog').classList.add('active')
-      document.getElementById('sv-ex').classList.remove('active')
-      renderProgList()
-    })
+    // (ancien toggle Exercices/Programmes remplacé par sportShowView, voir plus bas)
 
     // ── Liste des programmes ──
     function renderProgList() {
@@ -3273,7 +3421,8 @@
         ex.sets.forEach(function(set, setIdx) {
           let inputsHtml = ''
           fields.forEach(function(fm) {
-            inputsHtml += '<input type="number" class="session-set-input" placeholder="' + fm.ph + '" value="' + (set[fm.f] || '') + '" data-ex="' + exIdx + '" data-set="' + setIdx + '" data-f="' + fm.f + '" />'
+            const stepMap = { weight: '0.5', reps: '1', duration: '1', distance: '0.1', speed: '0.1', resistance: '1', incline: '0.5', calories: '1' }
+            inputsHtml += '<input type="number" class="session-set-input" placeholder="' + fm.ph + '" step="' + (stepMap[fm.f] || '1') + '" value="' + (set[fm.f] || '') + '" data-ex="' + exIdx + '" data-set="' + setIdx + '" data-f="' + fm.f + '" />'
           })
           setsHtml += '<div class="session-set-row">' +
             '<div class="session-set-num">' + (setIdx+1) + '</div>' +
@@ -3340,18 +3489,7 @@
       })
     })
 
-    document.getElementById('btn-sv-stats').addEventListener('click', function() {
-      document.getElementById('btn-sv-stats').classList.add('active')
-      document.getElementById('btn-sv-ex').classList.remove('active')
-      document.getElementById('btn-sv-prog').classList.remove('active')
-      document.getElementById('sv-stats').classList.add('active')
-      document.getElementById('sv-ex').classList.remove('active')
-      document.getElementById('sv-prog').classList.remove('active')
-      setTimeout(renderAllSportStats, 100)
-    })
-    // S'assurer que les autres boutons referment bien l'onglet stats
-    document.getElementById('btn-sv-ex').addEventListener('click', function() { document.getElementById('sv-stats').classList.remove('active') })
-    document.getElementById('btn-sv-prog').addEventListener('click', function() { document.getElementById('sv-stats').classList.remove('active') })
+    // (ancien listener btn-sv-stats remplacé par sportShowView, voir plus bas)
 
     function sportDayRange(period) { return period === 'week' ? 7 : (period === 'month' ? 30 : 365) }
 
@@ -3522,7 +3660,7 @@
           const ex = w.exercises.find(function(e){return e.name===exName})
           let maxW = null
           ;(ex.sets||[]).forEach(function(s){ if (s.weight && (!maxW || s.weight>maxW)) maxW = s.weight })
-          if (maxW) points.push({ date: w.date, weight: maxW })
+          if (maxW) points.push({ date: w.date, weight: Math.round(maxW * 10) / 10 })
         })
       sportCharts['sportPR'] = new Chart(ctx, {
         type: 'line',
@@ -3666,6 +3804,424 @@
       renderCardioSpeedChart()
       renderCardioDurationChart()
     }
+
+
+
+    // ══════════════════════════════════════
+    // SPORT — PLANNING (calendrier de séances)
+    // ══════════════════════════════════════
+    // sportPlanning: { "2026-07-01": [ {type:'program', progId, items:[{exId,name,emoji,sets,reps,weight,metrics,done,setsDone:[bool]}] }, {type:'exercise', exId, name, emoji, sets, reps, weight, metrics, done, setsDone:[bool]} ] }
+    let sportPlanning = {}
+    let sportDayOffset = 0
+    let sportWeekOffsetCal = 0
+    let planTargetDate = null
+    let quickLogTarget = null // { dateKey, groupIdx, itemIdx | null si exercice direct }
+
+    function loadSportPlanning() {
+      const s = localStorage.getItem('tdv_planning_' + profile.id)
+      sportPlanning = s ? JSON.parse(s) : {}
+    }
+    function saveSportPlanning() { localStorage.setItem('tdv_planning_' + profile.id, JSON.stringify(sportPlanning)) }
+
+    function buildPlanItemFromEx(ex) {
+      return {
+        exId: ex.id, name: ex.name, emoji: ex.emoji,
+        sets: ex.defaultSets || 3, reps: 10, weight: ex.usualWeight || null,
+        metrics: (ex.metrics && ex.metrics.length) ? ex.metrics.slice() : ['reps'],
+        done: false,
+        setsDone: Array.from({ length: ex.defaultSets || 3 }, function() { return false })
+      }
+    }
+    function buildPlanItemFromProgEx(progEx) {
+      const libEx = exLibrary.find(function(e) { return e.name === progEx.name })
+      const metrics = (libEx && libEx.metrics && libEx.metrics.length) ? libEx.metrics : ['reps']
+      return {
+        exId: libEx ? libEx.id : null, name: progEx.name, emoji: progEx.emoji,
+        sets: progEx.sets, reps: progEx.reps, weight: progEx.weight, metrics: metrics,
+        done: false,
+        setsDone: Array.from({ length: progEx.sets }, function() { return false })
+      }
+    }
+
+    function planProgramForDate(dateStr, prog) {
+      if (!sportPlanning[dateStr]) sportPlanning[dateStr] = []
+      sportPlanning[dateStr].push({
+        type: 'program', progId: prog.id, progName: prog.name, progEmoji: prog.emoji,
+        items: (prog.exercises || []).map(buildPlanItemFromProgEx)
+      })
+      saveSportPlanning()
+    }
+    function planExerciseForDate(dateStr, ex) {
+      if (!sportPlanning[dateStr]) sportPlanning[dateStr] = []
+      sportPlanning[dateStr].push({ type: 'exercise', item: buildPlanItemFromEx(ex) })
+      saveSportPlanning()
+    }
+
+    function getDayGroups(dateStr) { return sportPlanning[dateStr] || [] }
+
+    function dayProgress(dateStr) {
+      const groups = getDayGroups(dateStr)
+      let total = 0, done = 0
+      groups.forEach(function(g) {
+        const items = g.type === 'program' ? g.items : [g.item]
+        items.forEach(function(it) { total++; if (it.done) done++ })
+      })
+      return { total: total, done: done, pct: total > 0 ? Math.round((done / total) * 100) : 0 }
+    }
+
+    // ══════════════════════════════════════
+    // VUE JOUR — rendu
+    // ══════════════════════════════════════
+    function sportDayDateForOffset(offset) {
+      const d = new Date()
+      d.setDate(d.getDate() + offset)
+      return toDateStr(d)
+    }
+
+    function renderSportDay() {
+      const dateStr = sportDayDateForOffset(sportDayOffset)
+      const d = new Date(dateStr + 'T12:00:00')
+      const todayStr = toDateStr(new Date())
+      document.getElementById('sday-title').textContent = dateStr === todayStr ? "Aujourd'hui" : d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+
+      const prog = dayProgress(dateStr)
+      document.getElementById('sday-progress-pct').textContent = prog.pct + '%'
+      document.getElementById('sday-progress-fill').style.width = prog.pct + '%'
+
+      const groups = getDayGroups(dateStr)
+      const content = document.getElementById('sday-content')
+      if (!groups.length) {
+        content.innerHTML = '<div class="sday-empty"><p>Aucune séance planifiée ce jour.<br/>Touche « Planifier ce jour » pour en ajouter une.</p></div>'
+        return
+      }
+      content.innerHTML = ''
+      groups.forEach(function(g, gIdx) {
+        const wrap = document.createElement('div')
+        wrap.className = 'sday-prog-group'
+        let labelHtml = ''
+        if (g.type === 'program') labelHtml = '<div class="sday-prog-label">' + g.progEmoji + ' ' + g.progName + '</div>'
+        wrap.innerHTML = labelHtml
+        const items = g.type === 'program' ? g.items : [g.item]
+        items.forEach(function(item, iIdx) {
+          wrap.appendChild(renderSdayExCard(dateStr, gIdx, g.type === 'program' ? iIdx : null, item))
+        })
+        content.appendChild(wrap)
+      })
+    }
+
+    function metricUnitLabel(metrics, item) {
+      if (metrics.includes('reps')) return item.sets + ' séries · ' + item.reps + ' reps' + (item.weight ? ' · ' + item.weight + ' kg' : '')
+      const labels = { duration: 'min', distance: 'km', speed: 'km/h', resistance: 'résist.', incline: '% incl.', calories: 'kcal' }
+      return metrics.map(function(m) { return labels[m] || m }).join(', ')
+    }
+
+    function renderSdayExCard(dateStr, gIdx, iIdx, item) {
+      const card = document.createElement('div')
+      card.className = 'sday-ex-card'
+      const setsLabel = metricUnitLabel(item.metrics, item)
+      card.innerHTML = '<div class="sday-ex-header">' +
+        '<button type="button" class="sday-ex-check' + (item.done ? ' done' : '') + '"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>' +
+        '<span class="sday-ex-emoji">' + item.emoji + '</span>' +
+        '<div class="sday-ex-info"><div class="sday-ex-name' + (item.done ? ' done-text' : '') + '">' + item.name + '</div><div class="sday-ex-meta">' + setsLabel + '</div></div>' +
+        '<button type="button" class="sday-ex-expand"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>' +
+        '</div>' +
+        '<div class="sday-sets-wrap"></div>'
+
+      const setsWrap = card.querySelector('.sday-sets-wrap')
+      item.setsDone.forEach(function(done, setIdx) {
+        const row = document.createElement('div')
+        row.className = 'sday-set-row'
+        row.innerHTML = '<div class="sday-set-num">' + (setIdx+1) + '</div>' +
+          '<div class="sday-set-label">' + (item.metrics.includes('reps') ? item.reps + ' reps' + (item.weight ? ' · ' + item.weight + ' kg' : '') : setsLabel) + '</div>' +
+          '<button type="button" class="sday-set-check' + (done ? ' done' : '') + '"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>'
+        row.querySelector('.sday-set-check').addEventListener('click', function() {
+          toggleSdaySet(dateStr, gIdx, iIdx, setIdx)
+        })
+        setsWrap.appendChild(row)
+      })
+
+      card.querySelector('.sday-ex-expand').addEventListener('click', function(e) {
+        e.stopPropagation()
+        setsWrap.classList.toggle('open')
+        e.currentTarget.classList.toggle('open')
+      })
+      card.querySelector('.sday-ex-check').addEventListener('click', function(e) {
+        e.stopPropagation()
+        toggleSdayExercise(dateStr, gIdx, iIdx, item)
+      })
+      return card
+    }
+
+    function getPlanItem(dateStr, gIdx, iIdx) {
+      const g = sportPlanning[dateStr][gIdx]
+      return g.type === 'program' ? g.items[iIdx] : g.item
+    }
+
+    function toggleSdaySet(dateStr, gIdx, iIdx, setIdx) {
+      const item = getPlanItem(dateStr, gIdx, iIdx)
+      item.setsDone[setIdx] = !item.setsDone[setIdx]
+      item.done = item.setsDone.every(function(s) { return s })
+      saveSportPlanning()
+      logSdayProgressToHistory(dateStr)
+      renderSportDay()
+      renderSweekGrid()
+    }
+
+    function toggleSdayExercise(dateStr, gIdx, iIdx, item) {
+      const needsData = item.metrics.includes('reps') ? (!item.reps || !item.weight) : item.metrics.some(function(m) { return !item['_' + m] && m !== 'reps' })
+      if (!item.done && needsData && item.metrics.includes('reps') && (!item.weight)) {
+        // Demande confirmation/saisie si poids non renseigné
+        openQuickLog(dateStr, gIdx, iIdx, item)
+        return
+      }
+      item.done = !item.done
+      item.setsDone = item.setsDone.map(function() { return item.done })
+      saveSportPlanning()
+      logSdayProgressToHistory(dateStr)
+      renderSportDay()
+      renderSweekGrid()
+    }
+
+    // ── Quick log : demande les valeurs manquantes avant de cocher ──
+    function openQuickLog(dateStr, gIdx, iIdx, item) {
+      quickLogTarget = { dateStr: dateStr, gIdx: gIdx, iIdx: iIdx }
+      document.getElementById('quick-log-ex-name').textContent = item.emoji + ' ' + item.name
+      const fieldsEl = document.getElementById('quick-log-fields')
+      let html = ''
+      if (item.metrics.includes('reps')) {
+        html += '<div class="quick-log-field"><label>Poids (kg)</label><input class="form-input" type="number" id="ql-weight" value="' + (item.weight || '') + '" step="0.5" /></div>'
+        html += '<div class="quick-log-field"><label>Répétitions</label><input class="form-input" type="number" id="ql-reps" value="' + (item.reps || '') + '" /></div>'
+      }
+      fieldsEl.innerHTML = html
+      document.getElementById('modal-quick-log').classList.add('open')
+    }
+    document.getElementById('modal-quick-log-close').addEventListener('click', function() { document.getElementById('modal-quick-log').classList.remove('open') })
+    document.getElementById('quick-log-cancel').addEventListener('click', function() { document.getElementById('modal-quick-log').classList.remove('open') })
+    document.getElementById('quick-log-confirm').addEventListener('click', function() {
+      if (!quickLogTarget) return
+      const item = getPlanItem(quickLogTarget.dateStr, quickLogTarget.gIdx, quickLogTarget.iIdx)
+      const wEl = document.getElementById('ql-weight')
+      const rEl = document.getElementById('ql-reps')
+      if (wEl) item.weight = parseFloat(wEl.value) || item.weight
+      if (rEl) item.reps = parseInt(rEl.value) || item.reps
+      item.done = true
+      item.setsDone = item.setsDone.map(function() { return true })
+      saveSportPlanning()
+      logSdayProgressToHistory(quickLogTarget.dateStr)
+      document.getElementById('modal-quick-log').classList.remove('open')
+      renderSportDay()
+      renderSweekGrid()
+      quickLogTarget = null
+    })
+
+    // Répercute la séance du jour dans workoutHistory pour que les stats se mettent à jour
+    function logSdayProgressToHistory(dateStr) {
+      const groups = getDayGroups(dateStr)
+      const exercises = []
+      groups.forEach(function(g) {
+        const items = g.type === 'program' ? g.items : [g.item]
+        items.forEach(function(item) {
+          if (!item.done) return
+          const sets = item.setsDone.map(function() {
+            return { reps: item.reps, weight: item.weight, duration: null, distance: null, speed: null, resistance: null, incline: null, calories: null, done: true }
+          })
+          exercises.push({ name: item.name, emoji: item.emoji, metrics: item.metrics, sets: sets })
+        })
+      })
+      // Retire l'ancienne entrée auto-générée pour ce jour (id préfixé "auto_"), puis recrée si besoin
+      workoutHistory = workoutHistory.filter(function(w) { return w.id !== 'auto_' + dateStr })
+      if (exercises.length) {
+        workoutHistory.push({ id: 'auto_' + dateStr, date: dateStr, programName: groups.map(function(g){return g.type==='program'?g.progName:g.item.name}).join(', '), duration: 0, exercises: exercises })
+      }
+      saveWorkoutHistory()
+    }
+
+    document.getElementById('btn-sday-prev').addEventListener('click', function() { sportDayOffset--; renderSportDay() })
+    document.getElementById('btn-sday-next').addEventListener('click', function() { sportDayOffset++; renderSportDay() })
+
+    // ══════════════════════════════════════
+    // VUE SEMAINE — calendrier planification
+    // ══════════════════════════════════════
+    let sweekSelectedDate = toDateStr(new Date())
+
+    function renderSweekGrid() {
+      const now = new Date()
+      const mon = new Date(now)
+      mon.setDate(now.getDate() - ((now.getDay() + 6) % 7) + sportWeekOffsetCal * 7)
+      const sun = new Date(mon); sun.setDate(mon.getDate() + 6)
+      document.getElementById('sweek-title').textContent =
+        mon.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' – ' + sun.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      const grid = document.getElementById('sweek-grid')
+      grid.innerHTML = ''
+      const todayStr = toDateStr(new Date())
+      const labels = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(mon); d.setDate(mon.getDate() + i)
+        const str = toDateStr(d)
+        const isToday = str === todayStr
+        const isSel = str === sweekSelectedDate
+        const prog = dayProgress(str)
+        const col = document.createElement('div')
+        col.className = 'week-big-col'
+        let cls = 'week-big-cell'
+        if (isToday) cls += ' is-today'
+        if (isSel) cls += ' is-selected'
+        col.innerHTML = '<div class="week-big-label">' + labels[i] + '</div>' +
+          '<div class="' + cls + '">' +
+          '<span class="week-big-num">' + d.getDate() + '</span>' +
+          '<div class="week-big-ring" style="--pct:' + prog.pct + ';"><div class="week-big-ring-inner">' + (prog.total > 0 ? prog.pct : '') + '</div></div>' +
+          '</div>'
+        col.querySelector('.week-big-cell').addEventListener('click', function() {
+          sweekSelectedDate = str
+          renderSweekGrid()
+          renderSweekDayCard()
+        })
+        grid.appendChild(col)
+      }
+    }
+
+    function renderSweekDayCard() {
+      const card = document.getElementById('sweek-day-card')
+      const d = new Date(sweekSelectedDate + 'T12:00:00')
+      document.getElementById('sweek-day-title').textContent = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+      const groups = getDayGroups(sweekSelectedDate)
+      const listEl = document.getElementById('sweek-day-list')
+      if (!groups.length) {
+        listEl.innerHTML = '<p style="font-size:0.875rem;color:var(--text-muted);padding:0.5rem 0;">Rien de planifié.</p>'
+      } else {
+        listEl.innerHTML = ''
+        groups.forEach(function(g, gIdx) {
+          const row = document.createElement('div')
+          row.className = 'prog-lib-item'
+          const name = g.type === 'program' ? g.progEmoji + ' ' + g.progName : g.item.emoji + ' ' + g.item.name
+          const itemCount = g.type === 'program' ? g.items.length + ' exercices' : '1 exercice'
+          row.innerHTML = '<div class="prog-lib-info"><div class="prog-lib-name">' + name + '</div><div class="prog-lib-meta">' + itemCount + '</div></div>' +
+            '<button class="btn-icon" data-remove="' + gIdx + '"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>'
+          row.querySelector('[data-remove]').addEventListener('click', function(e) {
+            e.stopPropagation()
+            sportPlanning[sweekSelectedDate].splice(gIdx, 1)
+            saveSportPlanning()
+            renderSweekGrid()
+            renderSweekDayCard()
+          })
+          listEl.appendChild(row)
+        })
+      }
+      card.style.display = ''
+    }
+
+    document.getElementById('btn-sweek-prev').addEventListener('click', function() { sportWeekOffsetCal--; renderSweekGrid() })
+    document.getElementById('btn-sweek-next').addEventListener('click', function() { sportWeekOffsetCal++; renderSweekGrid() })
+    document.getElementById('btn-sweek-add').addEventListener('click', function() { openPlanModal(sweekSelectedDate) })
+
+    // ══════════════════════════════════════
+    // MODAL PLANIFIER
+    // ══════════════════════════════════════
+    function openPlanModal(dateStr) {
+      planTargetDate = dateStr
+      const d = new Date(dateStr + 'T12:00:00')
+      document.getElementById('plan-date-label').textContent = '– ' + d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'short' })
+      renderPlanProgList()
+      renderPlanExList('')
+      document.getElementById('plan-ex-search').value = ''
+      document.getElementById('btn-plan-prog').classList.add('active')
+      document.getElementById('btn-plan-ex').classList.remove('active')
+      document.getElementById('plan-tab-prog').classList.add('active')
+      document.getElementById('plan-tab-ex').classList.remove('active')
+      document.getElementById('modal-plan').classList.add('open')
+    }
+    document.getElementById('btn-sday-plan').addEventListener('click', function() { openPlanModal(sportDayDateForOffset(sportDayOffset)) })
+    document.getElementById('modal-plan-close').addEventListener('click', function() { document.getElementById('modal-plan').classList.remove('open') })
+    document.getElementById('modal-plan').addEventListener('click', function(e) { if (e.target === e.currentTarget) document.getElementById('modal-plan').classList.remove('open') })
+
+    document.getElementById('btn-plan-prog').addEventListener('click', function() {
+      document.getElementById('btn-plan-prog').classList.add('active')
+      document.getElementById('btn-plan-ex').classList.remove('active')
+      document.getElementById('plan-tab-prog').classList.add('active')
+      document.getElementById('plan-tab-ex').classList.remove('active')
+    })
+    document.getElementById('btn-plan-ex').addEventListener('click', function() {
+      document.getElementById('btn-plan-ex').classList.add('active')
+      document.getElementById('btn-plan-prog').classList.remove('active')
+      document.getElementById('plan-tab-ex').classList.add('active')
+      document.getElementById('plan-tab-prog').classList.remove('active')
+    })
+
+    function renderPlanProgList() {
+      const el = document.getElementById('plan-prog-list')
+      if (!sportPrograms.length) { el.innerHTML = '<p style="font-size:0.875rem;color:var(--text-muted);padding:1rem;">Aucun programme créé. Va dans l\'onglet Programmes pour en créer un.</p>'; return }
+      el.innerHTML = ''
+      sportPrograms.forEach(function(p) {
+        const row = document.createElement('div')
+        row.className = 'plan-item-row'
+        row.innerHTML = '<span style="font-size:1.25rem;">' + (p.emoji || '💪') + '</span><div><div style="font-size:0.9375rem;font-weight:600;">' + p.name + '</div><div style="font-size:0.75rem;color:var(--text-muted);">' + (p.exercises || []).length + ' exercices</div></div>'
+        row.addEventListener('click', function() {
+          planProgramForDate(planTargetDate, p)
+          document.getElementById('modal-plan').classList.remove('open')
+          renderSportDay()
+          renderSweekGrid()
+          if (document.getElementById('sweek-day-card').style.display !== 'none') renderSweekDayCard()
+          showToast('Programme planifié')
+        })
+        el.appendChild(row)
+      })
+    }
+
+    function renderPlanExList(search) {
+      const el = document.getElementById('plan-ex-list')
+      const filtered = exLibrary.filter(function(e) { return !search || e.name.toLowerCase().includes(search.toLowerCase()) })
+      if (!filtered.length) { el.innerHTML = '<p style="font-size:0.875rem;color:var(--text-muted);padding:1rem;">Aucun résultat.</p>'; return }
+      el.innerHTML = ''
+      filtered.forEach(function(ex) {
+        const row = document.createElement('div')
+        row.className = 'plan-item-row'
+        row.innerHTML = '<span style="font-size:1.25rem;">' + ex.emoji + '</span><span style="font-size:0.9375rem;font-weight:500;">' + ex.name + '</span>'
+        row.addEventListener('click', function() {
+          planExerciseForDate(planTargetDate, ex)
+          document.getElementById('modal-plan').classList.remove('open')
+          renderSportDay()
+          renderSweekGrid()
+          if (document.getElementById('sweek-day-card').style.display !== 'none') renderSweekDayCard()
+          showToast('Exercice planifié')
+        })
+        el.appendChild(row)
+      })
+    }
+    document.getElementById('plan-ex-search').addEventListener('input', function(e) { renderPlanExList(e.target.value) })
+
+    // ══════════════════════════════════════
+    // NAVIGATION ENTRE VUES SPORT
+    // ══════════════════════════════════════
+    function sportShowView(viewId) {
+      ['sv-day', 'sv-week', 'sv-ex', 'sv-prog', 'sv-stats'].forEach(function(id) {
+        const el = document.getElementById(id)
+        if (el) { el.classList.remove('active'); el.style.display = 'none' }
+      })
+      const target = document.getElementById(viewId)
+      target.classList.add('active')
+      target.style.display = ''
+    }
+    document.getElementById('btn-sv-day').addEventListener('click', function() {
+      document.querySelectorAll('#module-sport > .task-view-toggle .task-view-btn').forEach(function(b) { b.classList.remove('active') })
+      document.getElementById('btn-sv-day').classList.add('active')
+      sportShowView('sv-day')
+      renderSportDay()
+    })
+    document.getElementById('btn-sv-week').addEventListener('click', function() {
+      document.querySelectorAll('#module-sport > .task-view-toggle .task-view-btn').forEach(function(b) { b.classList.remove('active') })
+      document.getElementById('btn-sv-week').classList.add('active')
+      sportShowView('sv-week')
+      document.getElementById('sweek-day-card').style.display = 'none'
+      renderSweekGrid()
+    })
+    document.getElementById('btn-sv-stats').addEventListener('click', function() {
+      document.querySelectorAll('#module-sport > .task-view-toggle .task-view-btn').forEach(function(b) { b.classList.remove('active') })
+      document.getElementById('btn-sv-stats').classList.add('active')
+      sportShowView('sv-stats')
+      setTimeout(renderAllSportStats, 100)
+    })
+    document.getElementById('btn-goto-ex').addEventListener('click', function() { sportShowView('sv-ex') })
+    document.getElementById('btn-goto-prog').addEventListener('click', function() { sportShowView('sv-prog'); renderProgList() })
 
 
     // ── HEADER ──
@@ -4025,6 +4581,7 @@
       loadExLibrary()
       loadSportPrograms()
       loadWorkoutHistory()
+      loadSportPlanning()
       renderHeader()
       renderTabs()
       await loadTasks()
@@ -4035,6 +4592,7 @@
       updateDateTitle()
       updateExtendedStats()
       renderExLibrary()
+      renderSportDay()
 
       // FAB
       document.getElementById('fab').addEventListener('click', () => {
