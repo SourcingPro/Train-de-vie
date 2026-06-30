@@ -1643,14 +1643,15 @@
         <input class="form-input" id="prog-nom" placeholder="Ex : Push Day, Full Body…" maxlength="40" />
       </div>
       <div class="form-group" style="display:flex;gap:0.75rem;align-items:flex-end;">
-        <div style="flex:0 0 80px;">
-          <label class="form-label">Emoji</label>
-          <input class="form-input" id="prog-emoji" placeholder="💪" maxlength="4" style="font-size:1.5rem;text-align:center;" />
-        </div>
         <div style="flex:1;">
           <label class="form-label">Notes (optionnel)</label>
           <input class="form-input" id="prog-notes" placeholder="Contexte, objectif…" />
         </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Emoji</label>
+        <div class="emoji-selected-display" id="prog-emoji-display">💪</div>
+        <div class="emoji-picker-grid" id="prog-emoji-picker"></div>
       </div>
       <div class="form-group">
         <label class="form-label">Exercices</label>
@@ -2187,15 +2188,25 @@
       '📖','✏️','🎯','💡','🔑','📱','🧠','❤️','😊','🌞'
     ]
 
+    const SPORT_EMOJI_LIST = [
+      '💪','🏋️','🏋️‍♀️','🤸','🤸‍♀️','🧘','🧘‍♀️','🏃','🏃‍♀️','🚴',
+      '🚴‍♀️','🏊','🏊‍♀️','🤾','🤾‍♀️','⚽','🏀','🎾','🏐','🥊',
+      '🥋','⛹️','⛹️‍♀️','🚣','🚣‍♀️','🤺','🏌️','🏌️‍♀️','🧗','🧗‍♀️',
+      '🤼','🤼‍♀️','🏈','🏉','⚾','🏓','🏸','🥏','🛼','🛹',
+      '🔥','⚡','💯','🎯','🦵','💯','🫀','🦾','⏱️','🏆'
+    ]
+
     let selectedTaskEmoji = '✓'
     let selectedTagEmoji = '🏷️'
+    let selectedProgEmoji = '💪'
 
-    function renderEmojiPicker(containerId, displayId, selected, onSelect) {
+    function renderEmojiPicker(containerId, displayId, selected, onSelect, list) {
       const grid = document.getElementById(containerId)
       const display = document.getElementById(displayId)
       if (!grid) return
+      const emojis = list || EMOJI_LIST
       if (display) display.textContent = selected
-      grid.innerHTML = EMOJI_LIST.map(function(e) {
+      grid.innerHTML = emojis.map(function(e) {
         return '<button type="button" class="emoji-option' + (e === selected ? ' selected' : '') + '" data-emoji="' + e + '">' + e + '</button>'
       }).join('')
       grid.querySelectorAll('.emoji-option').forEach(function(btn) {
@@ -2946,12 +2957,13 @@
     function openNewProg() {
       editingProgId = null
       progExBuilder = []
+      selectedProgEmoji = '💪'
       document.getElementById('modal-prog-title').textContent = 'Nouveau programme'
       document.getElementById('prog-nom').value = ''
-      document.getElementById('prog-emoji').value = ''
       document.getElementById('prog-notes').value = ''
       document.getElementById('prog-actions').innerHTML = '<button class="btn-secondary" id="prog-cancel">Annuler</button><button class="btn-primary" id="prog-save">Créer</button>'
       bindProgModalButtons()
+      renderEmojiPicker('prog-emoji-picker', 'prog-emoji-display', selectedProgEmoji, function(e) { selectedProgEmoji = e }, SPORT_EMOJI_LIST)
       renderProgExBuilder()
       document.getElementById('modal-prog').classList.add('open')
     }
@@ -2959,12 +2971,13 @@
     function openEditProg(p) {
       editingProgId = p.id
       progExBuilder = JSON.parse(JSON.stringify(p.exercises || []))
+      selectedProgEmoji = p.emoji || '💪'
       document.getElementById('modal-prog-title').textContent = 'Modifier le programme'
       document.getElementById('prog-nom').value = p.name
-      document.getElementById('prog-emoji').value = p.emoji || ''
       document.getElementById('prog-notes').value = p.notes || ''
       document.getElementById('prog-actions').innerHTML = '<button class="btn-danger" id="prog-delete">Supprimer</button><button class="btn-primary" id="prog-save">Enregistrer</button>'
       bindProgModalButtons()
+      renderEmojiPicker('prog-emoji-picker', 'prog-emoji-display', selectedProgEmoji, function(e) { selectedProgEmoji = e }, SPORT_EMOJI_LIST)
       renderProgExBuilder()
       document.getElementById('modal-prog').classList.add('open')
     }
@@ -2986,7 +2999,7 @@
       const prog = {
         id: editingProgId || ('prog' + Date.now()),
         name: name,
-        emoji: document.getElementById('prog-emoji').value.trim() || '💪',
+        emoji: selectedProgEmoji,
         notes: document.getElementById('prog-notes').value.trim(),
         exercises: progExBuilder.slice()
       }
