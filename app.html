@@ -1410,10 +1410,11 @@
         <div class="page-subtitle" id="tasks-subtitle"></div>
       </div>
 
-      <!-- Toggle Jour / Semaine / Stats -->
-      <div class="task-view-toggle">
+      <!-- Toggle Jour / Semaine / Bibliothèque / Stats -->
+      <div class="task-view-toggle" style="overflow-x:auto;scrollbar-width:none;">
         <button class="task-view-btn active" id="btn-tv-day">Jour</button>
         <button class="task-view-btn" id="btn-tv-week">Semaine</button>
+        <button class="task-view-btn" id="btn-tv-lib">Bibliothèque</button>
         <button class="task-view-btn" id="btn-tv-stats">Stats</button>
       </div>
 
@@ -1484,6 +1485,18 @@
         </div>
         <div class="week-table-wrap">
           <table class="week-table" id="week-table"></table>
+        </div>
+      </div>
+
+      <!-- ── VUE BIBLIOTHÈQUE ── -->
+      <div class="task-view" id="tv-lib">
+        <div class="ex-lib-search-row">
+          <input class="form-input" style="flex:1;" placeholder="Rechercher un modèle…" id="tlib-search" />
+          <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-tlib">+ Ajouter</button>
+        </div>
+        <div class="ex-filter-row" id="tlib-filter-cats"></div>
+        <div class="card" style="padding:0;">
+          <div id="tlib-list"></div>
         </div>
       </div>
 
@@ -1788,6 +1801,40 @@
       <input class="form-input" placeholder="Rechercher…" id="task-lib-search" style="margin-bottom:0.75rem;" />
       <div class="ex-filter-row" id="task-lib-filter-cats" style="padding:0 0 0.75rem;"></div>
       <div id="task-lib-list" style="max-height:55dvh;overflow-y:auto;border:0.5px solid var(--border);border-radius:var(--radius-sm);"></div>
+    </div>
+  </div>
+
+  <!-- MODAL ÉDITION MODÈLE DE TÂCHE -->
+  <div class="modal-overlay" id="modal-tlib-edit">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="tlib-edit-title">Nouveau modèle</div>
+        <button class="modal-close" id="modal-tlib-edit-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nom</label>
+        <input class="form-input" id="tlib-name-input" placeholder="Ex : Méditer, Lire…" maxlength="60" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Emoji</label>
+        <div class="emoji-selected-display" id="tlib-emoji-display">✓</div>
+        <div class="emoji-picker-grid" id="tlib-emoji-picker"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catégorie</label>
+        <div class="tag-picker" id="tlib-tag-picker"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fréquence par défaut</label>
+        <select class="form-select" id="tlib-freq-input">
+          <option value="daily">Tous les jours</option>
+          <option value="weekly">Hebdomadaire</option>
+          <option value="monthly">Mensuel</option>
+          <option value="once">Ponctuelle</option>
+        </select>
+      </div>
+      <input type="hidden" id="tlib-editing-id" />
+      <div class="modal-actions" id="tlib-edit-actions"></div>
     </div>
   </div>
 
@@ -2507,29 +2554,23 @@
     let weekTableOffset = 0
 
     document.getElementById('btn-tv-day').addEventListener('click', function() {
+      document.querySelectorAll('#module-tasks > .task-view-toggle .task-view-btn').forEach(function(b) { b.classList.remove('active') })
       document.getElementById('btn-tv-day').classList.add('active')
-      document.getElementById('btn-tv-week').classList.remove('active')
-      document.getElementById('btn-tv-stats').classList.remove('active')
+      document.querySelectorAll('#module-tasks > .task-view').forEach(function(el) { el.classList.remove('active') })
       document.getElementById('tv-day').classList.add('active')
-      document.getElementById('tv-week').classList.remove('active')
-      document.getElementById('tv-stats').classList.remove('active')
     })
     document.getElementById('btn-tv-week').addEventListener('click', function() {
+      document.querySelectorAll('#module-tasks > .task-view-toggle .task-view-btn').forEach(function(b) { b.classList.remove('active') })
       document.getElementById('btn-tv-week').classList.add('active')
-      document.getElementById('btn-tv-day').classList.remove('active')
-      document.getElementById('btn-tv-stats').classList.remove('active')
+      document.querySelectorAll('#module-tasks > .task-view').forEach(function(el) { el.classList.remove('active') })
       document.getElementById('tv-week').classList.add('active')
-      document.getElementById('tv-day').classList.remove('active')
-      document.getElementById('tv-stats').classList.remove('active')
       renderWeekTable()
     })
     document.getElementById('btn-tv-stats').addEventListener('click', function() {
+      document.querySelectorAll('#module-tasks > .task-view-toggle .task-view-btn').forEach(function(b) { b.classList.remove('active') })
       document.getElementById('btn-tv-stats').classList.add('active')
-      document.getElementById('btn-tv-day').classList.remove('active')
-      document.getElementById('btn-tv-week').classList.remove('active')
+      document.querySelectorAll('#module-tasks > .task-view').forEach(function(el) { el.classList.remove('active') })
       document.getElementById('tv-stats').classList.add('active')
-      document.getElementById('tv-day').classList.remove('active')
-      document.getElementById('tv-week').classList.remove('active')
       setTimeout(renderAllTaskStats, 100)
     })
 
@@ -4408,40 +4449,21 @@
 
 
     // ══════════════════════════════════════
-    // TÂCHES — BIBLIOTHÈQUE DE MODÈLES
+    // TÂCHES — BIBLIOTHÈQUE DE MODÈLES (personnelle)
     // ══════════════════════════════════════
-    const TASK_TEMPLATES = [
-      { name: 'Méditer', emoji: '🧘', cat: 'Santé', freq: 'daily' },
-      { name: 'Boire 2L d\'eau', emoji: '💧', cat: 'Santé', freq: 'daily' },
-      { name: 'Prendre les vitamines', emoji: '💊', cat: 'Santé', freq: 'daily' },
-      { name: 'Dormir 8h', emoji: '💤', cat: 'Santé', freq: 'daily' },
-      { name: 'Étirements', emoji: '🤸', cat: 'Santé', freq: 'daily' },
-      { name: 'Rendez-vous médical', emoji: '🩺', cat: 'Santé', freq: 'once' },
-      { name: 'Lire 20 minutes', emoji: '📖', cat: 'Personnel', freq: 'daily' },
-      { name: 'Écrire dans le journal', emoji: '✍️', cat: 'Personnel', freq: 'daily' },
-      { name: 'Apprendre une langue', emoji: '🗣️', cat: 'Personnel', freq: 'daily' },
-      { name: 'Pratiquer un instrument', emoji: '🎸', cat: 'Personnel', freq: 'daily' },
-      { name: 'Faire le ménage', emoji: '🧹', cat: 'Maison', freq: 'weekly' },
-      { name: 'Faire la lessive', emoji: '🧺', cat: 'Maison', freq: 'weekly' },
-      { name: 'Sortir les poubelles', emoji: '🗑️', cat: 'Maison', freq: 'weekly' },
-      { name: 'Arroser les plantes', emoji: '🌿', cat: 'Maison', freq: 'weekly' },
-      { name: 'Faire les courses', emoji: '🛒', cat: 'Maison', freq: 'weekly' },
-      { name: 'Changer les draps', emoji: '🛏️', cat: 'Maison', freq: 'weekly' },
-      { name: 'Nettoyer la salle de bain', emoji: '🚿', cat: 'Maison', freq: 'weekly' },
-      { name: 'Répondre aux emails', emoji: '📧', cat: 'Travail', freq: 'daily' },
-      { name: 'Planifier la semaine', emoji: '📅', cat: 'Travail', freq: 'weekly' },
-      { name: 'Faire une pause écran', emoji: '👀', cat: 'Travail', freq: 'daily' },
-      { name: 'Préparer les repas', emoji: '🍱', cat: 'Travail', freq: 'weekly' },
-      { name: 'Appeler un proche', emoji: '📞', cat: 'Social', freq: 'weekly' },
-      { name: 'Voir des amis', emoji: '👥', cat: 'Social', freq: 'weekly' },
-      { name: 'Sortie en couple', emoji: '❤️', cat: 'Social', freq: 'weekly' },
-      { name: 'Payer les factures', emoji: '💰', cat: 'Finances', freq: 'monthly' },
-      { name: 'Faire le budget', emoji: '📊', cat: 'Finances', freq: 'monthly' },
-      { name: 'Épargner', emoji: '🏦', cat: 'Finances', freq: 'monthly' }
-    ]
-    const TASK_LIB_CATS = ['Santé', 'Personnel', 'Maison', 'Travail', 'Social', 'Finances']
+    let taskTemplates = []
+    let editingTlibId = null
+    let selectedTlibEmoji = '✓'
+    let selectedTlibTagIds = []
+    let tlibFilterCat = 'Tous'
     let taskLibFilterCat = 'Tous'
     let taskLibSearch = ''
+
+    function loadTaskTemplates() {
+      const s = localStorage.getItem('tdv_tasktemplates_' + profile.id)
+      taskTemplates = s ? JSON.parse(s) : []
+    }
+    function saveTaskTemplates() { localStorage.setItem('tdv_tasktemplates_' + profile.id, JSON.stringify(taskTemplates)) }
 
     function findOrCreateTagByName(name, emoji) {
       let tag = taskTags.find(function(t) { return t.name === name })
@@ -4454,6 +4476,7 @@
       return tag
     }
 
+    // ── Sélecteur rapide (depuis le formulaire de tâche) ──
     function openTaskLib() {
       taskLibSearch = ''
       taskLibFilterCat = 'Tous'
@@ -4464,7 +4487,7 @@
     }
     function renderTaskLibFilters() {
       const el = document.getElementById('task-lib-filter-cats')
-      const cats = ['Tous'].concat(TASK_LIB_CATS)
+      const cats = ['Tous'].concat(taskTags.map(function(t) { return t.name }))
       el.innerHTML = cats.map(function(c) {
         return '<button class="filter-chip' + (c === taskLibFilterCat ? ' active' : '') + '" data-tlc="' + c + '">' + c + '</button>'
       }).join('')
@@ -4474,25 +4497,27 @@
     }
     function renderTaskLibList() {
       const el = document.getElementById('task-lib-list')
-      const filtered = TASK_TEMPLATES.filter(function(t) {
-        const mc = taskLibFilterCat === 'Tous' || t.cat === taskLibFilterCat
+      const filtered = taskTemplates.filter(function(t) {
+        const tagNames = (t.tagIds || []).map(function(id) { const tg = tagById(id); return tg ? tg.name : '' })
+        const mc = taskLibFilterCat === 'Tous' || tagNames.includes(taskLibFilterCat)
         const ms = !taskLibSearch || t.name.toLowerCase().includes(taskLibSearch.toLowerCase())
         return mc && ms
       })
+      if (!taskTemplates.length) { el.innerHTML = '<div class="empty-state" style="padding:1.5rem;"><p>Aucun modèle pour l\'instant.<br/>Crée tes modèles dans l\'onglet Bibliothèque.</p></div>'; return }
       if (!filtered.length) { el.innerHTML = '<div class="empty-state" style="padding:1.5rem;"><p>Aucun résultat.</p></div>'; return }
       el.innerHTML = ''
       filtered.forEach(function(t) {
+        const tagNames = (t.tagIds || []).map(function(id) { const tg = tagById(id); return tg ? (tg.emoji + ' ' + tg.name) : '' }).filter(Boolean).join(', ')
         const row = document.createElement('div')
         row.className = 'pick-ex-row'
-        row.innerHTML = '<span style="font-size:1.125rem;">' + t.emoji + '</span><div><div style="font-size:0.875rem;font-weight:500;">' + t.name + '</div><div style="font-size:0.75rem;color:var(--text-muted);">' + t.cat + '</div></div>'
+        row.innerHTML = '<span style="font-size:1.125rem;">' + t.emoji + '</span><div><div style="font-size:0.875rem;font-weight:500;">' + t.name + '</div><div style="font-size:0.75rem;color:var(--text-muted);">' + (tagNames || freqLabel(t.freq)) + '</div></div>'
         row.addEventListener('click', function() {
           document.getElementById('task-name-input').value = t.name
-          document.getElementById('task-freq-input').value = t.freq
+          document.getElementById('task-freq-input').value = t.freq || 'daily'
           updateFreqFieldsVisibility()
           selectedTaskEmoji = t.emoji
           renderEmojiPicker('task-emoji-picker', 'task-emoji-display', selectedTaskEmoji, function(e) { selectedTaskEmoji = e })
-          const tag = findOrCreateTagByName(t.cat, '🏷️')
-          selectedTaskTagIds = [tag.id]
+          selectedTaskTagIds = (t.tagIds || []).slice()
           renderTaskTagPicker()
           document.getElementById('modal-task-lib').classList.remove('open')
         })
@@ -4503,6 +4528,129 @@
     document.getElementById('btn-task-from-lib').addEventListener('click', openTaskLib)
     document.getElementById('modal-task-lib-close').addEventListener('click', function() { document.getElementById('modal-task-lib').classList.remove('open') })
     document.getElementById('modal-task-lib').addEventListener('click', function(e) { if (e.target === e.currentTarget) document.getElementById('modal-task-lib').classList.remove('open') })
+
+    // ── Onglet Bibliothèque (CRUD complet) ──
+    document.getElementById('btn-tv-lib').addEventListener('click', function() {
+      document.querySelectorAll('#module-tasks > .task-view-toggle .task-view-btn').forEach(function(b) { b.classList.remove('active') })
+      document.getElementById('btn-tv-lib').classList.add('active')
+      document.querySelectorAll('#module-tasks > .task-view').forEach(function(el) { el.classList.remove('active') })
+      document.getElementById('tv-lib').classList.add('active')
+      renderTlibFilters()
+      renderTlibList()
+    })
+
+    function renderTlibFilters() {
+      const el = document.getElementById('tlib-filter-cats')
+      const cats = ['Tous'].concat(taskTags.map(function(t) { return t.name }))
+      el.innerHTML = cats.map(function(c) {
+        return '<button class="filter-chip' + (c === tlibFilterCat ? ' active' : '') + '" data-tfc="' + c + '">' + c + '</button>'
+      }).join('')
+      el.querySelectorAll('[data-tfc]').forEach(function(btn) {
+        btn.addEventListener('click', function() { tlibFilterCat = btn.dataset.tfc; renderTlibFilters(); renderTlibList() })
+      })
+    }
+
+    function renderTlibList() {
+      const el = document.getElementById('tlib-list')
+      const search = document.getElementById('tlib-search').value.toLowerCase()
+      const filtered = taskTemplates.filter(function(t) {
+        const tagNames = (t.tagIds || []).map(function(id) { const tg = tagById(id); return tg ? tg.name : '' })
+        const mc = tlibFilterCat === 'Tous' || tagNames.includes(tlibFilterCat)
+        const ms = !search || t.name.toLowerCase().includes(search)
+        return mc && ms
+      })
+      if (!filtered.length) { el.innerHTML = '<div class="empty-state" style="padding:2.5rem;"><p>Aucun modèle pour l\'instant.<br/>Crée ton premier modèle de tâche.</p></div>'; return }
+      el.innerHTML = ''
+      filtered.forEach(function(t) {
+        const tagsHtml = (t.tagIds || []).map(function(id) {
+          const tg = tagById(id)
+          return tg ? '<span class="muscle-tag">' + tg.emoji + ' ' + tg.name + '</span>' : ''
+        }).join('')
+        const div = document.createElement('div')
+        div.className = 'ex-lib-item'
+        div.innerHTML = '<div class="ex-lib-emoji">' + t.emoji + '</div>' +
+          '<div class="ex-lib-info">' +
+          '<div class="ex-lib-name">' + t.name + '</div>' +
+          '<div class="ex-lib-meta">' + freqLabel(t.freq) + '</div>' +
+          (tagsHtml ? '<div class="ex-lib-tags">' + tagsHtml + '</div>' : '') +
+          '</div>'
+        div.addEventListener('click', function() { openEditTlib(t) })
+        el.appendChild(div)
+      })
+    }
+    document.getElementById('tlib-search').addEventListener('input', renderTlibList)
+
+    function openNewTlib() {
+      editingTlibId = null
+      selectedTlibEmoji = '✓'
+      selectedTlibTagIds = []
+      document.getElementById('tlib-edit-title').textContent = 'Nouveau modèle'
+      document.getElementById('tlib-name-input').value = ''
+      document.getElementById('tlib-freq-input').value = 'daily'
+      document.getElementById('tlib-edit-actions').innerHTML = '<button class="btn-secondary" id="tlib-cancel">Annuler</button><button class="btn-primary" id="tlib-save">Créer</button>'
+      bindTlibEditButtons()
+      renderEmojiPicker('tlib-emoji-picker', 'tlib-emoji-display', selectedTlibEmoji, function(e) { selectedTlibEmoji = e })
+      renderTlibTagPicker()
+      document.getElementById('modal-tlib-edit').classList.add('open')
+    }
+
+    function openEditTlib(t) {
+      editingTlibId = t.id
+      selectedTlibEmoji = t.emoji || '✓'
+      selectedTlibTagIds = (t.tagIds || []).slice()
+      document.getElementById('tlib-edit-title').textContent = 'Modifier le modèle'
+      document.getElementById('tlib-name-input').value = t.name
+      document.getElementById('tlib-freq-input').value = t.freq || 'daily'
+      document.getElementById('tlib-edit-actions').innerHTML = '<button class="btn-danger" id="tlib-delete">Supprimer</button><button class="btn-primary" id="tlib-save">Enregistrer</button>'
+      bindTlibEditButtons()
+      renderEmojiPicker('tlib-emoji-picker', 'tlib-emoji-display', selectedTlibEmoji, function(e) { selectedTlibEmoji = e })
+      renderTlibTagPicker()
+      document.getElementById('modal-tlib-edit').classList.add('open')
+    }
+
+    function renderTlibTagPicker() {
+      const el = document.getElementById('tlib-tag-picker')
+      if (!taskTags.length) { el.innerHTML = '<span style="font-size:0.8125rem;color:var(--text-muted);">Aucune catégorie. Crée-en une via la gestion des catégories.</span>'; return }
+      el.innerHTML = taskTags.map(function(t) {
+        const sel = selectedTlibTagIds.includes(t.id)
+        return '<button type="button" class="tag-option' + (sel ? ' selected' : '') + '" style="color:' + t.color + ';' + (sel ? 'background:' + t.color + '22;' : '') + '" data-tlib-tag="' + t.id + '">' + t.emoji + ' ' + t.name + '</button>'
+      }).join('')
+      el.querySelectorAll('[data-tlib-tag]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const id = btn.dataset.tlibTag
+          if (selectedTlibTagIds.includes(id)) selectedTlibTagIds = selectedTlibTagIds.filter(function(x) { return x !== id })
+          else selectedTlibTagIds.push(id)
+          renderTlibTagPicker()
+        })
+      })
+    }
+
+    function closeTlibEditModal() { document.getElementById('modal-tlib-edit').classList.remove('open') }
+    function bindTlibEditButtons() {
+      document.getElementById('tlib-cancel')?.addEventListener('click', closeTlibEditModal)
+      document.getElementById('tlib-delete')?.addEventListener('click', function() {
+        taskTemplates = taskTemplates.filter(function(t) { return t.id !== editingTlibId })
+        saveTaskTemplates(); closeTlibEditModal(); renderTlibList(); showToast('Modèle supprimé')
+      })
+      document.getElementById('tlib-save').addEventListener('click', saveTlib)
+    }
+    function saveTlib() {
+      const name = document.getElementById('tlib-name-input').value.trim()
+      if (!name) return
+      const tpl = {
+        id: editingTlibId || ('tlib' + Date.now()),
+        name: name,
+        emoji: selectedTlibEmoji,
+        freq: document.getElementById('tlib-freq-input').value,
+        tagIds: selectedTlibTagIds.slice()
+      }
+      if (editingTlibId) taskTemplates = taskTemplates.map(function(t) { return t.id === editingTlibId ? tpl : t })
+      else taskTemplates.push(tpl)
+      saveTaskTemplates(); closeTlibEditModal(); renderTlibList(); showToast('Modèle enregistré')
+    }
+    document.getElementById('modal-tlib-edit-close').addEventListener('click', closeTlibEditModal)
+    document.getElementById('modal-tlib-edit').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeTlibEditModal() })
+    document.getElementById('btn-new-tlib').addEventListener('click', openNewTlib)
 
 
     // ── HEADER ──
@@ -4859,6 +5007,7 @@
       loadTheme()
       loadTaskTags()
       loadTaskReschedules()
+      loadTaskTemplates()
       loadExLibrary()
       loadSportPrograms()
       loadWorkoutHistory()
