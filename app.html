@@ -940,6 +940,57 @@
       font-size: 1.5rem;
       margin-bottom: 0.5rem;
     }
+
+    /* ══════════════════════════════════════
+       VUE SEMAINE — TABLEAU
+    ══════════════════════════════════════ */
+    .task-view-toggle {
+      display: flex; margin: 0 1.25rem 1rem;
+      background: var(--surface-2); border-radius: var(--radius-sm); padding: 3px;
+    }
+    .task-view-btn {
+      flex: 1; padding: 0.5rem; border: none; background: transparent;
+      border-radius: 8px; font-size: 0.8125rem; font-weight: 500;
+      font-family: inherit; cursor: pointer; color: var(--text-muted);
+      transition: all var(--transition);
+    }
+    .task-view-btn.active { background: var(--surface); color: var(--text-primary); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .task-view { display: none; }
+    .task-view.active { display: block; }
+
+    .week-table-wrap {
+      margin: 0 1.25rem 1rem;
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      overflow-x: auto;
+    }
+    .week-table { border-collapse: collapse; width: 100%; min-width: 480px; }
+    .week-table th, .week-table td { padding: 0.625rem 0.5rem; text-align: center; }
+    .week-table thead th {
+      font-size: 0.625rem; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; border-bottom: 0.5px solid var(--border);
+      position: sticky; top: 0; background: var(--surface);
+    }
+    .week-table thead th.task-name-col { text-align: left; min-width: 140px; }
+    .week-table thead th.is-today-col { color: var(--accent); }
+    .week-table tbody tr { border-bottom: 0.5px solid var(--border); }
+    .week-table tbody tr:last-child { border-bottom: none; }
+    .week-table td.task-name-cell {
+      text-align: left; font-size: 0.875rem; font-weight: 500;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .week-table-emoji { font-size: 0.9375rem; }
+    .week-check {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1.5px solid var(--border-strong); background: transparent;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      transition: all var(--transition); -webkit-tap-highlight-color: transparent;
+    }
+    .week-check svg { width: 12px; height: 12px; fill: none; stroke: white; stroke-width: 3; stroke-linecap: round; opacity: 0; }
+    .week-check.done svg { opacity: 1; }
+    .week-table-empty { padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.875rem; }
+
 </style>
 </head>
 <body>
@@ -971,57 +1022,80 @@
         <div class="page-subtitle" id="tasks-subtitle"></div>
       </div>
 
-      <!-- Navigation semaine -->
-      <div class="week-nav-row">
-        <button class="btn-icon" id="btn-tweek-prev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
-        <span class="week-nav-title" id="tweek-title"></span>
-        <button class="btn-icon" id="btn-tweek-next"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+      <!-- Toggle Jour / Semaine -->
+      <div class="task-view-toggle">
+        <button class="task-view-btn active" id="btn-tv-day">Jour</button>
+        <button class="task-view-btn" id="btn-tv-week">Semaine</button>
       </div>
 
-      <!-- Semaine agrandie -->
-      <div class="week-big-grid" id="week-big-grid"></div>
+      <!-- ── VUE JOUR ── -->
+      <div class="task-view active" id="tv-day">
 
-      <!-- Progression du jour -->
-      <div class="progress-wrap">
-        <div class="progress-header">
-          <span class="progress-label">Progression du jour</span>
-          <span class="progress-pct" id="progress-pct">0%</span>
+        <!-- Navigation semaine -->
+        <div class="week-nav-row">
+          <button class="btn-icon" id="btn-tweek-prev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <span class="week-nav-title" id="tweek-title"></span>
+          <button class="btn-icon" id="btn-tweek-next"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
         </div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+
+        <!-- Semaine agrandie -->
+        <div class="week-big-grid" id="week-big-grid"></div>
+
+        <!-- Progression du jour -->
+        <div class="progress-wrap">
+          <div class="progress-header">
+            <span class="progress-label">Progression du jour</span>
+            <span class="progress-pct" id="progress-pct">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+          </div>
         </div>
+
+        <!-- Stats étendues -->
+        <div class="stats-grid-4">
+          <div class="stat-card-sm">
+            <div class="stat-value-sm" id="stat-avg-day">0</div>
+            <div class="stat-label-sm">Moyenne / jour</div>
+          </div>
+          <div class="stat-card-sm">
+            <div class="stat-value-sm" id="stat-avg-week">0</div>
+            <div class="stat-label-sm">Moyenne / semaine</div>
+          </div>
+          <div class="stat-card-sm">
+            <div class="stat-value-sm" id="stat-avg-month">0</div>
+            <div class="stat-label-sm">Moyenne / mois</div>
+          </div>
+          <div class="stat-card-sm">
+            <div class="stat-value-sm" id="stat-streak">0</div>
+            <div class="stat-label-sm">Jours consécutifs</div>
+          </div>
+        </div>
+
+        <!-- Stats par tag -->
+        <div class="card" id="tag-stats-card" style="display:none;">
+          <div class="card-title">Par catégorie</div>
+          <div id="tag-stats-list"></div>
+        </div>
+
+        <!-- Liste des tâches -->
+        <div class="card">
+          <div class="card-title">Mes tâches</div>
+          <div id="tasks-list"></div>
+        </div>
+
       </div>
 
-      <!-- Stats étendues -->
-      <div class="stats-grid-4">
-        <div class="stat-card-sm">
-          <div class="stat-value-sm" id="stat-avg-day">0</div>
-          <div class="stat-label-sm">Moyenne / jour</div>
+      <!-- ── VUE SEMAINE (TABLEAU) ── -->
+      <div class="task-view" id="tv-week">
+        <div class="week-nav-row">
+          <button class="btn-icon" id="btn-wtable-prev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <span class="week-nav-title" id="wtable-title"></span>
+          <button class="btn-icon" id="btn-wtable-next"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
         </div>
-        <div class="stat-card-sm">
-          <div class="stat-value-sm" id="stat-avg-week">0</div>
-          <div class="stat-label-sm">Moyenne / semaine</div>
+        <div class="week-table-wrap">
+          <table class="week-table" id="week-table"></table>
         </div>
-        <div class="stat-card-sm">
-          <div class="stat-value-sm" id="stat-avg-month">0</div>
-          <div class="stat-label-sm">Moyenne / mois</div>
-        </div>
-        <div class="stat-card-sm">
-          <div class="stat-value-sm" id="stat-streak">0</div>
-          <div class="stat-label-sm">Jours consécutifs</div>
-        </div>
-      </div>
-
-      <!-- Stats par tag -->
-      <div class="card" id="tag-stats-card" style="display:none;">
-        <div class="card-title">Par catégorie</div>
-        <div id="tag-stats-list"></div>
-      </div>
-
-      <!-- Liste des tâches -->
-      <div class="card">
-        <div class="card-title">Mes tâches</div>
-        <div id="tasks-list"></div>
       </div>
 
       <!-- Gestion des tags -->
@@ -1535,6 +1609,94 @@
           btn.classList.add('selected')
         })
       })
+    }
+
+
+
+    // ══════════════════════════════════════
+    // VUE SEMAINE — TABLEAU
+    // ══════════════════════════════════════
+    let weekTableOffset = 0
+
+    document.getElementById('btn-tv-day').addEventListener('click', function() {
+      document.getElementById('btn-tv-day').classList.add('active')
+      document.getElementById('btn-tv-week').classList.remove('active')
+      document.getElementById('tv-day').classList.add('active')
+      document.getElementById('tv-week').classList.remove('active')
+    })
+    document.getElementById('btn-tv-week').addEventListener('click', function() {
+      document.getElementById('btn-tv-week').classList.add('active')
+      document.getElementById('btn-tv-day').classList.remove('active')
+      document.getElementById('tv-week').classList.add('active')
+      document.getElementById('tv-day').classList.remove('active')
+      renderWeekTable()
+    })
+
+    document.getElementById('btn-wtable-prev').addEventListener('click', function() { weekTableOffset--; renderWeekTable() })
+    document.getElementById('btn-wtable-next').addEventListener('click', function() { weekTableOffset++; renderWeekTable() })
+
+    function renderWeekTable() {
+      const now = new Date()
+      const mon = new Date(now)
+      mon.setDate(now.getDate() - ((now.getDay() + 6) % 7) + weekTableOffset * 7)
+      const sun = new Date(mon); sun.setDate(mon.getDate() + 6)
+      document.getElementById('wtable-title').textContent =
+        mon.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' – ' +
+        sun.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+
+      const table = document.getElementById('week-table')
+      const activeTasks = tasks.filter(function(t) { return t.active })
+
+      if (!activeTasks.length) {
+        table.innerHTML = '<tr><td class="week-table-empty" colspan="8">Aucune tâche pour l\\'instant.</td></tr>'
+        return
+      }
+
+      const labels = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
+      const todayStr = toDateStr(new Date())
+      const days = []
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(mon); d.setDate(mon.getDate() + i)
+        days.push({ str: toDateStr(d), num: d.getDate(), label: labels[i], isToday: toDateStr(d) === todayStr })
+      }
+
+      let thead = '<thead><tr><th class="task-name-col">Tâche</th>'
+      days.forEach(function(d) {
+        thead += '<th class="' + (d.isToday ? 'is-today-col' : '') + '">' + d.label + '<br/>' + d.num + '</th>'
+      })
+      thead += '</tr></thead>'
+
+      let tbody = '<tbody>'
+      activeTasks.forEach(function(task) {
+        tbody += '<tr><td class="task-name-cell"><span class="week-table-emoji">' + (task.emoji || '✓') + '</span>' + task.name + '</td>'
+        days.forEach(function(d) {
+          const key = d.str + '_' + task.id
+          const isDone = !!completions[key]
+          tbody += '<td><button class="week-check' + (isDone ? ' done' : '') + '" style="' + (isDone ? 'background:' + (task.color || 'var(--accent)') + ';border-color:' + (task.color || 'var(--accent)') + ';' : '') + '" onclick="toggleTaskForDate(\\'' + task.id + '\\',\\'' + d.str + '\\')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button></td>'
+        })
+        tbody += '</tr>'
+      })
+      tbody += '</tbody>'
+
+      table.innerHTML = thead + tbody
+    }
+
+    window.toggleTaskForDate = async function(taskId, dateStr) {
+      const key = dateStr + '_' + taskId
+      if (completions[key]) {
+        await db.from('task_completions').delete().eq('id', completions[key])
+        delete completions[key]
+      } else {
+        const { data } = await db.from('task_completions').insert({ task_id: taskId, completed_date: dateStr }).select().single()
+        if (data) completions[key] = data.id
+      }
+      renderWeekTable()
+      if (dateStr === selectedDate) {
+        renderTasksList()
+        updateProgress()
+        renderWeekBig()
+      }
+      updateExtendedStats()
     }
 
 
