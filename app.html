@@ -1547,9 +1547,11 @@
       </div>
 
       <!-- Toggle principal -->
-      <div class="task-view-toggle">
+      <div class="task-view-toggle" style="overflow-x:auto;scrollbar-width:none;">
         <button class="task-view-btn active" id="btn-sv-day">Jour</button>
         <button class="task-view-btn" id="btn-sv-week">Semaine</button>
+        <button class="task-view-btn" id="btn-goto-ex">Exercices</button>
+        <button class="task-view-btn" id="btn-goto-prog">Programmes</button>
         <button class="task-view-btn" id="btn-sv-stats">Stats</button>
       </div>
 
@@ -1573,10 +1575,6 @@
 
         <div id="sday-content"></div>
 
-        <div style="display:flex;gap:0.625rem;padding:0 1.25rem 0.625rem;">
-          <button class="btn-secondary" style="flex:1;" id="btn-goto-ex">📚 Exercices</button>
-          <button class="btn-secondary" style="flex:1;" id="btn-goto-prog">📋 Programmes</button>
-        </div>
         <div style="padding:0 1.25rem 1rem;">
           <button class="btn-secondary" style="width:100%;" id="btn-sday-plan">📅 Planifier ce jour</button>
         </div>
@@ -4386,8 +4384,17 @@
       sportShowView('sv-stats')
       setTimeout(renderAllSportStats, 100)
     })
-    document.getElementById('btn-goto-ex').addEventListener('click', function() { sportShowView('sv-ex') })
-    document.getElementById('btn-goto-prog').addEventListener('click', function() { sportShowView('sv-prog'); renderProgList() })
+    document.getElementById('btn-goto-ex').addEventListener('click', function() {
+      document.querySelectorAll('#module-sport > .task-view-toggle .task-view-btn').forEach(function(b) { b.classList.remove('active') })
+      document.getElementById('btn-goto-ex').classList.add('active')
+      sportShowView('sv-ex')
+    })
+    document.getElementById('btn-goto-prog').addEventListener('click', function() {
+      document.querySelectorAll('#module-sport > .task-view-toggle .task-view-btn').forEach(function(b) { b.classList.remove('active') })
+      document.getElementById('btn-goto-prog').classList.add('active')
+      sportShowView('sv-prog')
+      renderProgList()
+    })
 
 
     // ── HEADER ──
