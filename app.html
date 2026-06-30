@@ -4815,7 +4815,7 @@
 
     // ── TASKS ──
     async function loadHouseholdId() {
-      const { data } = await db.from('profiles').select('household_id').eq('id', profile.id).single()
+      const { data } = await db.from('profile_household').select('household_id').eq('profile_id', profile.id).maybeSingle()
       householdId = data ? data.household_id : null
     }
 
