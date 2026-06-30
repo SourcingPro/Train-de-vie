@@ -1166,6 +1166,103 @@
     .ex-detail-history-row:last-child { border-bottom: none; }
     .ex-detail-history-date { color: var(--text-muted); font-size: 0.8125rem; }
     .ex-detail-history-value { font-weight: 600; }
+
+    /* ══════════════════════════════════════
+       SPORT — PROGRAMMES
+    ══════════════════════════════════════ */
+    .prog-lib-item {
+      display: flex; align-items: center; gap: 0.875rem;
+      padding: 0.875rem 1.25rem; border-bottom: 0.5px solid var(--border);
+      cursor: pointer; transition: background var(--transition);
+    }
+    .prog-lib-item:hover { background: var(--surface-2); }
+    .prog-lib-item:last-child { border-bottom: none; }
+    .prog-lib-emoji { font-size: 1.5rem; flex-shrink: 0; width: 38px; text-align: center; }
+    .prog-lib-info { flex: 1; min-width: 0; }
+    .prog-lib-name { font-size: 0.9375rem; font-weight: 600; }
+    .prog-lib-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem; }
+
+    .prog-ex-row {
+      display: flex; align-items: center; gap: 0.625rem;
+      padding: 0.75rem; background: var(--surface-2); border-radius: var(--radius-sm);
+      margin-bottom: 0.5rem;
+    }
+    .prog-ex-emoji { font-size: 1.125rem; flex-shrink: 0; }
+    .prog-ex-info { flex: 1; min-width: 0; }
+    .prog-ex-name { font-size: 0.875rem; font-weight: 600; }
+    .prog-ex-fields { display: flex; gap: 0.375rem; margin-top: 0.375rem; }
+    .prog-ex-field { flex: 1; }
+    .prog-ex-field label { font-size: 0.625rem; color: var(--text-muted); display: block; margin-bottom: 0.15rem; }
+    .prog-ex-field input {
+      width: 100%; padding: 0.4rem 0.5rem; border-radius: 8px;
+      border: 1px solid var(--border-strong); background: var(--surface);
+      font-size: 0.8125rem; font-family: inherit;
+    }
+    .prog-ex-remove {
+      flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+      border: none; background: transparent; color: var(--text-muted);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .prog-ex-remove svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
+    .pick-ex-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 1rem; border-bottom: 0.5px solid var(--border);
+      cursor: pointer; transition: background var(--transition);
+    }
+    .pick-ex-row:hover { background: var(--surface-2); }
+    .pick-ex-row:last-child { border-bottom: none; }
+
+    /* ── Session live ── */
+    .session-overlay {
+      position: fixed; inset: 0; background: var(--bg);
+      z-index: 200; display: none; flex-direction: column;
+    }
+    .session-overlay.open { display: flex; }
+    .session-top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.25rem; padding-top: max(1rem, env(safe-area-inset-top));
+      border-bottom: 0.5px solid var(--border);
+    }
+    .session-top-title { font-size: 1.0625rem; font-weight: 700; }
+    .session-timer { font-size: 0.9375rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--accent); }
+    .session-body { flex: 1; overflow-y: auto; padding: 1rem 1.25rem; }
+    .session-footer {
+      display: flex; gap: 0.75rem;
+      padding: 1rem 1.25rem; padding-bottom: max(1rem, env(safe-area-inset-bottom));
+      border-top: 0.5px solid var(--border);
+    }
+    .session-ex-card {
+      background: var(--surface); border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card); padding: 1.125rem; margin-bottom: 0.875rem;
+    }
+    .session-ex-header { display: flex; align-items: center; gap: 0.625rem; margin-bottom: 0.875rem; }
+    .session-ex-emoji { font-size: 1.25rem; }
+    .session-ex-name { font-size: 1rem; font-weight: 700; flex: 1; }
+    .session-set-row {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.5rem 0; border-bottom: 0.5px solid var(--border);
+    }
+    .session-set-row:last-child { border-bottom: none; }
+    .session-set-num {
+      width: 24px; height: 24px; border-radius: 50%; background: var(--surface-2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); flex-shrink: 0;
+    }
+    .session-set-input {
+      flex: 1; padding: 0.5rem; border-radius: 8px;
+      border: 1px solid var(--border-strong); background: var(--surface-2);
+      font-size: 0.875rem; font-family: inherit; text-align: center;
+    }
+    .session-set-check {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      border: 1.5px solid var(--border-strong); background: transparent;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    .session-set-check.done { background: var(--pastel-green); border-color: var(--pastel-green); color: var(--pastel-green-text); }
+    .session-set-check svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; opacity: 0; }
+    .session-set-check.done svg { opacity: 1; }
 </style>
 </head>
 <body>
@@ -1336,17 +1433,36 @@
     <div class="module" id="module-sport">
       <div class="page-header">
         <div class="page-title">Sport</div>
-        <div class="page-subtitle" id="sport-subtitle">Bibliothèque d'exercices</div>
+        <div class="page-subtitle" id="sport-subtitle">Bibliothèque & programmes</div>
       </div>
 
-      <div class="ex-lib-search-row">
-        <input class="form-input" style="flex:1;" placeholder="Rechercher un exercice…" id="ex-search" />
-        <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-ex">+ Ajouter</button>
+      <!-- Toggle Exercices / Programmes -->
+      <div class="task-view-toggle">
+        <button class="task-view-btn active" id="btn-sv-ex">Exercices</button>
+        <button class="task-view-btn" id="btn-sv-prog">Programmes</button>
       </div>
-      <div class="ex-filter-row" id="ex-filter-cats"></div>
-      <div class="ex-filter-row" id="ex-filter-muscles"></div>
-      <div class="card" style="padding:0;">
-        <div id="ex-list"></div>
+
+      <!-- ── VUE EXERCICES ── -->
+      <div class="task-view active" id="sv-ex">
+        <div class="ex-lib-search-row">
+          <input class="form-input" style="flex:1;" placeholder="Rechercher un exercice…" id="ex-search" />
+          <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-ex">+ Ajouter</button>
+        </div>
+        <div class="ex-filter-row" id="ex-filter-cats"></div>
+        <div class="ex-filter-row" id="ex-filter-muscles"></div>
+        <div class="card" style="padding:0;">
+          <div id="ex-list"></div>
+        </div>
+      </div>
+
+      <!-- ── VUE PROGRAMMES ── -->
+      <div class="task-view" id="sv-prog">
+        <div style="padding:0 1.25rem 0.875rem;">
+          <button class="btn-primary" style="width:100%;" id="btn-new-prog">+ Nouveau programme</button>
+        </div>
+        <div class="card" style="padding:0;">
+          <div id="prog-list"></div>
+        </div>
       </div>
     </div>
 <div class="module" id="module-reading">
@@ -1512,6 +1628,80 @@
         <button class="btn-secondary" id="btn-ex-detail-edit">Modifier l'exercice</button>
         <button class="btn-danger" id="btn-ex-detail-delete">Supprimer</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL PROGRAMME -->
+  <div class="modal-overlay" id="modal-prog">
+    <div class="modal" style="max-height:90dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-prog-title">Nouveau programme</div>
+        <button class="modal-close" id="modal-prog-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nom</label>
+        <input class="form-input" id="prog-nom" placeholder="Ex : Push Day, Full Body…" maxlength="40" />
+      </div>
+      <div class="form-group" style="display:flex;gap:0.75rem;align-items:flex-end;">
+        <div style="flex:0 0 80px;">
+          <label class="form-label">Emoji</label>
+          <input class="form-input" id="prog-emoji" placeholder="💪" maxlength="4" style="font-size:1.5rem;text-align:center;" />
+        </div>
+        <div style="flex:1;">
+          <label class="form-label">Notes (optionnel)</label>
+          <input class="form-input" id="prog-notes" placeholder="Contexte, objectif…" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Exercices</label>
+        <div id="prog-ex-builder"></div>
+        <button class="btn-add-ex" id="btn-prog-add-ex">📚 Ajouter un exercice</button>
+      </div>
+      <input type="hidden" id="prog-editing-id" />
+      <div class="modal-actions" id="prog-actions"></div>
+    </div>
+  </div>
+
+  <!-- MODAL CHOISIR EXERCICE (pour programme) -->
+  <div class="modal-overlay" id="modal-pick-ex">
+    <div class="modal" style="max-height:90dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title">Choisir un exercice</div>
+        <button class="modal-close" id="modal-pick-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <input class="form-input" placeholder="Rechercher…" id="pick-search" style="margin-bottom:0.75rem;" />
+      <div class="ex-filter-row" id="pick-filter-cats" style="padding:0 0 0.75rem;"></div>
+      <div id="pick-list" style="max-height:50dvh;overflow-y:auto;border:0.5px solid var(--border);border-radius:var(--radius-sm);"></div>
+    </div>
+  </div>
+
+  <!-- MODAL DÉTAIL PROGRAMME -->
+  <div class="modal-overlay" id="modal-prog-detail">
+    <div class="modal" style="max-height:90dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title" id="prog-detail-title">Programme</div>
+        <button class="modal-close" id="modal-prog-detail-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div id="prog-detail-body"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btn-prog-detail-edit">Modifier</button>
+        <button class="btn-primary" id="btn-prog-detail-start">▶ Démarrer la séance</button>
+      </div>
+      <button class="btn-danger" style="width:100%;margin-top:0.625rem;" id="btn-prog-detail-delete">Supprimer le programme</button>
+    </div>
+  </div>
+
+  <!-- SESSION EN COURS (séance live) -->
+  <div class="session-overlay" id="session-overlay">
+    <div class="session-top">
+      <button class="btn-icon" id="session-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      <div class="session-top-title" id="session-title"></div>
+      <div class="session-timer" id="session-timer">0:00</div>
+    </div>
+    <div class="session-body" id="session-body"></div>
+    <div class="session-footer">
+      <button class="btn-secondary" style="flex:1;" id="session-cancel">Annuler</button>
+      <button class="btn-primary" style="flex:2;" id="session-finish">✓ Terminer la séance</button>
     </div>
   </div>
 
@@ -2635,6 +2825,328 @@
     document.getElementById('btn-new-ex').addEventListener('click', openNewEx)
 
 
+
+    // ══════════════════════════════════════
+    // SPORT — PROGRAMMES
+    // ══════════════════════════════════════
+    let sportPrograms = []
+    let editingProgId = null
+    let progExBuilder = [] // [{ exId, name, emoji, sets, reps, weight }]
+    let pickExCallback = null
+    let pickFilterCat = 'Tous'
+    let pickSearch = ''
+
+    function loadSportPrograms() {
+      const s = localStorage.getItem('tdv_progs_' + profile.id)
+      sportPrograms = s ? JSON.parse(s) : []
+    }
+    function saveSportPrograms() { localStorage.setItem('tdv_progs_' + profile.id, JSON.stringify(sportPrograms)) }
+
+    // ── Toggle Exercices / Programmes ──
+    document.getElementById('btn-sv-ex').addEventListener('click', function() {
+      document.getElementById('btn-sv-ex').classList.add('active')
+      document.getElementById('btn-sv-prog').classList.remove('active')
+      document.getElementById('sv-ex').classList.add('active')
+      document.getElementById('sv-prog').classList.remove('active')
+    })
+    document.getElementById('btn-sv-prog').addEventListener('click', function() {
+      document.getElementById('btn-sv-prog').classList.add('active')
+      document.getElementById('btn-sv-ex').classList.remove('active')
+      document.getElementById('sv-prog').classList.add('active')
+      document.getElementById('sv-ex').classList.remove('active')
+      renderProgList()
+    })
+
+    // ── Liste des programmes ──
+    function renderProgList() {
+      const el = document.getElementById('prog-list')
+      if (!sportPrograms.length) { el.innerHTML = '<div class="empty-state" style="padding:2.5rem;"><p>Aucun programme pour l\'instant.<br/>Crée ton premier programme.</p></div>'; return }
+      el.innerHTML = ''
+      sportPrograms.forEach(function(p) {
+        const div = document.createElement('div')
+        div.className = 'prog-lib-item'
+        div.innerHTML = '<div class="prog-lib-emoji">' + (p.emoji || '💪') + '</div>' +
+          '<div class="prog-lib-info"><div class="prog-lib-name">' + p.name + '</div>' +
+          '<div class="prog-lib-meta">' + (p.exercises || []).length + ' exercice' + ((p.exercises || []).length > 1 ? 's' : '') + '</div></div>' +
+          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>'
+        div.addEventListener('click', function() { openProgDetail(p.id) })
+        el.appendChild(div)
+      })
+    }
+
+    // ── Détail programme ──
+    let viewingProgId = null
+    function openProgDetail(id) {
+      const p = sportPrograms.find(function(x) { return x.id === id })
+      if (!p) return
+      viewingProgId = id
+      document.getElementById('prog-detail-title').textContent = (p.emoji || '💪') + ' ' + p.name
+      let html = ''
+      if (p.notes) html += '<p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:1rem;">' + p.notes + '</p>'
+      ;(p.exercises || []).forEach(function(ex, i) {
+        html += '<div class="prog-ex-row" style="cursor:default;">' +
+          '<div class="prog-ex-emoji">' + ex.emoji + '</div>' +
+          '<div class="prog-ex-info"><div class="prog-ex-name">' + (i+1) + '. ' + ex.name + '</div>' +
+          '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;">' + ex.sets + ' séries × ' + ex.reps + ' reps' + (ex.weight ? ' · ' + ex.weight + ' kg' : '') + '</div></div>' +
+          '</div>'
+      })
+      document.getElementById('prog-detail-body').innerHTML = html
+      document.getElementById('modal-prog-detail').classList.add('open')
+    }
+    document.getElementById('modal-prog-detail-close').addEventListener('click', function() { document.getElementById('modal-prog-detail').classList.remove('open') })
+    document.getElementById('modal-prog-detail').addEventListener('click', function(e) { if (e.target === e.currentTarget) document.getElementById('modal-prog-detail').classList.remove('open') })
+    document.getElementById('btn-prog-detail-edit').addEventListener('click', function() {
+      document.getElementById('modal-prog-detail').classList.remove('open')
+      const p = sportPrograms.find(function(x) { return x.id === viewingProgId })
+      if (p) openEditProg(p)
+    })
+    document.getElementById('btn-prog-detail-delete').addEventListener('click', function() {
+      sportPrograms = sportPrograms.filter(function(p) { return p.id !== viewingProgId })
+      saveSportPrograms()
+      document.getElementById('modal-prog-detail').classList.remove('open')
+      renderProgList()
+      showToast('Programme supprimé')
+    })
+    document.getElementById('btn-prog-detail-start').addEventListener('click', function() {
+      const p = sportPrograms.find(function(x) { return x.id === viewingProgId })
+      document.getElementById('modal-prog-detail').classList.remove('open')
+      if (p) startSession(p)
+    })
+
+    // ── Création / édition programme ──
+    function renderProgExBuilder() {
+      const el = document.getElementById('prog-ex-builder')
+      if (!progExBuilder.length) { el.innerHTML = '<p style="font-size:0.8125rem;color:var(--text-muted);padding:0.5rem 0;">Aucun exercice ajouté.</p>'; return }
+      el.innerHTML = ''
+      progExBuilder.forEach(function(ex, idx) {
+        const row = document.createElement('div')
+        row.className = 'prog-ex-row'
+        row.innerHTML = '<div class="prog-ex-emoji">' + ex.emoji + '</div>' +
+          '<div class="prog-ex-info">' +
+          '<div class="prog-ex-name">' + (idx+1) + '. ' + ex.name + '</div>' +
+          '<div class="prog-ex-fields">' +
+          '<div class="prog-ex-field"><label>Séries</label><input type="number" min="1" max="20" value="' + ex.sets + '" data-field="sets" /></div>' +
+          '<div class="prog-ex-field"><label>Reps</label><input type="number" min="1" max="100" value="' + ex.reps + '" data-field="reps" /></div>' +
+          '<div class="prog-ex-field"><label>Poids (kg)</label><input type="number" min="0" step="0.5" value="' + (ex.weight || '') + '" data-field="weight" /></div>' +
+          '</div></div>' +
+          '<button type="button" class="prog-ex-remove" data-idx="' + idx + '"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>'
+        row.querySelectorAll('input[data-field]').forEach(function(input) {
+          input.addEventListener('input', function() {
+            progExBuilder[idx][input.dataset.field] = input.dataset.field === 'weight' ? (parseFloat(input.value) || null) : (parseInt(input.value) || 1)
+          })
+        })
+        row.querySelector('.prog-ex-remove').addEventListener('click', function() {
+          progExBuilder.splice(idx, 1)
+          renderProgExBuilder()
+        })
+        el.appendChild(row)
+      })
+    }
+
+    function openNewProg() {
+      editingProgId = null
+      progExBuilder = []
+      document.getElementById('modal-prog-title').textContent = 'Nouveau programme'
+      document.getElementById('prog-nom').value = ''
+      document.getElementById('prog-emoji').value = ''
+      document.getElementById('prog-notes').value = ''
+      document.getElementById('prog-actions').innerHTML = '<button class="btn-secondary" id="prog-cancel">Annuler</button><button class="btn-primary" id="prog-save">Créer</button>'
+      bindProgModalButtons()
+      renderProgExBuilder()
+      document.getElementById('modal-prog').classList.add('open')
+    }
+
+    function openEditProg(p) {
+      editingProgId = p.id
+      progExBuilder = JSON.parse(JSON.stringify(p.exercises || []))
+      document.getElementById('modal-prog-title').textContent = 'Modifier le programme'
+      document.getElementById('prog-nom').value = p.name
+      document.getElementById('prog-emoji').value = p.emoji || ''
+      document.getElementById('prog-notes').value = p.notes || ''
+      document.getElementById('prog-actions').innerHTML = '<button class="btn-danger" id="prog-delete">Supprimer</button><button class="btn-primary" id="prog-save">Enregistrer</button>'
+      bindProgModalButtons()
+      renderProgExBuilder()
+      document.getElementById('modal-prog').classList.add('open')
+    }
+
+    function closeProgModal() { document.getElementById('modal-prog').classList.remove('open') }
+
+    function bindProgModalButtons() {
+      document.getElementById('prog-cancel')?.addEventListener('click', closeProgModal)
+      document.getElementById('prog-delete')?.addEventListener('click', function() {
+        sportPrograms = sportPrograms.filter(function(p) { return p.id !== editingProgId })
+        saveSportPrograms(); closeProgModal(); renderProgList(); showToast('Programme supprimé')
+      })
+      document.getElementById('prog-save').addEventListener('click', saveProg)
+    }
+
+    function saveProg() {
+      const name = document.getElementById('prog-nom').value.trim()
+      if (!name) return
+      const prog = {
+        id: editingProgId || ('prog' + Date.now()),
+        name: name,
+        emoji: document.getElementById('prog-emoji').value.trim() || '💪',
+        notes: document.getElementById('prog-notes').value.trim(),
+        exercises: progExBuilder.slice()
+      }
+      if (editingProgId) sportPrograms = sportPrograms.map(function(p) { return p.id === editingProgId ? prog : p })
+      else sportPrograms.push(prog)
+      saveSportPrograms(); closeProgModal(); renderProgList(); showToast('Programme enregistré')
+    }
+
+    document.getElementById('modal-prog-close').addEventListener('click', closeProgModal)
+    document.getElementById('modal-prog').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeProgModal() })
+    document.getElementById('btn-new-prog').addEventListener('click', openNewProg)
+
+    // ── Sélecteur d'exercice (pour programme) ──
+    function openPickExercise(callback) {
+      pickExCallback = callback
+      pickSearch = ''
+      pickFilterCat = 'Tous'
+      document.getElementById('pick-search').value = ''
+      renderPickFilters()
+      renderPickList()
+      document.getElementById('modal-pick-ex').classList.add('open')
+    }
+    function renderPickFilters() {
+      const el = document.getElementById('pick-filter-cats')
+      const cats = ['Tous'].concat(EX_CATEGORIES)
+      el.innerHTML = cats.map(function(c) {
+        return '<button class="filter-chip' + (c === pickFilterCat ? ' active' : '') + '" data-pc="' + c + '">' + c + '</button>'
+      }).join('')
+      el.querySelectorAll('[data-pc]').forEach(function(btn) {
+        btn.addEventListener('click', function() { pickFilterCat = btn.dataset.pc; renderPickFilters(); renderPickList() })
+      })
+    }
+    function renderPickList() {
+      const el = document.getElementById('pick-list')
+      const filtered = exLibrary.filter(function(e) {
+        const mc = pickFilterCat === 'Tous' || e.cat === pickFilterCat
+        const ms = !pickSearch || e.name.toLowerCase().includes(pickSearch.toLowerCase())
+        return mc && ms
+      })
+      if (!filtered.length) { el.innerHTML = '<div class="empty-state" style="padding:1.5rem;"><p>Aucun résultat.</p></div>'; return }
+      el.innerHTML = ''
+      filtered.forEach(function(ex) {
+        const row = document.createElement('div')
+        row.className = 'pick-ex-row'
+        row.innerHTML = '<span style="font-size:1.125rem;">' + ex.emoji + '</span><span style="font-size:0.875rem;font-weight:500;">' + ex.name + '</span>'
+        row.addEventListener('click', function() {
+          document.getElementById('modal-pick-ex').classList.remove('open')
+          if (pickExCallback) pickExCallback(ex)
+        })
+        el.appendChild(row)
+      })
+    }
+    document.getElementById('pick-search').addEventListener('input', function(e) { pickSearch = e.target.value; renderPickList() })
+    document.getElementById('modal-pick-close').addEventListener('click', function() { document.getElementById('modal-pick-ex').classList.remove('open') })
+    document.getElementById('modal-pick-ex').addEventListener('click', function(e) { if (e.target === e.currentTarget) document.getElementById('modal-pick-ex').classList.remove('open') })
+
+    document.getElementById('btn-prog-add-ex').addEventListener('click', function() {
+      openPickExercise(function(ex) {
+        progExBuilder.push({ exId: ex.id, name: ex.name, emoji: ex.emoji, sets: ex.defaultSets || 3, reps: 10, weight: ex.usualWeight || null })
+        renderProgExBuilder()
+      })
+    })
+
+    // ══════════════════════════════════════
+    // SÉANCE LIVE
+    // ══════════════════════════════════════
+    let activeSession = null // { program, startedAt, exercises: [{name, emoji, sets: [{reps, weight, done}]}] }
+    let sessionTimerInterval = null
+    let workoutHistory = []
+
+    function loadWorkoutHistory() {
+      const s = localStorage.getItem('tdv_workouts_' + profile.id)
+      workoutHistory = s ? JSON.parse(s) : []
+    }
+    function saveWorkoutHistory() { localStorage.setItem('tdv_workouts_' + profile.id, JSON.stringify(workoutHistory)) }
+
+    function startSession(program) {
+      activeSession = {
+        programId: program.id,
+        programName: program.name,
+        startedAt: Date.now(),
+        exercises: (program.exercises || []).map(function(ex) {
+          return {
+            name: ex.name, emoji: ex.emoji,
+            sets: Array.from({ length: ex.sets }, function() { return { reps: ex.reps, weight: ex.weight, done: false } })
+          }
+        })
+      }
+      document.getElementById('session-title').textContent = program.name
+      renderSessionBody()
+      document.getElementById('session-overlay').classList.add('open')
+      sessionTimerInterval = setInterval(updateSessionTimer, 1000)
+    }
+
+    function updateSessionTimer() {
+      if (!activeSession) return
+      const elapsed = Math.floor((Date.now() - activeSession.startedAt) / 1000)
+      const m = Math.floor(elapsed / 60)
+      const s = elapsed % 60
+      document.getElementById('session-timer').textContent = m + ':' + (s < 10 ? '0' : '') + s
+    }
+
+    function renderSessionBody() {
+      const el = document.getElementById('session-body')
+      el.innerHTML = ''
+      activeSession.exercises.forEach(function(ex, exIdx) {
+        const card = document.createElement('div')
+        card.className = 'session-ex-card'
+        let setsHtml = ''
+        ex.sets.forEach(function(set, setIdx) {
+          setsHtml += '<div class="session-set-row">' +
+            '<div class="session-set-num">' + (setIdx+1) + '</div>' +
+            '<input type="number" class="session-set-input" placeholder="kg" value="' + (set.weight || '') + '" data-ex="' + exIdx + '" data-set="' + setIdx + '" data-f="weight" />' +
+            '<input type="number" class="session-set-input" placeholder="reps" value="' + (set.reps || '') + '" data-ex="' + exIdx + '" data-set="' + setIdx + '" data-f="reps" />' +
+            '<button type="button" class="session-set-check' + (set.done ? ' done' : '') + '" data-ex="' + exIdx + '" data-set="' + setIdx + '"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>' +
+            '</div>'
+        })
+        card.innerHTML = '<div class="session-ex-header"><span class="session-ex-emoji">' + ex.emoji + '</span><span class="session-ex-name">' + ex.name + '</span></div>' + setsHtml
+        card.querySelectorAll('input[data-f]').forEach(function(input) {
+          input.addEventListener('input', function() {
+            const exI = parseInt(input.dataset.ex), setI = parseInt(input.dataset.set), f = input.dataset.f
+            activeSession.exercises[exI].sets[setI][f] = parseFloat(input.value) || 0
+          })
+        })
+        card.querySelectorAll('.session-set-check').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            const exI = parseInt(btn.dataset.ex), setI = parseInt(btn.dataset.set)
+            activeSession.exercises[exI].sets[setI].done = !activeSession.exercises[exI].sets[setI].done
+            btn.classList.toggle('done')
+          })
+        })
+        el.appendChild(card)
+      })
+    }
+
+    function closeSession() {
+      if (sessionTimerInterval) clearInterval(sessionTimerInterval)
+      sessionTimerInterval = null
+      activeSession = null
+      document.getElementById('session-overlay').classList.remove('open')
+    }
+
+    document.getElementById('session-close').addEventListener('click', closeSession)
+    document.getElementById('session-cancel').addEventListener('click', closeSession)
+    document.getElementById('session-finish').addEventListener('click', function() {
+      if (!activeSession) return
+      const durationMin = Math.round((Date.now() - activeSession.startedAt) / 60000)
+      workoutHistory.push({
+        id: 'w' + Date.now(),
+        date: toDateStr(new Date()),
+        programName: activeSession.programName,
+        duration: durationMin,
+        exercises: activeSession.exercises
+      })
+      saveWorkoutHistory()
+      showToast('Séance enregistrée 💪')
+      closeSession()
+    })
+
+
     // ── HEADER ──
     function renderHeader() {
       const colors = ['#DBEAFE','#FCE4EC','#DCEDC8','#FFE0B2','#EDE7F6']
@@ -2990,6 +3502,8 @@
       loadTaskTags()
       loadTaskReschedules()
       loadExLibrary()
+      loadSportPrograms()
+      loadWorkoutHistory()
       renderHeader()
       renderTabs()
       await loadTasks()
