@@ -1410,6 +1410,12 @@
         <div class="page-subtitle" id="tasks-subtitle"></div>
       </div>
 
+      <!-- Toggle Perso / Commune -->
+      <div class="task-stats-period-toggle" style="margin:0 1.25rem 0.875rem;">
+        <button class="task-stats-period-btn active" id="btn-scope-perso">Perso</button>
+        <button class="task-stats-period-btn" id="btn-scope-commun">Commune</button>
+      </div>
+
       <!-- Toggle Jour / Semaine / Bibliothèque / Stats -->
       <div class="task-view-toggle" style="overflow-x:auto;scrollbar-width:none;">
         <button class="task-view-btn active" id="btn-tv-day">Jour</button>
@@ -1752,6 +1758,13 @@
         <input class="form-input" id="task-name-input" placeholder="Ex : Méditer, Lire…" maxlength="60" />
       </div>
       <div class="form-group">
+        <label class="form-label">Visibilité</label>
+        <div class="task-view-toggle" style="margin:0;">
+          <button class="task-view-btn active" type="button" id="task-scope-perso">Perso</button>
+          <button class="task-view-btn" type="button" id="task-scope-commun">Commune</button>
+        </div>
+      </div>
+      <div class="form-group">
         <label class="form-label">Fréquence</label>
         <select class="form-select" id="task-freq-input">
           <option value="daily">Tous les jours</option>
@@ -1814,6 +1827,13 @@
       <div class="form-group">
         <label class="form-label">Nom</label>
         <input class="form-input" id="tlib-name-input" placeholder="Ex : Méditer, Lire…" maxlength="60" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Visibilité</label>
+        <div class="task-view-toggle" style="margin:0;">
+          <button class="task-view-btn active" type="button" id="tlib-scope-perso">Perso</button>
+          <button class="task-view-btn" type="button" id="tlib-scope-commun">Commune</button>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Emoji</label>
@@ -2112,6 +2132,9 @@
     }
 
     if (!profile.id) { window.location.href = 'index.html' }
+
+    let householdId = null
+    let taskScope = 'perso' // 'perso' | 'commun'
 
     let selectedDate = toDateStr(new Date())
     let tasks = []
@@ -2557,6 +2580,25 @@
     }
 
 
+
+    // ══════════════════════════════════════
+    // TOGGLE PERSO / COMMUNE
+    // ══════════════════════════════════════
+    async function switchTaskScope(newScope) {
+      taskScope = newScope
+      document.getElementById('btn-scope-perso').classList.toggle('active', newScope === 'perso')
+      document.getElementById('btn-scope-commun').classList.toggle('active', newScope === 'commun')
+      await loadTasks()
+      await loadCompletions()
+      renderWeekBig()
+      renderTasksList()
+      updateProgress()
+      updateDateTitle()
+      updateExtendedStats()
+      renderWeekTable()
+    }
+    document.getElementById('btn-scope-perso').addEventListener('click', function() { switchTaskScope('perso') })
+    document.getElementById('btn-scope-commun').addEventListener('click', function() { switchTaskScope('commun') })
 
     // ══════════════════════════════════════
     // VUE SEMAINE — TABLEAU
@@ -4503,8 +4545,10 @@
     let taskLibSearch = ''
 
     async function loadTaskTemplates() {
-      const { data } = await db.from('task_templates').select('*').eq('profile_id', profile.id).order('created_at')
-      taskTemplates = (data || []).map(function(t) { return { id: t.id, name: t.name, emoji: t.emoji, freq: t.freq, tagIds: t.tag_ids || [] } })
+      const { data: persoData } = await db.from('task_templates').select('*').eq('profile_id', profile.id).eq('scope', 'perso').order('created_at')
+      const { data: communData } = await db.from('task_templates').select('*').eq('household_id', householdId).eq('scope', 'commun').order('created_at')
+      const mapRow = function(t) { return { id: t.id, name: t.name, emoji: t.emoji, freq: t.freq, tagIds: t.tag_ids || [], scope: t.scope } }
+      taskTemplates = (persoData || []).map(mapRow).concat((communData || []).map(mapRow))
     }
 
     function findOrCreateTagByName(name, emoji) {
@@ -4561,6 +4605,8 @@
           renderEmojiPicker('task-emoji-picker', 'task-emoji-display', selectedTaskEmoji, function(e) { selectedTaskEmoji = e })
           selectedTaskTagIds = (t.tagIds || []).slice()
           renderTaskTagPicker()
+          selectedTaskScope = t.scope || 'perso'
+          updateTaskScopeButtons()
           document.getElementById('modal-task-lib').classList.remove('open')
         })
         el.appendChild(row)
@@ -4608,13 +4654,14 @@
           const tg = tagById(id)
           return tg ? '<span class="muscle-tag">' + tg.emoji + ' ' + tg.name + '</span>' : ''
         }).join('')
+        const scopeBadge = '<span class="muscle-tag sub">' + (t.scope === 'commun' ? '👥 Commune' : '🔒 Perso') + '</span>'
         const div = document.createElement('div')
         div.className = 'ex-lib-item'
         div.innerHTML = '<div class="ex-lib-emoji">' + t.emoji + '</div>' +
           '<div class="ex-lib-info">' +
           '<div class="ex-lib-name">' + t.name + '</div>' +
           '<div class="ex-lib-meta">' + freqLabel(t.freq) + '</div>' +
-          (tagsHtml ? '<div class="ex-lib-tags">' + tagsHtml + '</div>' : '') +
+          '<div class="ex-lib-tags">' + scopeBadge + tagsHtml + '</div>' +
           '</div>'
         div.addEventListener('click', function() { openEditTlib(t) })
         el.appendChild(div)
@@ -4622,10 +4669,19 @@
     }
     document.getElementById('tlib-search').addEventListener('input', renderTlibList)
 
+    let selectedTlibScope = 'perso'
+    function updateTlibScopeButtons() {
+      document.getElementById('tlib-scope-perso').classList.toggle('active', selectedTlibScope === 'perso')
+      document.getElementById('tlib-scope-commun').classList.toggle('active', selectedTlibScope === 'commun')
+    }
+    document.getElementById('tlib-scope-perso').addEventListener('click', function() { selectedTlibScope = 'perso'; updateTlibScopeButtons() })
+    document.getElementById('tlib-scope-commun').addEventListener('click', function() { selectedTlibScope = 'commun'; updateTlibScopeButtons() })
+
     function openNewTlib() {
       editingTlibId = null
       selectedTlibEmoji = '✓'
       selectedTlibTagIds = []
+      selectedTlibScope = 'perso'
       document.getElementById('tlib-edit-title').textContent = 'Nouveau modèle'
       document.getElementById('tlib-name-input').value = ''
       document.getElementById('tlib-freq-input').value = 'daily'
@@ -4633,6 +4689,7 @@
       bindTlibEditButtons()
       renderEmojiPicker('tlib-emoji-picker', 'tlib-emoji-display', selectedTlibEmoji, function(e) { selectedTlibEmoji = e })
       renderTlibTagPicker()
+      updateTlibScopeButtons()
       document.getElementById('modal-tlib-edit').classList.add('open')
     }
 
@@ -4640,6 +4697,7 @@
       editingTlibId = t.id
       selectedTlibEmoji = t.emoji || '✓'
       selectedTlibTagIds = (t.tagIds || []).slice()
+      selectedTlibScope = t.scope || 'perso'
       document.getElementById('tlib-edit-title').textContent = 'Modifier le modèle'
       document.getElementById('tlib-name-input').value = t.name
       document.getElementById('tlib-freq-input').value = t.freq || 'daily'
@@ -4647,6 +4705,7 @@
       bindTlibEditButtons()
       renderEmojiPicker('tlib-emoji-picker', 'tlib-emoji-display', selectedTlibEmoji, function(e) { selectedTlibEmoji = e })
       renderTlibTagPicker()
+      updateTlibScopeButtons()
       document.getElementById('modal-tlib-edit').classList.add('open')
     }
 
@@ -4685,9 +4744,13 @@
         name: name,
         emoji: selectedTlibEmoji,
         freq: document.getElementById('tlib-freq-input').value,
-        tagIds: selectedTlibTagIds.slice()
+        tagIds: selectedTlibTagIds.slice(),
+        scope: selectedTlibScope
       }
-      await db.from('task_templates').upsert({ id: tpl.id, profile_id: profile.id, name: tpl.name, emoji: tpl.emoji, freq: tpl.freq, tag_ids: tpl.tagIds })
+      const payload = { id: tpl.id, name: tpl.name, emoji: tpl.emoji, freq: tpl.freq, tag_ids: tpl.tagIds, scope: tpl.scope }
+      if (tpl.scope === 'commun') payload.household_id = householdId
+      else payload.profile_id = profile.id
+      await db.from('task_templates').upsert(payload)
       if (editingTlibId) taskTemplates = taskTemplates.map(function(t) { return t.id === editingTlibId ? tpl : t })
       else taskTemplates.push(tpl)
       closeTlibEditModal(); renderTlibList(); showToast('Modèle enregistré')
@@ -4751,8 +4814,19 @@
     }
 
     // ── TASKS ──
+    async function loadHouseholdId() {
+      const { data } = await db.from('profiles').select('household_id').eq('id', profile.id).single()
+      householdId = data ? data.household_id : null
+    }
+
     async function loadTasks() {
-      const { data } = await db.from('tasks').select('*').eq('profile_id', profile.id).eq('active', true).order('created_at')
+      let query = db.from('tasks').select('*').eq('active', true).order('created_at')
+      if (taskScope === 'commun') {
+        query = query.eq('scope', 'commun').eq('household_id', householdId)
+      } else {
+        query = query.eq('scope', 'perso').eq('profile_id', profile.id)
+      }
+      const { data } = await query
       tasks = data || []
     }
 
@@ -4914,6 +4988,7 @@
       selectedTaskTagIds = []
       selectedTaskEmoji = '✓'
       selectedTaskWeekdays = []
+      selectedTaskScope = taskScope
       document.getElementById('modal-task-title').textContent = 'Nouvelle tâche'
       document.getElementById('task-name-input').value = ''
       document.getElementById('task-freq-input').value = 'daily'
@@ -4928,6 +5003,7 @@
       renderEmojiPicker('task-emoji-picker', 'task-emoji-display', selectedTaskEmoji, e => selectedTaskEmoji = e)
       renderTaskTagPicker()
       updateFreqFieldsVisibility()
+      updateTaskScopeButtons()
       document.getElementById('modal-task').classList.add('open')
       setTimeout(() => document.getElementById('task-name-input').focus(), 100)
     }
@@ -4938,6 +5014,7 @@
       selectedTaskTagIds = [...(task.tag_ids || [])]
       selectedTaskEmoji = task.emoji || '✓'
       selectedTaskWeekdays = [...(task.freq_days || [])]
+      selectedTaskScope = task.scope || 'perso'
       document.getElementById('modal-task-title').textContent = 'Modifier la tâche'
       document.getElementById('task-name-input').value = task.name
       document.getElementById('task-freq-input').value = task.frequency
@@ -4952,8 +5029,17 @@
       renderEmojiPicker('task-emoji-picker', 'task-emoji-display', selectedTaskEmoji, e => selectedTaskEmoji = e)
       renderTaskTagPicker()
       updateFreqFieldsVisibility()
+      updateTaskScopeButtons()
       document.getElementById('modal-task').classList.add('open')
     }
+
+    let selectedTaskScope = 'perso'
+    function updateTaskScopeButtons() {
+      document.getElementById('task-scope-perso').classList.toggle('active', selectedTaskScope === 'perso')
+      document.getElementById('task-scope-commun').classList.toggle('active', selectedTaskScope === 'commun')
+    }
+    document.getElementById('task-scope-perso').addEventListener('click', function() { selectedTaskScope = 'perso'; updateTaskScopeButtons() })
+    document.getElementById('task-scope-commun').addEventListener('click', function() { selectedTaskScope = 'commun'; updateTaskScopeButtons() })
 
     function closeTaskModal() {
       document.getElementById('modal-task').classList.remove('open')
@@ -4980,6 +5066,7 @@
       const btn = document.getElementById('modal-task-save')
       btn.disabled = true
       const tagIds = [...selectedTaskTagIds]
+      const scope = selectedTaskScope
 
       if (editingTaskId) {
         await db.from('tasks').update({ name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays, freq_once_date: freqOnceDate }).eq('id', editingTaskId)
@@ -4987,8 +5074,11 @@
         if (idx !== -1) tasks[idx] = { ...tasks[idx], name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays, freq_once_date: freqOnceDate }
         showToast('Tâche modifiée')
       } else {
-        const { data } = await db.from('tasks').insert({ profile_id: profile.id, name, frequency: freq, color: selectedTaskColor, active: true, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays, freq_once_date: freqOnceDate }).select().single()
-        if (data) tasks.push(data)
+        const payload = { name, frequency: freq, color: selectedTaskColor, active: true, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays, freq_once_date: freqOnceDate, scope: scope }
+        if (scope === 'commun') payload.household_id = householdId
+        else payload.profile_id = profile.id
+        const { data } = await db.from('tasks').insert(payload).select().single()
+        if (data && data.scope === taskScope) tasks.push(data)
         showToast('Tâche créée')
       }
 
@@ -5049,6 +5139,7 @@
     // ── INIT ──
     async function init() {
       loadTheme()
+      await loadHouseholdId()
       await loadTaskTags()
       await loadTaskReschedules()
       await loadTaskTemplates()
