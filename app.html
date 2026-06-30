@@ -1359,7 +1359,7 @@
       if (!taskTags.length) { el.innerHTML = '<span style="font-size:0.8125rem;color:var(--text-muted);">Aucune catégorie. Crée-en une via "Gérer les catégories".</span>'; return }
       el.innerHTML = taskTags.map(function(t) {
         const sel = selectedTaskTagIds.includes(t.id)
-        return '<button type="button" class="tag-option' + (sel ? ' selected' : '') + '" style="color:' + t.color + ';' + (sel ? 'background:' + t.color + '22;' : '') + '" onclick="toggleTaskTag(\'' + t.id + '\')">' + t.emoji + ' ' + t.name + '</button>'
+        return '<button type="button" class="tag-option' + (sel ? ' selected' : '') + '" style="color:' + t.color + ';' + (sel ? 'background:' + t.color + '22;' : '') + '" data-tag-id="' + t.id + '" onclick="toggleTaskTag(this.dataset.tagId)">' + t.emoji + ' ' + t.name + '</button>'
       }).join('')
     }
     window.toggleTaskTag = function(id) {
@@ -1377,7 +1377,7 @@
           '<span class="tag-manage-emoji">' + t.emoji + '</span>' +
           '<span class="tag-manage-name">' + t.name + '</span>' +
           '<span class="tag-color-dot" style="background:' + t.color + ';"></span>' +
-          '<button class="btn-icon" style="width:28px;height:28px;" onclick="deleteTag(\'' + t.id + '\')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>' +
+          '<button class="btn-icon" style="width:28px;height:28px;" data-tag-id="' + t.id + '" onclick="deleteTag(this.dataset.tagId)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>' +
           '</div>'
       }).join('')
     }
@@ -1405,7 +1405,7 @@
     function renderNewTagColorPicker() {
       const el = document.getElementById('new-tag-color-picker')
       el.innerHTML = TAG_COLORS.map(function(c) {
-        return '<div class="color-dot' + (c === newTagColor ? ' selected' : '') + '" style="background:' + c + ';" onclick="selectNewTagColor(\'' + c + '\')"></div>'
+        return '<div class="color-dot' + (c === newTagColor ? ' selected' : '') + '" style="background:' + c + ';" data-color="' + c + '" onclick="selectNewTagColor(this.dataset.color)"></div>'
       }).join('')
     }
     window.selectNewTagColor = function(c) { newTagColor = c; renderNewTagColorPicker() }
