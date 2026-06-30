@@ -1085,6 +1085,87 @@
     .heatmap-dot[data-level="2"] { background: color-mix(in srgb, var(--accent) 50%, var(--surface-2)); }
     .heatmap-dot[data-level="3"] { background: color-mix(in srgb, var(--accent) 75%, var(--surface-2)); }
     .heatmap-dot[data-level="4"] { background: var(--accent); }
+
+    /* ══════════════════════════════════════
+       SPORT — BIBLIOTHÈQUE D'EXERCICES
+    ══════════════════════════════════════ */
+    .ex-lib-search-row {
+      display: flex; gap: 0.5rem;
+      padding: 0 1.25rem 0.75rem;
+    }
+    .ex-filter-row {
+      display: flex; gap: 0.375rem;
+      padding: 0 1.25rem 0.75rem;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .ex-filter-row::-webkit-scrollbar { display: none; }
+    .filter-chip {
+      padding: 0.35rem 0.8rem; border-radius: 100px;
+      border: 1.5px solid var(--border-strong); background: transparent;
+      font-size: 0.8125rem; font-weight: 500; font-family: inherit;
+      cursor: pointer; color: var(--text-secondary); white-space: nowrap;
+      transition: all var(--transition);
+    }
+    .filter-chip.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .ex-lib-item {
+      display: flex; align-items: center; gap: 0.875rem;
+      padding: 0.875rem 1.25rem; border-bottom: 0.5px solid var(--border);
+      cursor: pointer; transition: background var(--transition);
+    }
+    .ex-lib-item:hover { background: var(--surface-2); }
+    .ex-lib-item:last-child { border-bottom: none; }
+    .ex-lib-emoji { font-size: 1.375rem; flex-shrink: 0; width: 36px; text-align: center; }
+    .ex-lib-info { flex: 1; min-width: 0; }
+    .ex-lib-name { font-size: 0.9375rem; font-weight: 600; }
+    .ex-lib-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem; }
+    .ex-lib-tags { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.375rem; }
+    .muscle-tag {
+      display: inline-block; font-size: 0.625rem; font-weight: 600;
+      padding: 0.2rem 0.5rem; border-radius: 100px;
+      background: var(--pastel-blue); color: var(--pastel-blue-text);
+    }
+    .muscle-tag.sub { background: var(--surface-2); color: var(--text-secondary); }
+    .ex-lib-pr { font-size: 0.8125rem; font-weight: 700; color: var(--text-secondary); flex-shrink: 0; text-align: right; }
+    .ex-lib-pr-label { font-size: 0.625rem; color: var(--text-muted); font-weight: 500; }
+
+    .muscle-picker-btn {
+      padding: 0.4rem 0.8rem; border-radius: 100px;
+      border: 1.5px solid var(--border-strong); background: transparent;
+      font-size: 0.8125rem; font-weight: 500; font-family: inherit;
+      cursor: pointer; color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+    .muscle-picker-btn.selected { background: var(--pastel-blue); border-color: var(--pastel-blue); color: var(--pastel-blue-text); }
+    .submuscle-picker-btn {
+      padding: 0.35rem 0.7rem; border-radius: 100px;
+      border: 1.5px solid var(--border-strong); background: transparent;
+      font-size: 0.75rem; font-weight: 500; font-family: inherit;
+      cursor: pointer; color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+    .submuscle-picker-btn.selected { background: var(--surface-2); border-color: var(--text-muted); color: var(--text-primary); }
+
+    .btn-add-ex {
+      width: 100%; padding: 0.7rem; border-radius: var(--radius-sm);
+      border: 1.5px dashed var(--border-strong); background: transparent;
+      color: var(--text-secondary); font-size: 0.9375rem;
+      font-family: inherit; cursor: pointer; margin-bottom: 0.875rem;
+      transition: all var(--transition);
+    }
+
+    .ex-detail-section { margin-bottom: 1.25rem; }
+    .ex-detail-label { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .ex-detail-pr-card {
+      background: var(--pastel-amber); border-radius: var(--radius-sm);
+      padding: 1rem; text-align: center;
+    }
+    .ex-detail-pr-value { font-size: 1.75rem; font-weight: 800; color: var(--pastel-amber-text); letter-spacing: -0.02em; }
+    .ex-detail-pr-sub { font-size: 0.75rem; color: var(--pastel-amber-text); opacity: 0.8; margin-top: 0.25rem; }
+    .ex-detail-pr-empty { font-size: 0.875rem; color: var(--text-muted); text-align: center; padding: 1rem; background: var(--surface-2); border-radius: var(--radius-sm); }
+    .ex-detail-history-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 0.5px solid var(--border); font-size: 0.875rem; }
+    .ex-detail-history-row:last-child { border-bottom: none; }
+    .ex-detail-history-date { color: var(--text-muted); font-size: 0.8125rem; }
+    .ex-detail-history-value { font-weight: 600; }
 </style>
 </head>
 <body>
@@ -1253,7 +1334,20 @@
 
 <!-- MODULE : SPORT -->
     <div class="module" id="module-sport">
-      <div class="coming-soon"><div class="coming-soon-icon">🏋️</div><h2>Sport</h2><p>Suivi de tes séances,<br/>exercices et statistiques.</p></div>
+      <div class="page-header">
+        <div class="page-title">Sport</div>
+        <div class="page-subtitle" id="sport-subtitle">Bibliothèque d'exercices</div>
+      </div>
+
+      <div class="ex-lib-search-row">
+        <input class="form-input" style="flex:1;" placeholder="Rechercher un exercice…" id="ex-search" />
+        <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-ex">+ Ajouter</button>
+      </div>
+      <div class="ex-filter-row" id="ex-filter-cats"></div>
+      <div class="ex-filter-row" id="ex-filter-muscles"></div>
+      <div class="card" style="padding:0;">
+        <div id="ex-list"></div>
+      </div>
     </div>
 <div class="module" id="module-reading">
       <div class="coming-soon"><div class="coming-soon-icon">📚</div><h2>Lecture & Médias</h2><p>Livres, podcasts, vidéos<br/>et livres audio.</p></div>
@@ -1342,6 +1436,82 @@
         <div class="tag-picker" id="task-tag-picker"></div>
       </div>
       <div class="modal-actions" id="modal-task-actions"></div>
+    </div>
+  </div>
+
+  <!-- MODAL EXERCICE -->
+  <div class="modal-overlay" id="modal-exercice">
+    <div class="modal" style="max-height:90dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-ex-title">Nouvel exercice</div>
+        <button class="modal-close" id="modal-ex-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nom</label>
+        <input class="form-input" id="ex-nom" placeholder="Ex : Développé couché" maxlength="50" />
+      </div>
+      <div class="form-group" style="display:flex;gap:0.75rem;align-items:flex-end;">
+        <div style="flex:0 0 80px;">
+          <label class="form-label">Emoji</label>
+          <input class="form-input" id="ex-emoji" placeholder="🏋️" maxlength="4" style="font-size:1.5rem;text-align:center;" />
+        </div>
+        <div style="flex:1;">
+          <label class="form-label">Catégorie</label>
+          <select class="form-select" id="ex-cat">
+            <option value="Musculation">Musculation</option>
+            <option value="Cardio">Cardio</option>
+            <option value="Étirement">Étirement / Mobilité</option>
+            <option value="Fonctionnel">Fonctionnel</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Équipement</label>
+        <select class="form-select" id="ex-equip">
+          <option value="Barre">Barre</option>
+          <option value="Haltères">Haltères</option>
+          <option value="Machine">Machine</option>
+          <option value="Poids du corps">Poids du corps</option>
+          <option value="Élastique">Élastique</option>
+          <option value="Kettlebell">Kettlebell</option>
+          <option value="Câble / Poulie">Câble / Poulie</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Groupes musculaires</label>
+        <div style="display:flex;flex-wrap:wrap;gap:0.375rem;" id="ex-muscles-picker"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sous-muscles (optionnel)</label>
+        <div style="display:flex;flex-wrap:wrap;gap:0.375rem;" id="ex-submuscles-picker"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Poids habituel (kg)</label>
+        <input class="form-input" type="number" id="ex-usual-weight" placeholder="Ex : 60" min="0" step="0.5" style="width:120px;" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Séries par défaut</label>
+        <input class="form-input" type="number" id="ex-def-sets" placeholder="3" min="1" max="20" style="width:80px;" />
+      </div>
+      <input type="hidden" id="ex-editing-id" />
+      <div class="modal-actions" id="ex-actions"></div>
+    </div>
+  </div>
+
+  <!-- MODAL DÉTAIL EXERCICE (avec PR) -->
+  <div class="modal-overlay" id="modal-ex-detail">
+    <div class="modal" style="max-height:90dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title" id="ex-detail-title">Exercice</div>
+        <button class="modal-close" id="modal-ex-detail-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div id="ex-detail-body"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btn-ex-detail-edit">Modifier l'exercice</button>
+        <button class="btn-danger" id="btn-ex-detail-delete">Supprimer</button>
+      </div>
     </div>
   </div>
 
@@ -2186,6 +2356,285 @@
     }
 
 
+
+    // ══════════════════════════════════════
+    // SPORT — BIBLIOTHÈQUE D'EXERCICES
+    // ══════════════════════════════════════
+    const MUSCLE_GROUPS = {
+      'Pectoraux': ['Pectoraux haut', 'Pectoraux bas', 'Pectoraux milieu'],
+      'Dos': ['Trapèzes', 'Grand dorsal', 'Lombaires', 'Rhomboïdes'],
+      'Épaules': ['Deltoïde antérieur', 'Deltoïde latéral', 'Deltoïde postérieur'],
+      'Bras': ['Biceps', 'Triceps', 'Avant-bras'],
+      'Jambes': ['Quadriceps', 'Ischio-jambiers', 'Fessiers', 'Mollets', 'Adducteurs'],
+      'Abdominaux': ['Grand droit', 'Obliques', 'Transverse'],
+      'Full Body': [],
+      'Cardio': []
+    }
+    const ALL_MUSCLE_NAMES = Object.keys(MUSCLE_GROUPS)
+    const EX_CATEGORIES = ['Musculation', 'Cardio', 'Étirement', 'Fonctionnel', 'Autre']
+    const EX_EQUIPMENT = ['Barre', 'Haltères', 'Machine', 'Poids du corps', 'Élastique', 'Kettlebell', 'Câble / Poulie', 'Autre']
+
+    const DEFAULT_EXERCISES = [
+      { id: 'de1', name: 'Développé couché', emoji: '🏋️', cat: 'Musculation', equip: 'Barre', muscles: ['Pectoraux'], submuscles: ['Pectoraux milieu'], usualWeight: null, defaultSets: 4 },
+      { id: 'de2', name: 'Développé incliné haltères', emoji: '💪', cat: 'Musculation', equip: 'Haltères', muscles: ['Pectoraux', 'Épaules'], submuscles: ['Pectoraux haut'], usualWeight: null, defaultSets: 3 },
+      { id: 'de3', name: 'Squat', emoji: '🦵', cat: 'Musculation', equip: 'Barre', muscles: ['Jambes'], submuscles: ['Quadriceps', 'Fessiers'], usualWeight: null, defaultSets: 4 },
+      { id: 'de4', name: 'Soulevé de terre', emoji: '🏋️', cat: 'Musculation', equip: 'Barre', muscles: ['Dos', 'Jambes'], submuscles: ['Lombaires', 'Ischio-jambiers'], usualWeight: null, defaultSets: 4 },
+      { id: 'de5', name: 'Tractions', emoji: '🧗', cat: 'Musculation', equip: 'Poids du corps', muscles: ['Dos', 'Bras'], submuscles: ['Grand dorsal', 'Biceps'], usualWeight: null, defaultSets: 4 },
+      { id: 'de6', name: 'Rowing barre', emoji: '🚣', cat: 'Musculation', equip: 'Barre', muscles: ['Dos'], submuscles: ['Grand dorsal', 'Trapèzes'], usualWeight: null, defaultSets: 3 },
+      { id: 'de7', name: 'Développé militaire', emoji: '🏋️', cat: 'Musculation', equip: 'Barre', muscles: ['Épaules'], submuscles: ['Deltoïde antérieur'], usualWeight: null, defaultSets: 3 },
+      { id: 'de8', name: 'Élévations latérales', emoji: '🦋', cat: 'Musculation', equip: 'Haltères', muscles: ['Épaules'], submuscles: ['Deltoïde latéral'], usualWeight: null, defaultSets: 3 },
+      { id: 'de9', name: 'Curl biceps', emoji: '💪', cat: 'Musculation', equip: 'Haltères', muscles: ['Bras'], submuscles: ['Biceps'], usualWeight: null, defaultSets: 3 },
+      { id: 'de10', name: 'Extensions triceps', emoji: '💪', cat: 'Musculation', equip: 'Câble / Poulie', muscles: ['Bras'], submuscles: ['Triceps'], usualWeight: null, defaultSets: 3 },
+      { id: 'de11', name: 'Dips', emoji: '⬇️', cat: 'Musculation', equip: 'Poids du corps', muscles: ['Bras', 'Pectoraux'], submuscles: ['Triceps', 'Pectoraux bas'], usualWeight: null, defaultSets: 3 },
+      { id: 'de12', name: 'Leg press', emoji: '🦵', cat: 'Musculation', equip: 'Machine', muscles: ['Jambes'], submuscles: ['Quadriceps', 'Fessiers'], usualWeight: null, defaultSets: 4 },
+      { id: 'de13', name: 'Fentes', emoji: '🦵', cat: 'Musculation', equip: 'Haltères', muscles: ['Jambes'], submuscles: ['Quadriceps', 'Fessiers'], usualWeight: null, defaultSets: 3 },
+      { id: 'de14', name: 'Hip thrust', emoji: '🍑', cat: 'Musculation', equip: 'Barre', muscles: ['Jambes'], submuscles: ['Fessiers'], usualWeight: null, defaultSets: 4 },
+      { id: 'de15', name: 'Crunch', emoji: '🎯', cat: 'Musculation', equip: 'Poids du corps', muscles: ['Abdominaux'], submuscles: ['Grand droit'], usualWeight: null, defaultSets: 3 },
+      { id: 'de16', name: 'Planche', emoji: '🧘', cat: 'Musculation', equip: 'Poids du corps', muscles: ['Abdominaux'], submuscles: ['Transverse'], usualWeight: null, defaultSets: 3 },
+      { id: 'de17', name: 'Tapis de course', emoji: '🏃', cat: 'Cardio', equip: 'Machine', muscles: ['Cardio'], submuscles: [], usualWeight: null, defaultSets: 1 },
+      { id: 'de18', name: 'Rameur', emoji: '🚣', cat: 'Cardio', equip: 'Machine', muscles: ['Cardio', 'Full Body'], submuscles: [], usualWeight: null, defaultSets: 1 },
+      { id: 'de19', name: 'Pompes', emoji: '💪', cat: 'Fonctionnel', equip: 'Poids du corps', muscles: ['Pectoraux', 'Bras'], submuscles: ['Triceps'], usualWeight: null, defaultSets: 3 },
+      { id: 'de20', name: 'Burpees', emoji: '🔥', cat: 'Fonctionnel', equip: 'Poids du corps', muscles: ['Full Body'], submuscles: [], usualWeight: null, defaultSets: 3 },
+      { id: 'de21', name: 'Étirements', emoji: '🌿', cat: 'Étirement', equip: 'Poids du corps', muscles: ['Full Body'], submuscles: [], usualWeight: null, defaultSets: 1 }
+    ]
+
+    let exLibrary = []
+    let editingExId = null
+    let selectedExMuscles = []
+    let selectedExSubmuscles = []
+    let exFilterCat = 'Tous'
+    let exFilterMuscle = 'Tous'
+    let exSearch = ''
+    let viewingExId = null
+
+    function loadExLibrary() {
+      const s = localStorage.getItem('tdv_ex_' + profile.id)
+      exLibrary = s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT_EXERCISES))
+    }
+    function saveExLibrary() { localStorage.setItem('tdv_ex_' + profile.id, JSON.stringify(exLibrary)) }
+
+    // Calcule le PR (poids max atteint) à partir de l'historique des séances enregistrées.
+    // Pour l'instant aucune séance n'est encore loguée — retourne null proprement.
+    function getExercisePR(exerciseId) {
+      const exName = (exLibrary.find(function(e) { return e.id === exerciseId }) || {}).name
+      if (!exName || typeof workoutHistory === 'undefined') return null
+      let best = null
+      ;(workoutHistory || []).forEach(function(w) {
+        (w.exercises || []).forEach(function(ex) {
+          if (ex.name !== exName) return
+          ;(ex.sets || []).forEach(function(s) {
+            if (s.weight && (!best || s.weight > best.weight)) best = { weight: s.weight, reps: s.reps, date: w.date }
+          })
+        })
+      })
+      return best
+    }
+
+    function renderExLibrary() {
+      const catEl = document.getElementById('ex-filter-cats')
+      if (catEl) {
+        const cats = ['Tous'].concat(EX_CATEGORIES)
+        catEl.innerHTML = cats.map(function(c) {
+          return '<button class="filter-chip' + (c === exFilterCat ? ' active' : '') + '" data-cat="' + c + '">' + c + '</button>'
+        }).join('')
+        catEl.querySelectorAll('[data-cat]').forEach(function(btn) {
+          btn.addEventListener('click', function() { exFilterCat = btn.dataset.cat; renderExLibrary() })
+        })
+      }
+      const musEl = document.getElementById('ex-filter-muscles')
+      if (musEl) {
+        const muscles = ['Tous'].concat(ALL_MUSCLE_NAMES)
+        musEl.innerHTML = muscles.map(function(m) {
+          return '<button class="filter-chip' + (m === exFilterMuscle ? ' active' : '') + '" data-mus="' + m + '">' + m + '</button>'
+        }).join('')
+        musEl.querySelectorAll('[data-mus]').forEach(function(btn) {
+          btn.addEventListener('click', function() { exFilterMuscle = btn.dataset.mus; renderExLibrary() })
+        })
+      }
+      const listEl = document.getElementById('ex-list')
+      if (!listEl) return
+      const filtered = exLibrary.filter(function(e) {
+        const mc = exFilterCat === 'Tous' || e.cat === exFilterCat
+        const mm = exFilterMuscle === 'Tous' || (e.muscles || []).includes(exFilterMuscle)
+        const ms = !exSearch || e.name.toLowerCase().includes(exSearch.toLowerCase())
+        return mc && mm && ms
+      })
+      if (!filtered.length) { listEl.innerHTML = '<div class="empty-state" style="padding:2.5rem;"><p>Aucun exercice trouvé.</p></div>'; return }
+      listEl.innerHTML = ''
+      filtered.forEach(function(ex) {
+        const pr = getExercisePR(ex.id)
+        const div = document.createElement('div')
+        div.className = 'ex-lib-item'
+        const tagsHtml = (ex.muscles || []).map(function(m) { return '<span class="muscle-tag">' + m + '</span>' }).join('') +
+          (ex.submuscles || []).map(function(s) { return '<span class="muscle-tag sub">' + s + '</span>' }).join('')
+        div.innerHTML = '<div class="ex-lib-emoji">' + (ex.emoji || '•') + '</div>' +
+          '<div class="ex-lib-info">' +
+          '<div class="ex-lib-name">' + ex.name + '</div>' +
+          '<div class="ex-lib-meta">' + ex.cat + (ex.equip ? ' · ' + ex.equip : '') + '</div>' +
+          (tagsHtml ? '<div class="ex-lib-tags">' + tagsHtml + '</div>' : '') +
+          '</div>' +
+          '<div class="ex-lib-pr">' + (pr ? pr.weight + ' kg' : '—') + '<div class="ex-lib-pr-label">PR</div></div>'
+        div.addEventListener('click', function() { openExDetail(ex.id) })
+        listEl.appendChild(div)
+      })
+    }
+
+    document.getElementById('ex-search').addEventListener('input', function(e) { exSearch = e.target.value; renderExLibrary() })
+
+    // ── Détail exercice + PR ──
+    function openExDetail(id) {
+      const ex = exLibrary.find(function(e) { return e.id === id })
+      if (!ex) return
+      viewingExId = id
+      const pr = getExercisePR(id)
+      document.getElementById('ex-detail-title').textContent = ex.emoji + ' ' + ex.name
+      const muscleTags = (ex.muscles || []).map(function(m) { return '<span class="muscle-tag">' + m + '</span>' }).join('') +
+        (ex.submuscles || []).map(function(s) { return '<span class="muscle-tag sub">' + s + '</span>' }).join('')
+      let html = '<div class="ex-detail-section">' +
+        '<div class="ex-detail-label">Informations</div>' +
+        '<div style="font-size:0.875rem;color:var(--text-secondary);line-height:1.6;">' +
+        'Catégorie : ' + ex.cat + '<br/>' +
+        'Équipement : ' + (ex.equip || '—') + '<br/>' +
+        (ex.usualWeight ? 'Poids habituel : ' + ex.usualWeight + ' kg<br/>' : '') +
+        'Séries par défaut : ' + (ex.defaultSets || 3) +
+        '</div></div>'
+      if (muscleTags) {
+        html += '<div class="ex-detail-section"><div class="ex-detail-label">Muscles travaillés</div><div class="ex-lib-tags">' + muscleTags + '</div></div>'
+      }
+      html += '<div class="ex-detail-section"><div class="ex-detail-label">Record personnel (PR)</div>'
+      if (pr) {
+        html += '<div class="ex-detail-pr-card"><div class="ex-detail-pr-value">' + pr.weight + ' kg</div><div class="ex-detail-pr-sub">' + (pr.reps ? pr.reps + ' répétitions · ' : '') + new Date(pr.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div></div>'
+      } else {
+        html += '<div class="ex-detail-pr-empty">Aucun PR enregistré pour l\'instant.<br/>Il se calculera automatiquement dès que tu logueras des séances avec cet exercice.</div>'
+      }
+      html += '</div>'
+      document.getElementById('ex-detail-body').innerHTML = html
+      document.getElementById('modal-ex-detail').classList.add('open')
+    }
+    document.getElementById('modal-ex-detail-close').addEventListener('click', function() { document.getElementById('modal-ex-detail').classList.remove('open') })
+    document.getElementById('modal-ex-detail').addEventListener('click', function(e) { if (e.target === e.currentTarget) document.getElementById('modal-ex-detail').classList.remove('open') })
+    document.getElementById('btn-ex-detail-edit').addEventListener('click', function() {
+      document.getElementById('modal-ex-detail').classList.remove('open')
+      const ex = exLibrary.find(function(e) { return e.id === viewingExId })
+      if (ex) openEditEx(ex)
+    })
+    document.getElementById('btn-ex-detail-delete').addEventListener('click', function() {
+      if (!viewingExId) return
+      exLibrary = exLibrary.filter(function(e) { return e.id !== viewingExId })
+      saveExLibrary()
+      document.getElementById('modal-ex-detail').classList.remove('open')
+      renderExLibrary()
+      showToast('Exercice supprimé')
+    })
+
+    // ── Modal création/édition ──
+    function renderMusclesPicker() {
+      const el = document.getElementById('ex-muscles-picker')
+      el.innerHTML = ALL_MUSCLE_NAMES.map(function(m) {
+        const sel = selectedExMuscles.includes(m)
+        return '<button type="button" class="muscle-picker-btn' + (sel ? ' selected' : '') + '" data-m="' + m + '">' + m + '</button>'
+      }).join('')
+      el.querySelectorAll('[data-m]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const m = btn.dataset.m
+          if (selectedExMuscles.includes(m)) selectedExMuscles = selectedExMuscles.filter(function(x) { return x !== m })
+          else selectedExMuscles.push(m)
+          renderMusclesPicker()
+          renderSubmusclesPicker()
+        })
+      })
+    }
+
+    function renderSubmusclesPicker() {
+      const el = document.getElementById('ex-submuscles-picker')
+      const available = []
+      selectedExMuscles.forEach(function(m) { (MUSCLE_GROUPS[m] || []).forEach(function(sm) { if (!available.includes(sm)) available.push(sm) }) })
+      if (!available.length) { el.innerHTML = '<span style="font-size:0.8125rem;color:var(--text-muted);">Sélectionne un groupe musculaire d\'abord</span>'; return }
+      el.innerHTML = available.map(function(sm) {
+        const sel = selectedExSubmuscles.includes(sm)
+        return '<button type="button" class="submuscle-picker-btn' + (sel ? ' selected' : '') + '" data-sm="' + sm + '">' + sm + '</button>'
+      }).join('')
+      el.querySelectorAll('[data-sm]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const sm = btn.dataset.sm
+          if (selectedExSubmuscles.includes(sm)) selectedExSubmuscles = selectedExSubmuscles.filter(function(x) { return x !== sm })
+          else selectedExSubmuscles.push(sm)
+          renderSubmusclesPicker()
+        })
+      })
+    }
+
+    function openNewEx() {
+      editingExId = null
+      selectedExMuscles = []
+      selectedExSubmuscles = []
+      document.getElementById('modal-ex-title').textContent = 'Nouvel exercice'
+      document.getElementById('ex-nom').value = ''
+      document.getElementById('ex-emoji').value = ''
+      document.getElementById('ex-cat').value = 'Musculation'
+      document.getElementById('ex-equip').value = 'Barre'
+      document.getElementById('ex-usual-weight').value = ''
+      document.getElementById('ex-def-sets').value = '3'
+      document.getElementById('ex-actions').innerHTML = '<button class="btn-secondary" id="ex-cancel">Annuler</button><button class="btn-primary" id="ex-save">Enregistrer</button>'
+      bindExModalButtons()
+      renderMusclesPicker()
+      renderSubmusclesPicker()
+      document.getElementById('modal-exercice').classList.add('open')
+    }
+
+    function openEditEx(ex) {
+      editingExId = ex.id
+      selectedExMuscles = (ex.muscles || []).slice()
+      selectedExSubmuscles = (ex.submuscles || []).slice()
+      document.getElementById('modal-ex-title').textContent = 'Modifier l\'exercice'
+      document.getElementById('ex-nom').value = ex.name
+      document.getElementById('ex-emoji').value = ex.emoji || ''
+      document.getElementById('ex-cat').value = ex.cat || 'Musculation'
+      document.getElementById('ex-equip').value = ex.equip || 'Barre'
+      document.getElementById('ex-usual-weight').value = ex.usualWeight || ''
+      document.getElementById('ex-def-sets').value = ex.defaultSets || 3
+      document.getElementById('ex-actions').innerHTML = '<button class="btn-danger" id="ex-delete">Supprimer</button><button class="btn-primary" id="ex-save">Enregistrer</button>'
+      bindExModalButtons()
+      renderMusclesPicker()
+      renderSubmusclesPicker()
+      document.getElementById('modal-exercice').classList.add('open')
+    }
+
+    function closeExModal() { document.getElementById('modal-exercice').classList.remove('open') }
+
+    function bindExModalButtons() {
+      document.getElementById('ex-cancel')?.addEventListener('click', closeExModal)
+      document.getElementById('ex-delete')?.addEventListener('click', function() {
+        exLibrary = exLibrary.filter(function(e) { return e.id !== editingExId })
+        saveExLibrary(); closeExModal(); renderExLibrary(); showToast('Exercice supprimé')
+      })
+      document.getElementById('ex-save').addEventListener('click', saveEx)
+    }
+
+    function saveEx() {
+      const name = document.getElementById('ex-nom').value.trim()
+      if (!name) return
+      const ex = {
+        id: editingExId || ('ex' + Date.now()),
+        name: name,
+        emoji: document.getElementById('ex-emoji').value.trim() || '•',
+        cat: document.getElementById('ex-cat').value,
+        equip: document.getElementById('ex-equip').value,
+        muscles: selectedExMuscles.slice(),
+        submuscles: selectedExSubmuscles.slice(),
+        usualWeight: parseFloat(document.getElementById('ex-usual-weight').value) || null,
+        defaultSets: parseInt(document.getElementById('ex-def-sets').value) || 3
+      }
+      if (editingExId) exLibrary = exLibrary.map(function(e) { return e.id === editingExId ? ex : e })
+      else exLibrary.push(ex)
+      saveExLibrary(); closeExModal(); renderExLibrary(); showToast('Exercice enregistré')
+    }
+
+    document.getElementById('modal-ex-close').addEventListener('click', closeExModal)
+    document.getElementById('modal-exercice').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeExModal() })
+    document.getElementById('btn-new-ex').addEventListener('click', openNewEx)
+
+
     // ── HEADER ──
     function renderHeader() {
       const colors = ['#DBEAFE','#FCE4EC','#DCEDC8','#FFE0B2','#EDE7F6']
@@ -2540,6 +2989,7 @@
       loadTheme()
       loadTaskTags()
       loadTaskReschedules()
+      loadExLibrary()
       renderHeader()
       renderTabs()
       await loadTasks()
@@ -2549,6 +2999,7 @@
       updateProgress()
       updateDateTitle()
       updateExtendedStats()
+      renderExLibrary()
 
       // FAB
       document.getElementById('fab').addEventListener('click', () => {
