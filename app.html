@@ -2950,11 +2950,21 @@
     let exSearch = ''
     let viewingExId = null
 
-    function loadExLibrary() {
-      const s = localStorage.getItem('tdv_ex_' + profile.id)
-      exLibrary = s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT_EXERCISES))
+    async function loadExLibrary() {
+      const { data } = await db.from('sport_exercises').select('*').eq('profile_id', profile.id).order('created_at')
+      exLibrary = (data || []).map(function(e) {
+        return { id: e.id, name: e.name, emoji: e.emoji, cat: e.cat, equip: e.equip, muscles: e.muscles || [], submuscles: e.submuscles || [], metrics: e.metrics || ['reps'], usualWeight: e.usual_weight, defaultSets: e.default_sets || 3 }
+      })
+      if (!exLibrary.length) {
+        for (const e of DEFAULT_EXERCISES) {
+          await db.from('sport_exercises').insert({ id: e.id, profile_id: profile.id, name: e.name, emoji: e.emoji, cat: e.cat, equip: e.equip, muscles: e.muscles, submuscles: e.submuscles, metrics: ['reps'], usual_weight: e.usualWeight, default_sets: e.defaultSets })
+        }
+        exLibrary = JSON.parse(JSON.stringify(DEFAULT_EXERCISES)).map(function(e) { e.metrics = ['reps']; return e })
+      }
     }
-    function saveExLibrary() { localStorage.setItem('tdv_ex_' + profile.id, JSON.stringify(exLibrary)) }
+    async function saveExToSupabase(ex) {
+      await db.from('sport_exercises').upsert({ id: ex.id, profile_id: profile.id, name: ex.name, emoji: ex.emoji, cat: ex.cat, equip: ex.equip, muscles: ex.muscles, submuscles: ex.submuscles, metrics: ex.metrics, usual_weight: ex.usualWeight, default_sets: ex.defaultSets })
+    }
 
     // Calcule le PR (poids max atteint) à partir de l'historique des séances enregistrées.
     // Pour l'instant aucune séance n'est encore loguée — retourne null proprement.
@@ -3065,10 +3075,10 @@
       const ex = exLibrary.find(function(e) { return e.id === viewingExId })
       if (ex) openEditEx(ex)
     })
-    document.getElementById('btn-ex-detail-delete').addEventListener('click', function() {
+    document.getElementById('btn-ex-detail-delete').addEventListener('click', async function() {
       if (!viewingExId) return
+      await db.from('sport_exercises').delete().eq('id', viewingExId)
       exLibrary = exLibrary.filter(function(e) { return e.id !== viewingExId })
-      saveExLibrary()
       document.getElementById('modal-ex-detail').classList.remove('open')
       renderExLibrary()
       showToast('Exercice supprimé')
@@ -3173,14 +3183,15 @@
 
     function bindExModalButtons() {
       document.getElementById('ex-cancel')?.addEventListener('click', closeExModal)
-      document.getElementById('ex-delete')?.addEventListener('click', function() {
+      document.getElementById('ex-delete')?.addEventListener('click', async function() {
+        await db.from('sport_exercises').delete().eq('id', editingExId)
         exLibrary = exLibrary.filter(function(e) { return e.id !== editingExId })
-        saveExLibrary(); closeExModal(); renderExLibrary(); showToast('Exercice supprimé')
+        closeExModal(); renderExLibrary(); showToast('Exercice supprimé')
       })
       document.getElementById('ex-save').addEventListener('click', saveEx)
     }
 
-    function saveEx() {
+    async function saveEx() {
       const name = document.getElementById('ex-nom').value.trim()
       if (!name) return
       const ex = {
@@ -3195,9 +3206,10 @@
         usualWeight: parseFloat(document.getElementById('ex-usual-weight').value) || null,
         defaultSets: parseInt(document.getElementById('ex-def-sets').value) || 3
       }
+      await saveExToSupabase(ex)
       if (editingExId) exLibrary = exLibrary.map(function(e) { return e.id === editingExId ? ex : e })
       else exLibrary.push(ex)
-      saveExLibrary(); closeExModal(); renderExLibrary(); showToast('Exercice enregistré')
+      closeExModal(); renderExLibrary(); showToast('Exercice enregistré')
     }
 
     document.getElementById('modal-ex-close').addEventListener('click', closeExModal)
@@ -3216,11 +3228,13 @@
     let pickFilterCat = 'Tous'
     let pickSearch = ''
 
-    function loadSportPrograms() {
-      const s = localStorage.getItem('tdv_progs_' + profile.id)
-      sportPrograms = s ? JSON.parse(s) : []
+    async function loadSportPrograms() {
+      const { data } = await db.from('sport_programs').select('*').eq('profile_id', profile.id).order('created_at')
+      sportPrograms = (data || []).map(function(p) { return { id: p.id, name: p.name, emoji: p.emoji, notes: p.notes, exercises: p.exercises || [] } })
     }
-    function saveSportPrograms() { localStorage.setItem('tdv_progs_' + profile.id, JSON.stringify(sportPrograms)) }
+    async function saveProgToSupabase(p) {
+      await db.from('sport_programs').upsert({ id: p.id, profile_id: profile.id, name: p.name, emoji: p.emoji, notes: p.notes, exercises: p.exercises })
+    }
 
     // (ancien toggle Exercices/Programmes remplacé par sportShowView, voir plus bas)
 
@@ -3267,9 +3281,9 @@
       const p = sportPrograms.find(function(x) { return x.id === viewingProgId })
       if (p) openEditProg(p)
     })
-    document.getElementById('btn-prog-detail-delete').addEventListener('click', function() {
+    document.getElementById('btn-prog-detail-delete').addEventListener('click', async function() {
+      await db.from('sport_programs').delete().eq('id', viewingProgId)
       sportPrograms = sportPrograms.filter(function(p) { return p.id !== viewingProgId })
-      saveSportPrograms()
       document.getElementById('modal-prog-detail').classList.remove('open')
       renderProgList()
       showToast('Programme supprimé')
@@ -3409,14 +3423,15 @@
 
     function bindProgModalButtons() {
       document.getElementById('prog-cancel')?.addEventListener('click', closeProgModal)
-      document.getElementById('prog-delete')?.addEventListener('click', function() {
+      document.getElementById('prog-delete')?.addEventListener('click', async function() {
+        await db.from('sport_programs').delete().eq('id', editingProgId)
         sportPrograms = sportPrograms.filter(function(p) { return p.id !== editingProgId })
-        saveSportPrograms(); closeProgModal(); renderProgList(); showToast('Programme supprimé')
+        closeProgModal(); renderProgList(); showToast('Programme supprimé')
       })
       document.getElementById('prog-save').addEventListener('click', saveProg)
     }
 
-    function saveProg() {
+    async function saveProg() {
       const name = document.getElementById('prog-nom').value.trim()
       if (!name) return
       const prog = {
@@ -3426,9 +3441,10 @@
         notes: document.getElementById('prog-notes').value.trim(),
         exercises: progExBuilder.slice()
       }
+      await saveProgToSupabase(prog)
       if (editingProgId) sportPrograms = sportPrograms.map(function(p) { return p.id === editingProgId ? prog : p })
       else sportPrograms.push(prog)
-      saveSportPrograms(); closeProgModal(); renderProgList(); showToast('Programme enregistré')
+      closeProgModal(); renderProgList(); showToast('Programme enregistré')
     }
 
     document.getElementById('modal-prog-close').addEventListener('click', closeProgModal)
@@ -3503,11 +3519,16 @@
     let sessionTimerInterval = null
     let workoutHistory = []
 
-    function loadWorkoutHistory() {
-      const s = localStorage.getItem('tdv_workouts_' + profile.id)
-      workoutHistory = s ? JSON.parse(s) : []
+    async function loadWorkoutHistory() {
+      const { data } = await db.from('sport_workouts').select('*').eq('profile_id', profile.id).order('date')
+      workoutHistory = (data || []).map(function(w) { return { id: w.id, date: w.date, programName: w.program_name, duration: w.duration || 0, exercises: w.exercises || [] } })
     }
-    function saveWorkoutHistory() { localStorage.setItem('tdv_workouts_' + profile.id, JSON.stringify(workoutHistory)) }
+    async function saveWorkoutToSupabase(w) {
+      await db.from('sport_workouts').upsert({ id: w.id, profile_id: profile.id, date: w.date, program_name: w.programName, duration: w.duration, exercises: w.exercises })
+    }
+    async function deleteWorkoutFromSupabase(id) {
+      await db.from('sport_workouts').delete().eq('id', id)
+    }
 
     function startSession(program) {
       activeSession = {
@@ -3597,17 +3618,18 @@
 
     document.getElementById('session-close').addEventListener('click', closeSession)
     document.getElementById('session-cancel').addEventListener('click', closeSession)
-    document.getElementById('session-finish').addEventListener('click', function() {
+    document.getElementById('session-finish').addEventListener('click', async function() {
       if (!activeSession) return
       const durationMin = Math.round((Date.now() - activeSession.startedAt) / 60000)
-      workoutHistory.push({
+      const w = {
         id: 'w' + Date.now(),
         date: toDateStr(new Date()),
         programName: activeSession.programName,
         duration: durationMin,
         exercises: activeSession.exercises
-      })
-      saveWorkoutHistory()
+      }
+      await saveWorkoutToSupabase(w)
+      workoutHistory.push(w)
       showToast('Séance enregistrée 💪')
       closeSession()
     })
@@ -3912,11 +3934,19 @@
     let planTargetDate = null
     let quickLogTarget = null // { dateKey, groupIdx, itemIdx | null si exercice direct }
 
-    function loadSportPlanning() {
-      const s = localStorage.getItem('tdv_planning_' + profile.id)
-      sportPlanning = s ? JSON.parse(s) : {}
+    async function loadSportPlanning() {
+      const { data } = await db.from('sport_planning').select('*').eq('profile_id', profile.id)
+      sportPlanning = {}
+      ;(data || []).forEach(function(row) { sportPlanning[row.date] = row.groups || [] })
     }
-    function saveSportPlanning() { localStorage.setItem('tdv_planning_' + profile.id, JSON.stringify(sportPlanning)) }
+    async function savePlanningForDate(dateStr) {
+      const groups = sportPlanning[dateStr] || []
+      if (!groups.length) {
+        await db.from('sport_planning').delete().eq('profile_id', profile.id).eq('date', dateStr)
+      } else {
+        await db.from('sport_planning').upsert({ profile_id: profile.id, date: dateStr, groups: groups, updated_at: new Date().toISOString() }, { onConflict: 'profile_id,date' })
+      }
+    }
 
     function buildPlanItemFromEx(ex, customSeriesData) {
       const metrics = (ex.metrics && ex.metrics.length) ? ex.metrics.slice() : ['reps']
@@ -3948,18 +3978,18 @@
       }
     }
 
-    function planProgramForDate(dateStr, prog) {
+    async function planProgramForDate(dateStr, prog) {
       if (!sportPlanning[dateStr]) sportPlanning[dateStr] = []
       sportPlanning[dateStr].push({
         type: 'program', progId: prog.id, progName: prog.name, progEmoji: prog.emoji,
         items: (prog.exercises || []).map(buildPlanItemFromProgEx)
       })
-      saveSportPlanning()
+      await savePlanningForDate(dateStr)
     }
-    function planExerciseForDate(dateStr, ex) {
+    async function planExerciseForDate(dateStr, ex) {
       if (!sportPlanning[dateStr]) sportPlanning[dateStr] = []
       sportPlanning[dateStr].push({ type: 'exercise', item: buildPlanItemFromEx(ex) })
-      saveSportPlanning()
+      await savePlanningForDate(dateStr)
     }
 
     function getDayGroups(dateStr) { return sportPlanning[dateStr] || [] }
@@ -4092,12 +4122,12 @@
       if (card && card.style.display !== 'none' && sweekSelectedDate === dateStr) renderSweekDayCard()
     }
 
-    function toggleSdaySet(dateStr, gIdx, iIdx, setIdx) {
+    async function toggleSdaySet(dateStr, gIdx, iIdx, setIdx) {
       const item = getPlanItem(dateStr, gIdx, iIdx)
       item.setsDone[setIdx] = !item.setsDone[setIdx]
       item.done = item.setsDone.every(function(s) { return s })
-      saveSportPlanning()
-      logSdayProgressToHistory(dateStr)
+      await savePlanningForDate(dateStr)
+      await logSdayProgressToHistory(dateStr)
       renderSportDay()
       renderSweekGrid()
       refreshSweekIfVisible(dateStr)
@@ -4110,15 +4140,15 @@
       })
     }
 
-    function toggleSdayExercise(dateStr, gIdx, iIdx, item) {
+    async function toggleSdayExercise(dateStr, gIdx, iIdx, item) {
       if (!item.done && !seriesHasData(item)) {
         openQuickLog(dateStr, gIdx, iIdx, item)
         return
       }
       item.done = !item.done
       item.setsDone = item.setsDone.map(function() { return item.done })
-      saveSportPlanning()
-      logSdayProgressToHistory(dateStr)
+      await savePlanningForDate(dateStr)
+      await logSdayProgressToHistory(dateStr)
       renderSportDay()
       renderSweekGrid()
       refreshSweekIfVisible(dateStr)
@@ -4143,7 +4173,7 @@
     }
     document.getElementById('modal-quick-log-close').addEventListener('click', function() { document.getElementById('modal-quick-log').classList.remove('open') })
     document.getElementById('quick-log-cancel').addEventListener('click', function() { document.getElementById('modal-quick-log').classList.remove('open') })
-    document.getElementById('quick-log-confirm').addEventListener('click', function() {
+    document.getElementById('quick-log-confirm').addEventListener('click', async function() {
       if (!quickLogTarget) return
 
       if (quickLogTarget === 'PLAN_EX') {
@@ -4161,7 +4191,7 @@
         const item = buildPlanItemFromEx(ex, seriesData)
         if (!sportPlanning[planTargetDate]) sportPlanning[planTargetDate] = []
         sportPlanning[planTargetDate].push({ type: 'exercise', item: item })
-        saveSportPlanning()
+        await savePlanningForDate(planTargetDate)
         document.getElementById('modal-quick-log').classList.remove('open')
         renderSportDay()
         renderSweekGrid()
@@ -4181,8 +4211,8 @@
         item.done = true
         item.setsDone = item.setsDone.map(function() { return true })
       }
-      saveSportPlanning()
-      logSdayProgressToHistory(quickLogTarget.dateStr)
+      await savePlanningForDate(quickLogTarget.dateStr)
+      await logSdayProgressToHistory(quickLogTarget.dateStr)
       document.getElementById('modal-quick-log').classList.remove('open')
       renderSportDay()
       renderSweekGrid()
@@ -4191,7 +4221,7 @@
     })
 
     // Répercute la séance du jour dans workoutHistory pour que les stats se mettent à jour
-    function logSdayProgressToHistory(dateStr) {
+    async function logSdayProgressToHistory(dateStr) {
       const groups = getDayGroups(dateStr)
       const exercises = []
       groups.forEach(function(g) {
@@ -4205,11 +4235,14 @@
         })
       })
       // Retire l'ancienne entrée auto-générée pour ce jour (id préfixé "auto_"), puis recrée si besoin
-      workoutHistory = workoutHistory.filter(function(w) { return w.id !== 'auto_' + dateStr })
+      const autoId = 'auto_' + dateStr
+      await deleteWorkoutFromSupabase(autoId)
+      workoutHistory = workoutHistory.filter(function(w) { return w.id !== autoId })
       if (exercises.length) {
-        workoutHistory.push({ id: 'auto_' + dateStr, date: dateStr, programName: groups.map(function(g){return g.type==='program'?g.progName:g.item.name}).join(', '), duration: 0, exercises: exercises })
+        const w = { id: autoId, date: dateStr, programName: groups.map(function(g){return g.type==='program'?g.progName:g.item.name}).join(', '), duration: 0, exercises: exercises }
+        await saveWorkoutToSupabase(w)
+        workoutHistory.push(w)
       }
-      saveWorkoutHistory()
     }
 
     document.getElementById('btn-sday-prev').addEventListener('click', function() { sportDayOffset--; renderSportDay() })
@@ -4274,10 +4307,10 @@
             headerRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;'
             headerRow.innerHTML = '<div class="sday-prog-label" style="margin:0;">' + g.progEmoji + ' ' + g.progName + '</div>' +
               '<button class="btn-icon" style="width:26px;height:26px;" data-remove-group="' + gIdx + '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>'
-            headerRow.querySelector('[data-remove-group]').addEventListener('click', function(e) {
+            headerRow.querySelector('[data-remove-group]').addEventListener('click', async function(e) {
               e.stopPropagation()
               sportPlanning[sweekSelectedDate].splice(gIdx, 1)
-              saveSportPlanning()
+              await savePlanningForDate(sweekSelectedDate)
               renderSweekGrid()
               renderSweekDayCard()
             })
@@ -4295,10 +4328,10 @@
             removeBtn.className = 'btn-icon'
             removeBtn.style.cssText = 'position:absolute;top:0.5rem;right:2.75rem;width:26px;height:26px;'
             removeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>'
-            removeBtn.addEventListener('click', function(e) {
+            removeBtn.addEventListener('click', async function(e) {
               e.stopPropagation()
               sportPlanning[sweekSelectedDate].splice(gIdx, 1)
-              saveSportPlanning()
+              await savePlanningForDate(sweekSelectedDate)
               renderSweekGrid()
               renderSweekDayCard()
             })
@@ -4356,8 +4389,8 @@
         const row = document.createElement('div')
         row.className = 'plan-item-row'
         row.innerHTML = '<span style="font-size:1.25rem;">' + (p.emoji || '💪') + '</span><div><div style="font-size:0.9375rem;font-weight:600;">' + p.name + '</div><div style="font-size:0.75rem;color:var(--text-muted);">' + (p.exercises || []).length + ' exercices</div></div>'
-        row.addEventListener('click', function() {
-          planProgramForDate(planTargetDate, p)
+        row.addEventListener('click', async function() {
+          await planProgramForDate(planTargetDate, p)
           document.getElementById('modal-plan').classList.remove('open')
           renderSportDay()
           renderSweekGrid()
@@ -5019,10 +5052,10 @@
       await loadTaskTags()
       await loadTaskReschedules()
       await loadTaskTemplates()
-      loadExLibrary()
-      loadSportPrograms()
-      loadWorkoutHistory()
-      loadSportPlanning()
+      await loadExLibrary()
+      await loadSportPrograms()
+      await loadWorkoutHistory()
+      await loadSportPlanning()
       renderHeader()
       renderTabs()
       await loadTasks()
