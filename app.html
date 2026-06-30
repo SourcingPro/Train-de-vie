@@ -1333,6 +1333,12 @@
     .sday-ex-name { font-size: 0.9375rem; font-weight: 600; }
     .sday-ex-name.done-text { text-decoration: line-through; color: var(--text-muted); }
     .sday-ex-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem; }
+    .sday-ex-edit-btn {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      border: none; background: var(--surface-2); color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
     .sday-ex-expand {
       width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
       border: none; background: var(--surface-2); color: var(--text-secondary);
@@ -4027,6 +4033,7 @@
         '<button type="button" class="sday-ex-check' + (item.done ? ' done' : '') + '"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>' +
         '<span class="sday-ex-emoji">' + item.emoji + '</span>' +
         '<div class="sday-ex-info"><div class="sday-ex-name' + (item.done ? ' done-text' : '') + '">' + item.name + '</div><div class="sday-ex-meta">' + setsLabel + '</div></div>' +
+        '<button type="button" class="sday-ex-edit-btn" title="Modifier"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
         '<button type="button" class="sday-ex-expand"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>' +
         '</div>' +
         '<div class="sday-sets-wrap"></div>'
@@ -4053,6 +4060,10 @@
       card.querySelector('.sday-ex-check').addEventListener('click', function(e) {
         e.stopPropagation()
         toggleSdayExercise(dateStr, gIdx, iIdx, item)
+      })
+      card.querySelector('.sday-ex-edit-btn').addEventListener('click', function(e) {
+        e.stopPropagation()
+        openQuickLog(dateStr, gIdx, iIdx, item, true)
       })
       return card
     }
@@ -4093,8 +4104,8 @@
     }
 
     // ── Quick log : demande/édite les valeurs de chaque série avant de cocher ──
-    function openQuickLog(dateStr, gIdx, iIdx, item) {
-      quickLogTarget = { dateStr: dateStr, gIdx: gIdx, iIdx: iIdx }
+    function openQuickLog(dateStr, gIdx, iIdx, item, editOnly) {
+      quickLogTarget = { dateStr: dateStr, gIdx: gIdx, iIdx: iIdx, editOnly: !!editOnly }
       document.getElementById('quick-log-ex-name').textContent = item.emoji + ' ' + item.name
       const fields = metricFieldsFor(item.metrics)
       const fieldsEl = document.getElementById('quick-log-fields')
@@ -4145,8 +4156,10 @@
         const sIdx = parseInt(input.dataset.qset), f = input.dataset.qfield
         item.seriesData[sIdx][f] = parseFloat(input.value) || null
       })
-      item.done = true
-      item.setsDone = item.setsDone.map(function() { return true })
+      if (!quickLogTarget.editOnly) {
+        item.done = true
+        item.setsDone = item.setsDone.map(function() { return true })
+      }
       saveSportPlanning()
       logSdayProgressToHistory(quickLogTarget.dateStr)
       document.getElementById('modal-quick-log').classList.remove('open')
