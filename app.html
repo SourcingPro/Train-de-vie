@@ -1242,7 +1242,7 @@
     </div>
 
 
-    <!-- MODULE : SPORT -->
+        <!-- MODULE : SPORT -->
     <div class="module" id="module-sport">
       <div class="page-header">
         <div class="page-title">Sport</div>
@@ -1250,76 +1250,76 @@
       </div>
 
       <div class="sport-tabs">
-        <button class="sport-tab active" data-sport-tab="agenda">Agenda</button>
-        <button class="sport-tab" data-sport-tab="historique">Historique</button>
-        <button class="sport-tab" data-sport-tab="exercices">Exercices</button>
-        <button class="sport-tab" data-sport-tab="programmes">Programmes</button>
-        <button class="sport-tab" data-sport-tab="stats">Stats</button>
+        <button class="sport-tab active" data-stab="agenda">Agenda</button>
+        <button class="sport-tab" data-stab="historique">Historique</button>
+        <button class="sport-tab" data-stab="exercices">Exercices</button>
+        <button class="sport-tab" data-stab="programmes">Programmes</button>
+        <button class="sport-tab" data-stab="stats">Stats</button>
       </div>
 
-      <!-- ── AGENDA ── -->
-      <div class="sport-view active" id="sport-view-agenda">
+      <!-- AGENDA -->
+      <div class="sport-view active" id="sv-agenda">
         <div class="agenda-toggle">
-          <button class="agenda-toggle-btn active" id="btn-agenda-week">Semaine</button>
-          <button class="agenda-toggle-btn" id="btn-agenda-month">Mois</button>
+          <button class="agenda-toggle-btn active" id="btn-sw">Semaine</button>
+          <button class="agenda-toggle-btn" id="btn-sm">Mois</button>
         </div>
 
-        <!-- Vue Semaine -->
-        <div id="agenda-semaine">
-          <div class="month-nav">
-            <button class="btn-month-nav" id="btn-week-prev"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-            <span class="month-title" id="week-range-title"></span>
-            <button class="btn-month-nav" id="btn-week-next"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+        <!-- Vue semaine -->
+        <div id="sv-week">
+          <div class="week-nav">
+            <button class="btn-nav" id="btn-wp"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <span class="week-nav-title" id="week-title"></span>
+            <button class="btn-nav" id="btn-wn"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
           </div>
           <div class="week-grid" id="week-grid"></div>
           <div class="day-detail-card">
-            <div style="font-size:0.6875rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.875rem;" id="week-day-label">Sélectionne un jour</div>
+            <div class="day-detail-title" id="week-day-label">Sélectionne un jour</div>
             <div id="week-day-detail"></div>
           </div>
         </div>
 
-        <!-- Vue Mois -->
-        <div id="agenda-mois" style="display:none;">
+        <!-- Vue mois -->
+        <div id="sv-month" style="display:none;">
           <div class="month-nav">
-            <button class="btn-month-nav" id="btn-month-prev"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-            <span class="month-title" id="month-title"></span>
-            <button class="btn-month-nav" id="btn-month-next"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+            <button class="btn-nav" id="btn-mp"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <span class="month-nav-title" id="month-title"></span>
+            <button class="btn-nav" id="btn-mn"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
           </div>
           <div class="month-header-row">
-            <div class="month-day-label">Lun</div><div class="month-day-label">Mar</div>
-            <div class="month-day-label">Mer</div><div class="month-day-label">Jeu</div>
-            <div class="month-day-label">Ven</div><div class="month-day-label">Sam</div>
-            <div class="month-day-label">Dim</div>
+            <div class="month-header-cell">L</div><div class="month-header-cell">M</div>
+            <div class="month-header-cell">M</div><div class="month-header-cell">J</div>
+            <div class="month-header-cell">V</div><div class="month-header-cell">S</div>
+            <div class="month-header-cell">D</div>
           </div>
           <div class="month-grid" id="month-grid"></div>
           <div class="day-detail-card">
-            <div style="font-size:0.6875rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.875rem;" id="month-day-label">Sélectionne un jour</div>
+            <div class="day-detail-title" id="month-day-label">Sélectionne un jour</div>
             <div id="month-day-detail"></div>
           </div>
         </div>
       </div>
 
-      <!-- ── HISTORIQUE ── -->
-      <div class="sport-view" id="sport-view-historique">
+      <!-- HISTORIQUE -->
+      <div class="sport-view" id="sv-historique">
         <div class="sport-stats-grid">
           <div class="sport-stat-card">
-            <div class="sport-stat-value" id="s-stat-seances">0</div>
+            <div class="sport-stat-value" id="ss-seances">0</div>
             <div class="sport-stat-label">Séances ce mois</div>
-            <div class="sport-stat-sub" id="s-stat-type">—</div>
+            <div class="sport-stat-sub" id="ss-type">—</div>
           </div>
           <div class="sport-stat-card">
-            <div class="sport-stat-value" id="s-stat-week">0</div>
+            <div class="sport-stat-value" id="ss-week">0</div>
             <div class="sport-stat-label">Cette semaine</div>
             <div class="sport-stat-sub">séances</div>
           </div>
           <div class="sport-stat-card">
-            <div class="sport-stat-value" id="s-stat-exos">0</div>
-            <div class="sport-stat-label">Exercices totaux</div>
+            <div class="sport-stat-value" id="ss-exos">0</div>
+            <div class="sport-stat-label">Exercices</div>
             <div class="sport-stat-sub">ce mois</div>
           </div>
           <div class="sport-stat-card">
-            <div class="sport-stat-value" id="s-stat-series">0</div>
-            <div class="sport-stat-label">Séries totales</div>
+            <div class="sport-stat-value" id="ss-series">0</div>
+            <div class="sport-stat-label">Séries</div>
             <div class="sport-stat-sub">ce mois</div>
           </div>
         </div>
@@ -1329,29 +1329,29 @@
         </div>
       </div>
 
-      <!-- ── BIBLIOTHÈQUE EXERCICES ── -->
-      <div class="sport-view" id="sport-view-exercices">
-        <div style="padding:0 1.25rem 0.75rem;display:flex;gap:0.5rem;justify-content:space-between;align-items:center;">
-          <input class="form-input" style="flex:1;" placeholder="Rechercher un exercice…" id="ex-search" />
-          <button class="btn-primary" style="padding:0.5rem 0.875rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-exercise">+ Ajouter</button>
+      <!-- EXERCICES -->
+      <div class="sport-view" id="sv-exercices">
+        <div class="ex-lib-search-row">
+          <input class="form-input" style="flex:1;" placeholder="Rechercher…" id="ex-search" />
+          <button class="btn-primary" style="padding:0.5rem 0.875rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-ex">+ Ajouter</button>
         </div>
-        <div class="ex-lib-filter" id="ex-filter-cats"></div>
-        <div class="ex-lib-filter" id="ex-filter-muscles"></div>
+        <div class="ex-filter-row" id="ex-filter-cats"></div>
+        <div class="ex-filter-row" id="ex-filter-muscles"></div>
         <div class="card" style="padding:0;">
-          <div id="ex-library-list"></div>
+          <div id="ex-list"></div>
         </div>
       </div>
 
-      <!-- ── PROGRAMMES ── -->
-      <div class="sport-view" id="sport-view-programmes">
+      <!-- PROGRAMMES -->
+      <div class="sport-view" id="sv-programmes">
         <div style="padding:0 1.25rem 0.75rem;display:flex;justify-content:flex-end;">
-          <button class="btn-primary" style="padding:0.5rem 1rem;border-radius:var(--radius-sm);font-size:0.875rem;" id="btn-new-template">+ Nouveau programme</button>
+          <button class="btn-primary" style="padding:0.5rem 1rem;border-radius:var(--radius-sm);font-size:0.875rem;" id="btn-new-tmpl">+ Nouveau programme</button>
         </div>
         <div id="templates-list"></div>
       </div>
 
-      <!-- ── STATS ── -->
-      <div class="sport-view" id="sport-view-stats">
+      <!-- STATS -->
+      <div class="sport-view" id="sv-stats">
         <div class="chart-card">
           <div class="chart-header">
             <span class="chart-title">Séances / semaine</span>
@@ -1360,17 +1360,17 @@
               <button class="period-btn" data-chart="freq" data-period="year">Année</button>
             </div>
           </div>
-          <canvas id="chart-freq" height="120"></canvas>
+          <div class="chart-canvas-wrap"><canvas id="chart-freq"></canvas></div>
         </div>
         <div class="chart-card">
           <div class="chart-header">
             <span class="chart-title">Volume total (kg·reps)</span>
             <div class="chart-period">
-              <button class="period-btn active" data-chart="volume" data-period="month">Mois</button>
-              <button class="period-btn" data-chart="volume" data-period="year">Année</button>
+              <button class="period-btn active" data-chart="vol" data-period="month">Mois</button>
+              <button class="period-btn" data-chart="vol" data-period="year">Année</button>
             </div>
           </div>
-          <canvas id="chart-volume" height="120"></canvas>
+          <div class="chart-canvas-wrap"><canvas id="chart-vol"></canvas></div>
         </div>
         <div class="chart-card">
           <div class="chart-header">
@@ -1380,22 +1380,22 @@
               <button class="period-btn" data-chart="types" data-period="year">Année</button>
             </div>
           </div>
-          <canvas id="chart-types" height="160"></canvas>
+          <div class="chart-canvas-wrap" style="height:160px;"><canvas id="chart-types"></canvas></div>
         </div>
         <div class="chart-card">
           <div class="chart-header">
-            <span class="chart-title">Durée moyenne / séance (min)</span>
+            <span class="chart-title">Durée moyenne / séance</span>
             <div class="chart-period">
               <button class="period-btn active" data-chart="dur" data-period="month">Mois</button>
               <button class="period-btn" data-chart="dur" data-period="year">Année</button>
             </div>
           </div>
-          <canvas id="chart-dur" height="120"></canvas>
+          <div class="chart-canvas-wrap"><canvas id="chart-dur"></canvas></div>
         </div>
         <div class="chart-card">
           <div class="chart-header"><span class="chart-title">Progression par exercice</span></div>
-          <select class="form-select" id="chart-ex-select" style="margin-bottom:0.75rem;"></select>
-          <canvas id="chart-prog" height="120"></canvas>
+          <select class="form-select" id="chart-ex-sel" style="margin-bottom:0.75rem;"></select>
+          <div class="chart-canvas-wrap"><canvas id="chart-prog"></canvas></div>
         </div>
         <div class="chart-card">
           <div class="chart-header">
@@ -1409,7 +1409,8 @@
         </div>
       </div>
     </div>
-    <div class="module" id="module-reading">
+
+<div class="module" id="module-reading">
       <div class="coming-soon"><div class="coming-soon-icon">📚</div><h2>Lecture & Médias</h2><p>Livres, podcasts, vidéos<br/>et livres audio.</p></div>
     </div>
     <div class="module" id="module-plants">
