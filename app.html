@@ -1457,14 +1457,15 @@
       grid.innerHTML = ''
       const todayStr = toDateStr(new Date())
       const labels = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
-      const totalActive = tasks.filter(function(t) { return t.active }).length
       for (let i = 0; i < 7; i++) {
         const d = new Date(mon); d.setDate(mon.getDate() + i)
         const str = toDateStr(d)
         const isToday = str === todayStr
         const isSel = str === selectedDate
-        const done = tasks.filter(function(t) { return t.active && completions[str + '_' + t.id] }).length
-        const pct = totalActive > 0 ? Math.round((done / totalActive) * 100) : 0
+        const dayTasksList = getTasksForDate(str).filter(function(t) { return t.active })
+        const dayTotal = dayTasksList.length
+        const done = dayTasksList.filter(function(t) { return completions[str + '_' + t.id] }).length
+        const pct = dayTotal > 0 ? Math.round((done / dayTotal) * 100) : 0
         const col = document.createElement('div')
         col.className = 'week-big-col'
         let cls = 'week-big-cell'
@@ -1473,7 +1474,7 @@
         col.innerHTML = '<div class="week-big-label">' + labels[i] + '</div>' +
           '<div class="' + cls + '">' +
           '<span class="week-big-num">' + d.getDate() + '</span>' +
-          '<div class="week-big-ring" style="--pct:' + pct + ';"><div class="week-big-ring-inner">' + (totalActive > 0 ? pct : '') + '</div></div>' +
+          '<div class="week-big-ring" style="--pct:' + pct + ';"><div class="week-big-ring-inner">' + (dayTotal > 0 ? pct : '') + '</div></div>' +
           '</div>'
         col.querySelector('.week-big-cell').addEventListener('click', function() {
           selectedDate = str
@@ -1539,6 +1540,42 @@
     }
 
     // ══════════════════════════════════════
+    // REPORTS DE TÂCHES (localStorage)
+    // ══════════════════════════════════════
+    let taskReschedules = {}
+
+    function loadTaskReschedules() {
+      const s = localStorage.getItem('tdv_reschedules_' + profile.id)
+      taskReschedules = s ? JSON.parse(s) : {}
+    }
+    function saveTaskReschedules() {
+      localStorage.setItem('tdv_reschedules_' + profile.id, JSON.stringify(taskReschedules))
+    }
+
+    // Retourne la liste des tâches à afficher pour une date donnée,
+    // en tenant compte des reports (in/out) pour CE jour précis.
+    function getTasksForDate(dateStr) {
+      const result = []
+      tasks.forEach(function(task) {
+        const outKey = task.id + '_' + dateStr
+        // Si cette tâche a été reportée DEPUIS ce jour vers un autre, ne pas l'afficher ici
+        if (taskReschedules[outKey]) return
+        result.push(task)
+      })
+      // Ajouter les tâches reportées VERS ce jour (depuis n'importe quel autre jour)
+      Object.keys(taskReschedules).forEach(function(key) {
+        if (taskReschedules[key] === dateStr) {
+          const taskId = key.substring(0, key.lastIndexOf('_'))
+          const task = tasks.find(function(t) { return t.id === taskId })
+          if (task && !result.find(function(t) { return t.id === task.id })) {
+            result.push(task)
+          }
+        }
+      })
+      return result
+    }
+
+    // ══════════════════════════════════════
     // REPORT DE TÂCHE
     // ══════════════════════════════════════
     window.openReschedule = function(taskId) {
@@ -1565,14 +1602,17 @@
     })
 
     async function rescheduleTask(taskId, newDate) {
-      const key = selectedDate + '_' + taskId
-      if (completions[key]) {
-        await db.from('task_completions').delete().eq('id', completions[key])
-        delete completions[key]
+      // Retire une éventuelle "done" du jour d'origine si elle existait (report ≠ fait)
+      const originKey = selectedDate + '_' + taskId
+      if (completions[originKey]) {
+        await db.from('task_completions').delete().eq('id', completions[originKey])
+        delete completions[originKey]
       }
-      const { data } = await db.from('task_completions').insert({ task_id: taskId, completed_date: newDate }).select().single()
-      if (data) completions[newDate + '_' + taskId] = data.id
+      // Enregistre le report : ce taskId, depuis selectedDate, va vers newDate
+      taskReschedules[taskId + '_' + selectedDate] = newDate
+      saveTaskReschedules()
       document.getElementById('modal-reschedule').classList.remove('open')
+      renderWeekBig()
       renderTasksList()
       updateProgress()
       updateDateTitle()
@@ -1751,8 +1791,9 @@
 
     function updateDateTitle() {
       document.getElementById('tasks-date-title').textContent = formatDateTitle(selectedDate)
-      const total = tasks.filter(t => t.active).length
-      const done = tasks.filter(t => t.active && completions[selectedDate + '_' + t.id]).length
+      const dayTasks = getTasksForDate(selectedDate).filter(t => t.active)
+      const total = dayTasks.length
+      const done = dayTasks.filter(t => completions[selectedDate + '_' + t.id]).length
       document.getElementById('tasks-subtitle').textContent = done + ' / ' + total + ' tâches complétées'
     }
 
@@ -1792,7 +1833,8 @@
 
     function renderTasksList() {
       const list = document.getElementById('tasks-list')
-      if (tasks.length === 0) {
+      const dayTasks = getTasksForDate(selectedDate)
+      if (dayTasks.length === 0) {
         list.innerHTML = `
           <div class="empty-state">
             <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
@@ -1801,7 +1843,7 @@
         return
       }
       list.innerHTML = ''
-      tasks.forEach(task => {
+      dayTasks.forEach(task => {
         const key = selectedDate + '_' + task.id
         const isDone = !!completions[key]
         const item = document.createElement('div')
@@ -1843,8 +1885,9 @@
     }
 
     function updateProgress() {
-      const total = tasks.filter(t => t.active).length
-      const done = tasks.filter(t => t.active && completions[selectedDate + '_' + t.id]).length
+      const dayTasks = getTasksForDate(selectedDate).filter(t => t.active)
+      const total = dayTasks.length
+      const done = dayTasks.filter(t => completions[selectedDate + '_' + t.id]).length
       const pct = total > 0 ? Math.round((done / total) * 100) : 0
       document.getElementById('progress-pct').textContent = pct + '%'
       document.getElementById('progress-fill').style.width = pct + '%'
@@ -2014,6 +2057,7 @@
     async function init() {
       loadTheme()
       loadTaskTags()
+      loadTaskReschedules()
       renderHeader()
       renderTabs()
       await loadTasks()
