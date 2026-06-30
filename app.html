@@ -809,7 +809,107 @@
       .stat-value { font-size: 1.25rem; }
     }
 
-    </style>
+    
+    /* ══════════════════════════════════════
+       TASKS MODULE — AMÉLIORATIONS
+    ══════════════════════════════════════ */
+
+    /* Semaine agrandie */
+    .week-big-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+      padding: 0 1.25rem 1rem;
+    }
+    .week-big-col { display: flex; flex-direction: column; align-items: center; gap: 0.375rem; }
+    .week-big-label {
+      font-size: 0.625rem; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .week-big-cell {
+      width: 100%; aspect-ratio: 0.85; border-radius: 14px;
+      border: 1.5px solid var(--border-strong);
+      background: var(--surface); box-shadow: var(--shadow-card);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; transition: all var(--transition); gap: 0.25rem;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .week-big-num { font-size: 1.0625rem; font-weight: 700; color: var(--text-secondary); line-height: 1; }
+    .week-big-ring {
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.5625rem; font-weight: 700;
+      background: conic-gradient(var(--accent) calc(var(--pct,0) * 1%), var(--surface-2) 0);
+    }
+    .week-big-ring-inner {
+      width: 19px; height: 19px; border-radius: 50%; background: var(--surface);
+      display: flex; align-items: center; justify-content: center; color: var(--text-secondary);
+    }
+    .week-big-cell:hover { border-color: var(--accent); }
+    .week-big-cell.is-today { border-color: var(--accent); border-width: 2px; }
+    .week-big-cell.is-today .week-big-num { color: var(--accent); font-weight: 800; }
+    .week-big-cell.is-selected { background: var(--accent); border-color: var(--accent); }
+    .week-big-cell.is-selected .week-big-num { color: var(--bg); }
+    .week-big-cell.is-selected .week-big-ring-inner { background: transparent; color: var(--bg); }
+
+    .week-nav-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.25rem 0.625rem;
+    }
+    .week-nav-title { font-size: 0.9375rem; font-weight: 600; }
+
+    /* Stats étendues */
+    .stats-grid-4 {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 0.625rem; margin: 0 1.25rem 0.75rem;
+    }
+    .stat-card-sm {
+      background: var(--surface); border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-card); padding: 0.875rem; text-align: center;
+    }
+    .stat-card-sm .stat-value-sm { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
+    .stat-card-sm .stat-label-sm { font-size: 0.6875rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+    /* Tags */
+    .tag-pill {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      font-size: 0.6875rem; font-weight: 600;
+      padding: 0.15rem 0.5rem; border-radius: 100px;
+    }
+    .tags-row { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem; }
+    .tag-picker { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tag-option {
+      display: flex; align-items: center; gap: 0.375rem;
+      padding: 0.4rem 0.75rem; border-radius: 100px;
+      border: 1.5px solid var(--border-strong); background: transparent;
+      font-size: 0.8125rem; font-family: inherit; cursor: pointer;
+      transition: all var(--transition); color: var(--text-secondary);
+    }
+    .tag-option.selected { border-color: currentColor; }
+    .tag-manage-row {
+      display: flex; align-items: center; gap: 0.625rem;
+      padding: 0.625rem 0; border-bottom: 0.5px solid var(--border);
+    }
+    .tag-manage-row:last-child { border-bottom: none; }
+    .tag-manage-emoji { font-size: 1.125rem; }
+    .tag-manage-name { flex: 1; font-size: 0.9375rem; font-weight: 500; }
+    .tag-color-dot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Report modal */
+    .reschedule-options { display: flex; flex-direction: column; gap: 0.625rem; }
+    .reschedule-btn {
+      padding: 0.875rem 1rem; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border-strong); background: transparent;
+      font-size: 0.9375rem; font-family: inherit; cursor: pointer;
+      text-align: left; display: flex; align-items: center; gap: 0.75rem;
+      transition: all var(--transition); color: var(--text-primary);
+    }
+    .reschedule-btn:hover { border-color: var(--accent); }
+    .reschedule-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; flex-shrink: 0; }
+
+    .task-tags-display { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem; }
+
+</style>
 </head>
 <body>
 
@@ -833,20 +933,27 @@
   <!-- MAIN -->
   <main class="app-main">
 
-    <!-- MODULE : TÂCHES -->
+        <!-- MODULE : TÂCHES -->
     <div class="module active" id="module-tasks">
       <div class="page-header">
         <div class="page-title" id="tasks-date-title"></div>
         <div class="page-subtitle" id="tasks-subtitle"></div>
       </div>
 
-      <!-- Bande de dates -->
-      <div class="date-strip" id="date-strip"></div>
+      <!-- Navigation semaine -->
+      <div class="week-nav-row">
+        <button class="btn-icon" id="btn-tweek-prev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <span class="week-nav-title" id="tweek-title"></span>
+        <button class="btn-icon" id="btn-tweek-next"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+
+      <!-- Semaine agrandie -->
+      <div class="week-big-grid" id="week-big-grid"></div>
 
       <!-- Progression du jour -->
       <div class="progress-wrap">
         <div class="progress-header">
-          <span class="progress-label">Progression aujourd'hui</span>
+          <span class="progress-label">Progression du jour</span>
           <span class="progress-pct" id="progress-pct">0%</span>
         </div>
         <div class="progress-bar">
@@ -854,20 +961,30 @@
         </div>
       </div>
 
-      <!-- Stats -->
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-value" id="stat-today">0</div>
-          <div class="stat-label">Aujourd'hui</div>
+      <!-- Stats étendues -->
+      <div class="stats-grid-4">
+        <div class="stat-card-sm">
+          <div class="stat-value-sm" id="stat-avg-day">0</div>
+          <div class="stat-label-sm">Moyenne / jour</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value" id="stat-week">0</div>
-          <div class="stat-label">Cette semaine</div>
+        <div class="stat-card-sm">
+          <div class="stat-value-sm" id="stat-avg-week">0</div>
+          <div class="stat-label-sm">Moyenne / semaine</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value" id="stat-streak">0</div>
-          <div class="stat-label">Jours consécutifs</div>
+        <div class="stat-card-sm">
+          <div class="stat-value-sm" id="stat-avg-month">0</div>
+          <div class="stat-label-sm">Moyenne / mois</div>
         </div>
+        <div class="stat-card-sm">
+          <div class="stat-value-sm" id="stat-streak">0</div>
+          <div class="stat-label-sm">Jours consécutifs</div>
+        </div>
+      </div>
+
+      <!-- Stats par tag -->
+      <div class="card" id="tag-stats-card" style="display:none;">
+        <div class="card-title">Par catégorie</div>
+        <div id="tag-stats-list"></div>
       </div>
 
       <!-- Liste des tâches -->
@@ -876,10 +993,15 @@
         <div id="tasks-list"></div>
       </div>
 
+      <!-- Gestion des tags -->
+      <div style="padding:0 1.25rem 1rem;">
+        <button class="btn-secondary" style="width:100%;" id="btn-manage-tags">🏷️ Gérer les catégories</button>
+      </div>
+
     </div>
 
 
-            <!-- MODULE : SPORT -->
+<!-- MODULE : SPORT -->
     <div class="module" id="module-sport">
       <div class="coming-soon"><div class="coming-soon-icon">🏋️</div><h2>Sport</h2><p>Suivi de tes séances,<br/>exercices et statistiques.</p></div>
     </div>
@@ -945,9 +1067,63 @@
         <label class="form-label">Couleur</label>
         <div class="color-picker" id="task-color-picker"></div>
       </div>
+      <div class="form-group">
+        <label class="form-label">Catégories</label>
+        <div class="tag-picker" id="task-tag-picker"></div>
+      </div>
       <div class="modal-actions" id="modal-task-actions"></div>
     </div>
   </div>
+
+  <!-- MODAL REPORTER -->
+  <div class="modal-overlay" id="modal-reschedule">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Reporter la tâche</div>
+        <button class="modal-close" id="modal-reschedule-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="reschedule-options">
+        <button class="reschedule-btn" id="btn-reschedule-tomorrow">
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          Au lendemain
+        </button>
+        <button class="reschedule-btn" id="btn-reschedule-pick">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Choisir une date
+        </button>
+      </div>
+      <div class="form-group" id="reschedule-date-group" style="display:none;margin-top:1rem;">
+        <label class="form-label">Nouvelle date</label>
+        <input class="form-input" type="date" id="reschedule-date-input" />
+        <button class="btn-primary" style="width:100%;margin-top:0.75rem;" id="btn-reschedule-confirm">Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL GESTION TAGS -->
+  <div class="modal-overlay" id="modal-tags">
+    <div class="modal" style="max-height:85dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title">Catégories</div>
+        <button class="modal-close" id="modal-tags-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div id="tags-manage-list"></div>
+      <div class="form-group" style="margin-top:1rem;border-top:0.5px solid var(--border);padding-top:1rem;">
+        <label class="form-label">Nouvelle catégorie</label>
+        <div style="display:flex;gap:0.5rem;align-items:flex-end;">
+          <div style="flex:0 0 64px;">
+            <input class="form-input" id="new-tag-emoji" placeholder="🏷️" maxlength="4" style="font-size:1.25rem;text-align:center;" />
+          </div>
+          <div style="flex:1;">
+            <input class="form-input" id="new-tag-name" placeholder="Nom de la catégorie" maxlength="20" />
+          </div>
+        </div>
+        <div class="color-picker" id="new-tag-color-picker" style="margin-top:0.625rem;"></div>
+        <button class="btn-primary" style="width:100%;margin-top:0.75rem;" id="btn-add-tag">+ Créer la catégorie</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- MODAL SÉANCE -->
   <div class="modal-overlay" id="modal-seance">
@@ -1175,6 +1351,249 @@
       if (saved) applyTheme(saved)
     }
 
+
+    // ══════════════════════════════════════
+    // TAGS — gestion
+    // ══════════════════════════════════════
+    const TAG_COLORS = ['#1A1814','#DC2626','#EA580C','#D97706','#16A34A','#0891B2','#7C3AED','#DB2777','#64748B']
+    let taskTags = []
+    let selectedTaskTagIds = []
+    let editingRescheduleTaskId = null
+
+    function loadTaskTags() {
+      const s = localStorage.getItem('tdv_tags_' + profile.id)
+      taskTags = s ? JSON.parse(s) : [
+        { id: 't1', emoji: '💪', name: 'Santé', color: '#16A34A' },
+        { id: 't2', emoji: '💼', name: 'Travail', color: '#0891B2' },
+        { id: 't3', emoji: '🏠', name: 'Maison', color: '#D97706' }
+      ]
+    }
+    function saveTaskTags() { localStorage.setItem('tdv_tags_' + profile.id, JSON.stringify(taskTags)) }
+
+    function tagById(id) { return taskTags.find(function(t) { return t.id === id }) }
+
+    function renderTaskTagPicker() {
+      const el = document.getElementById('task-tag-picker')
+      if (!el) return
+      if (!taskTags.length) { el.innerHTML = '<span style="font-size:0.8125rem;color:var(--text-muted);">Aucune catégorie. Crée-en une via "Gérer les catégories".</span>'; return }
+      el.innerHTML = taskTags.map(function(t) {
+        const sel = selectedTaskTagIds.includes(t.id)
+        return '<button type="button" class="tag-option' + (sel ? ' selected' : '') + '" style="color:' + t.color + ';' + (sel ? 'background:' + t.color + '22;' : '') + '" onclick="toggleTaskTag(\'' + t.id + '\')">' + t.emoji + ' ' + t.name + '</button>'
+      }).join('')
+    }
+    window.toggleTaskTag = function(id) {
+      if (selectedTaskTagIds.includes(id)) selectedTaskTagIds = selectedTaskTagIds.filter(function(x) { return x !== id })
+      else selectedTaskTagIds.push(id)
+      renderTaskTagPicker()
+    }
+
+    function renderTagsManageList() {
+      const el = document.getElementById('tags-manage-list')
+      if (!el) return
+      if (!taskTags.length) { el.innerHTML = '<p style="font-size:0.875rem;color:var(--text-muted);padding:0.5rem 0;">Aucune catégorie pour l\\'instant.</p>'; return }
+      el.innerHTML = taskTags.map(function(t) {
+        return '<div class="tag-manage-row">' +
+          '<span class="tag-manage-emoji">' + t.emoji + '</span>' +
+          '<span class="tag-manage-name">' + t.name + '</span>' +
+          '<span class="tag-color-dot" style="background:' + t.color + ';"></span>' +
+          '<button class="btn-icon" style="width:28px;height:28px;" onclick="deleteTag(\'' + t.id + '\')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>' +
+          '</div>'
+      }).join('')
+    }
+
+    window.deleteTag = function(id) {
+      taskTags = taskTags.filter(function(t) { return t.id !== id })
+      saveTaskTags()
+      renderTagsManageList()
+      renderTasksList()
+      updateTagStats()
+      showToast('Catégorie supprimée')
+    }
+
+    document.getElementById('btn-manage-tags').addEventListener('click', function() {
+      renderTagsManageList()
+      renderNewTagColorPicker()
+      document.getElementById('modal-tags').classList.add('open')
+    })
+    document.getElementById('modal-tags-close').addEventListener('click', function() { document.getElementById('modal-tags').classList.remove('open') })
+    document.getElementById('modal-tags').addEventListener('click', function(e) { if (e.target === e.currentTarget) document.getElementById('modal-tags').classList.remove('open') })
+
+    let newTagColor = TAG_COLORS[0]
+    function renderNewTagColorPicker() {
+      const el = document.getElementById('new-tag-color-picker')
+      el.innerHTML = TAG_COLORS.map(function(c) {
+        return '<div class="color-dot' + (c === newTagColor ? ' selected' : '') + '" style="background:' + c + ';" onclick="selectNewTagColor(\'' + c + '\')"></div>'
+      }).join('')
+    }
+    window.selectNewTagColor = function(c) { newTagColor = c; renderNewTagColorPicker() }
+
+    document.getElementById('btn-add-tag').addEventListener('click', function() {
+      const name = document.getElementById('new-tag-name').value.trim()
+      if (!name) return
+      const emoji = document.getElementById('new-tag-emoji').value.trim() || '🏷️'
+      taskTags.push({ id: 'tag' + Date.now(), emoji: emoji, name: name, color: newTagColor })
+      saveTaskTags()
+      document.getElementById('new-tag-name').value = ''
+      document.getElementById('new-tag-emoji').value = ''
+      renderTagsManageList()
+      showToast('Catégorie créée')
+    })
+
+    function updateTagStats() {
+      const card = document.getElementById('tag-stats-card')
+      const list = document.getElementById('tag-stats-list')
+      if (!taskTags.length || !tasks.length) { card.style.display = 'none'; return }
+      card.style.display = ''
+      const today = toDateStr(new Date())
+      list.innerHTML = taskTags.map(function(tag) {
+        const tagTasks = tasks.filter(function(t) { return (t.tag_ids || []).includes(tag.id) })
+        if (!tagTasks.length) return ''
+        const done = tagTasks.filter(function(t) { return completions[today + '_' + t.id] }).length
+        const pct = Math.round((done / tagTasks.length) * 100)
+        return '<div style="margin-bottom:0.75rem;">' +
+          '<div style="display:flex;justify-content:space-between;font-size:0.8125rem;margin-bottom:0.375rem;">' +
+          '<span style="font-weight:500;">' + tag.emoji + ' ' + tag.name + '</span><span style="color:var(--text-muted);">' + pct + '%</span></div>' +
+          '<div class="progress-bar" style="height:5px;"><div class="progress-fill" style="width:' + pct + '%;background:' + tag.color + ';"></div></div></div>'
+      }).join('')
+    }
+
+    // ══════════════════════════════════════
+    // SEMAINE AGRANDIE
+    // ══════════════════════════════════════
+    let taskWeekOffset = 0
+
+    function renderWeekBig() {
+      const now = new Date()
+      const mon = new Date(now)
+      mon.setDate(now.getDate() - ((now.getDay() + 6) % 7) + taskWeekOffset * 7)
+      const sun = new Date(mon); sun.setDate(mon.getDate() + 6)
+      document.getElementById('tweek-title').textContent =
+        mon.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' – ' +
+        sun.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      const grid = document.getElementById('week-big-grid')
+      grid.innerHTML = ''
+      const todayStr = toDateStr(new Date())
+      const labels = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
+      const totalActive = tasks.filter(function(t) { return t.active }).length
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(mon); d.setDate(mon.getDate() + i)
+        const str = toDateStr(d)
+        const isToday = str === todayStr
+        const isSel = str === selectedDate
+        const done = tasks.filter(function(t) { return t.active && completions[str + '_' + t.id] }).length
+        const pct = totalActive > 0 ? Math.round((done / totalActive) * 100) : 0
+        const col = document.createElement('div')
+        col.className = 'week-big-col'
+        let cls = 'week-big-cell'
+        if (isToday) cls += ' is-today'
+        if (isSel) cls += ' is-selected'
+        col.innerHTML = '<div class="week-big-label">' + labels[i] + '</div>' +
+          '<div class="' + cls + '">' +
+          '<span class="week-big-num">' + d.getDate() + '</span>' +
+          '<div class="week-big-ring" style="--pct:' + pct + ';"><div class="week-big-ring-inner">' + (totalActive > 0 ? pct : '') + '</div></div>' +
+          '</div>'
+        col.querySelector('.week-big-cell').addEventListener('click', function() {
+          selectedDate = str
+          renderWeekBig()
+          renderTasksList()
+          updateProgress()
+          updateDateTitle()
+        })
+        grid.appendChild(col)
+      }
+    }
+
+    document.getElementById('btn-tweek-prev').addEventListener('click', function() { taskWeekOffset--; renderWeekBig() })
+    document.getElementById('btn-tweek-next').addEventListener('click', function() { taskWeekOffset++; renderWeekBig() })
+
+    // ══════════════════════════════════════
+    // STATS ÉTENDUES
+    // ══════════════════════════════════════
+    function updateExtendedStats() {
+      const totalActive = tasks.filter(function(t) { return t.active }).length
+      if (totalActive === 0) {
+        document.getElementById('stat-avg-day').textContent = '0'
+        document.getElementById('stat-avg-week').textContent = '0'
+        document.getElementById('stat-avg-month').textContent = '0'
+        document.getElementById('stat-streak').textContent = '0'
+        return
+      }
+      // Moyenne / jour (sur 7 derniers jours)
+      let sum7 = 0
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(); d.setDate(d.getDate() - i)
+        const str = toDateStr(d)
+        sum7 += tasks.filter(function(t) { return t.active && completions[str + '_' + t.id] }).length
+      }
+      document.getElementById('stat-avg-day').textContent = (sum7 / 7).toFixed(1)
+      document.getElementById('stat-avg-week').textContent = sum7
+
+      // Moyenne / mois (extrapolation sur 30j)
+      let sum30 = 0
+      for (let i = 0; i < 30; i++) {
+        const d = new Date(); d.setDate(d.getDate() - i)
+        const str = toDateStr(d)
+        sum30 += tasks.filter(function(t) { return t.active && completions[str + '_' + t.id] }).length
+      }
+      document.getElementById('stat-avg-month').textContent = sum30
+
+      // Streak
+      let streak = 0
+      for (let i = 0; i < 60; i++) {
+        const d = new Date(); d.setDate(d.getDate() - i)
+        const str = toDateStr(d)
+        const dayDone = tasks.filter(function(t) { return t.active && completions[str + '_' + t.id] }).length
+        if (dayDone > 0) streak++
+        else break
+      }
+      document.getElementById('stat-streak').textContent = streak
+
+      updateTagStats()
+    }
+
+    // ══════════════════════════════════════
+    // REPORT DE TÂCHE
+    // ══════════════════════════════════════
+    window.openReschedule = function(taskId) {
+      editingRescheduleTaskId = taskId
+      document.getElementById('reschedule-date-group').style.display = 'none'
+      document.getElementById('modal-reschedule').classList.add('open')
+    }
+    document.getElementById('modal-reschedule-close').addEventListener('click', function() { document.getElementById('modal-reschedule').classList.remove('open') })
+    document.getElementById('modal-reschedule').addEventListener('click', function(e) { if (e.target === e.currentTarget) document.getElementById('modal-reschedule').classList.remove('open') })
+
+    document.getElementById('btn-reschedule-tomorrow').addEventListener('click', async function() {
+      const tomorrow = new Date(selectedDate + 'T12:00:00')
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      await rescheduleTask(editingRescheduleTaskId, toDateStr(tomorrow))
+    })
+    document.getElementById('btn-reschedule-pick').addEventListener('click', function() {
+      document.getElementById('reschedule-date-group').style.display = ''
+      document.getElementById('reschedule-date-input').value = selectedDate
+    })
+    document.getElementById('btn-reschedule-confirm').addEventListener('click', async function() {
+      const date = document.getElementById('reschedule-date-input').value
+      if (!date) return
+      await rescheduleTask(editingRescheduleTaskId, date)
+    })
+
+    async function rescheduleTask(taskId, newDate) {
+      const key = selectedDate + '_' + taskId
+      if (completions[key]) {
+        await db.from('task_completions').delete().eq('id', completions[key])
+        delete completions[key]
+      }
+      const { data } = await db.from('task_completions').insert({ task_id: taskId, completed_date: newDate }).select().single()
+      if (data) completions[newDate + '_' + taskId] = data.id
+      document.getElementById('modal-reschedule').classList.remove('open')
+      renderTasksList()
+      updateProgress()
+      updateDateTitle()
+      updateExtendedStats()
+      showToast('Tâche reportée')
+    }
+
+
     // ── HEADER ──
     function renderHeader() {
       const colors = ['#DBEAFE','#FCE4EC','#DCEDC8','#FFE0B2','#EDE7F6']
@@ -1218,34 +1637,7 @@
       document.getElementById('fab').style.display = (id === 'tasks' || id === 'sport') ? 'flex' : 'none'
     }
 
-    // ── DATE STRIP ──
-    function renderDateStrip() {
-      const strip = document.getElementById('date-strip')
-      strip.innerHTML = ''
-      const today = new Date()
-      const days = ['dim','lun','mar','mer','jeu','ven','sam']
-      for (let i = -6; i <= 0; i++) {
-        const d = new Date(today)
-        d.setDate(today.getDate() + i)
-        const str = toDateStr(d)
-        const isToday = i === 0
-        const btn = document.createElement('button')
-        btn.className = 'date-pill' + (str === selectedDate ? ' today' : '')
-        btn.innerHTML = `
-          <span class="date-day">${days[d.getDay()]}</span>
-          <span class="date-num">${d.getDate()}</span>
-          <span class="date-dot"></span>
-        `
-        btn.addEventListener('click', () => {
-          selectedDate = str
-          renderDateStrip()
-          renderTasksList()
-          updateProgress()
-          updateDateTitle()
-        })
-        strip.appendChild(btn)
-      }
-    }
+    // (renderDateStrip remplacé par renderWeekBig, voir plus bas)
 
     function updateDateTitle() {
       document.getElementById('tasks-date-title').textContent = formatDateTitle(selectedDate)
@@ -1304,6 +1696,10 @@
         const isDone = !!completions[key]
         const item = document.createElement('div')
         item.className = 'task-item' + (isDone ? ' done' : '')
+        const tagBadges = (task.tag_ids || []).map(id => {
+          const t = tagById(id)
+          return t ? `<span class="tag-pill" style="background:${t.color}22;color:${t.color};">${t.emoji} ${t.name}</span>` : ''
+        }).join('')
         item.innerHTML = `
           <div class="task-check" style="${isDone ? 'background:' + (task.color || 'var(--accent)') + ';border-color:' + (task.color || 'var(--accent)') : ''}">
             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1311,10 +1707,14 @@
           <div class="task-info">
             <div class="task-name">${task.name}</div>
             <div class="task-freq">${freqLabel(task.frequency)}</div>
+            ${tagBadges ? `<div class="task-tags-display">${tagBadges}</div>` : ''}
           </div>
           <div class="task-color" style="background:${task.color || 'var(--text-muted)'}"></div>
           <div class="task-actions">
-            <button class="task-btn task-btn-edit" data-id="${task.id}">
+            <button class="task-btn task-btn-edit" data-id="${task.id}" title="Reporter">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <button class="task-btn task-btn-edit" data-id="${task.id}" title="Modifier">
               <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
             <button class="task-btn task-btn-delete" data-id="${task.id}">
@@ -1322,9 +1722,11 @@
             </button>
           </div>
         `
+        const actionBtns = item.querySelectorAll('.task-btn-edit')
         item.querySelector('.task-check').addEventListener('click', () => toggleTask(task.id))
         item.querySelector('.task-name').addEventListener('click', () => toggleTask(task.id))
-        item.querySelector('.task-btn-edit').addEventListener('click', (e) => { e.stopPropagation(); openEditTask(task) })
+        actionBtns[0].addEventListener('click', (e) => { e.stopPropagation(); openReschedule(task.id) })
+        actionBtns[1].addEventListener('click', (e) => { e.stopPropagation(); openEditTask(task) })
         item.querySelector('.task-btn-delete').addEventListener('click', (e) => { e.stopPropagation(); deleteTask(task.id) })
         list.appendChild(item)
       })
@@ -1340,31 +1742,7 @@
     }
 
     function updateStats() {
-      const today = toDateStr(new Date())
-      const todayDone = tasks.filter(t => t.active && completions[today + '_' + t.id]).length
-      document.getElementById('stat-today').textContent = todayDone
-
-      let weekTotal = 0
-      for (let i = 0; i < 7; i++) {
-        const d = new Date()
-        d.setDate(d.getDate() - i)
-        const str = toDateStr(d)
-        tasks.forEach(t => {
-          if (completions[str + '_' + t.id]) weekTotal++
-        })
-      }
-      document.getElementById('stat-week').textContent = weekTotal
-
-      let streak = 0
-      for (let i = 0; i < 30; i++) {
-        const d = new Date()
-        d.setDate(d.getDate() - i)
-        const str = toDateStr(d)
-        const dayDone = tasks.filter(t => t.active && completions[str + '_' + t.id]).length
-        if (dayDone > 0) streak++
-        else break
-      }
-      document.getElementById('stat-streak').textContent = streak
+      updateExtendedStats()
     }
 
     async function deleteTask(id) {
@@ -1400,6 +1778,7 @@
     function openAddTask() {
       editingTaskId = null
       selectedTaskColor = TASK_COLORS[0]
+      selectedTaskTagIds = []
       document.getElementById('modal-task-title').textContent = 'Nouvelle tâche'
       document.getElementById('task-name-input').value = ''
       document.getElementById('task-freq-input').value = 'daily'
@@ -1410,6 +1789,7 @@
       `
       bindModalTaskButtons()
       renderColorPicker('task-color-picker', selectedTaskColor, c => selectedTaskColor = c)
+      renderTaskTagPicker()
       document.getElementById('modal-task').classList.add('open')
       setTimeout(() => document.getElementById('task-name-input').focus(), 100)
     }
@@ -1417,6 +1797,7 @@
     function openEditTask(task) {
       editingTaskId = task.id
       selectedTaskColor = task.color || TASK_COLORS[0]
+      selectedTaskTagIds = [...(task.tag_ids || [])]
       document.getElementById('modal-task-title').textContent = 'Modifier la tâche'
       document.getElementById('task-name-input').value = task.name
       document.getElementById('task-freq-input').value = task.frequency
@@ -1426,6 +1807,7 @@
       `
       bindModalTaskButtons()
       renderColorPicker('task-color-picker', selectedTaskColor, c => selectedTaskColor = c)
+      renderTaskTagPicker()
       document.getElementById('modal-task').classList.add('open')
     }
 
@@ -1450,14 +1832,15 @@
       const freq = document.getElementById('task-freq-input').value
       const btn = document.getElementById('modal-task-save')
       btn.disabled = true
+      const tagIds = [...selectedTaskTagIds]
 
       if (editingTaskId) {
-        await db.from('tasks').update({ name, frequency: freq, color: selectedTaskColor }).eq('id', editingTaskId)
+        await db.from('tasks').update({ name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds }).eq('id', editingTaskId)
         const idx = tasks.findIndex(t => t.id === editingTaskId)
-        if (idx !== -1) tasks[idx] = { ...tasks[idx], name, frequency: freq, color: selectedTaskColor }
+        if (idx !== -1) tasks[idx] = { ...tasks[idx], name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds }
         showToast('Tâche modifiée')
       } else {
-        const { data } = await db.from('tasks').insert({ profile_id: profile.id, name, frequency: freq, color: selectedTaskColor, active: true }).select().single()
+        const { data } = await db.from('tasks').insert({ profile_id: profile.id, name, frequency: freq, color: selectedTaskColor, active: true, tag_ids: tagIds }).select().single()
         if (data) tasks.push(data)
         showToast('Tâche créée')
       }
@@ -1518,16 +1901,16 @@
     // ── INIT ──
     async function init() {
       loadTheme()
+      loadTaskTags()
       renderHeader()
       renderTabs()
-      renderDateStrip()
-      updateDateTitle()
       await loadTasks()
       await loadCompletions()
+      renderWeekBig()
       renderTasksList()
       updateProgress()
       updateDateTitle()
-      updateStats()
+      updateExtendedStats()
 
       // FAB
       document.getElementById('fab').addEventListener('click', () => {
