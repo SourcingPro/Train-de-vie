@@ -1390,7 +1390,7 @@
     function renderTagsManageList() {
       const el = document.getElementById('tags-manage-list')
       if (!el) return
-      if (!taskTags.length) { el.innerHTML = '<p style="font-size:0.875rem;color:var(--text-muted);padding:0.5rem 0;">Aucune catégorie pour l\\'instant.</p>'; return }
+      if (!taskTags.length) { el.innerHTML = '<p style="font-size:0.875rem;color:var(--text-muted);padding:0.5rem 0;">Aucune catégorie pour le moment.</p>'; return }
       el.innerHTML = taskTags.map(function(t) {
         return '<div class="tag-manage-row">' +
           '<span class="tag-manage-emoji">' + t.emoji + '</span>' +
