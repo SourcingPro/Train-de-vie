@@ -1274,6 +1274,27 @@
     .session-set-check.done { background: var(--pastel-green); border-color: var(--pastel-green); color: var(--pastel-green-text); }
     .session-set-check svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; opacity: 0; }
     .session-set-check.done svg { opacity: 1; }
+
+    /* ══════════════════════════════════════
+       GRAPHIQUES — STYLE COMMUN
+    ══════════════════════════════════════ */
+    .chart-card {
+      background: var(--surface); border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card); padding: 1.25rem;
+      margin: 0 1.25rem 0.875rem;
+    }
+    .chart-header { margin-bottom: 0.875rem; }
+    .chart-title { font-size: 0.875rem; font-weight: 700; color: var(--text-primary); }
+    .chart-canvas-wrap { position: relative; height: 200px; }
+
+    .muscle-heat-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.5rem 0;
+    }
+    .muscle-heat-name { flex: 0 0 110px; font-size: 0.8125rem; font-weight: 500; }
+    .muscle-heat-bar-wrap { flex: 1; height: 8px; background: var(--surface-2); border-radius: 100px; overflow: hidden; }
+    .muscle-heat-bar { height: 100%; border-radius: 100px; background: var(--accent); }
+    .muscle-heat-count { flex: 0 0 32px; text-align: right; font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -1447,10 +1468,11 @@
         <div class="page-subtitle" id="sport-subtitle">Bibliothèque & programmes</div>
       </div>
 
-      <!-- Toggle Exercices / Programmes -->
+      <!-- Toggle Exercices / Programmes / Stats -->
       <div class="task-view-toggle">
         <button class="task-view-btn active" id="btn-sv-ex">Exercices</button>
         <button class="task-view-btn" id="btn-sv-prog">Programmes</button>
+        <button class="task-view-btn" id="btn-sv-stats">Stats</button>
       </div>
 
       <!-- ── VUE EXERCICES ── -->
@@ -1473,6 +1495,78 @@
         </div>
         <div class="card" style="padding:0;">
           <div id="prog-list"></div>
+        </div>
+      </div>
+
+      <!-- ── VUE STATS ── -->
+      <div class="task-view" id="sv-stats">
+        <div class="task-stats-period-toggle">
+          <button class="task-stats-period-btn active" data-sstat-period="week">Semaine</button>
+          <button class="task-stats-period-btn" data-sstat-period="month">Mois</button>
+          <button class="task-stats-period-btn" data-sstat-period="year">Année</button>
+        </div>
+
+        <div class="stats-grid-4" style="margin:0 1.25rem 0.875rem;">
+          <div class="stat-card-sm"><div class="stat-value-sm" id="sstat-sessions">0</div><div class="stat-label-sm">Séances</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="sstat-duration">0</div><div class="stat-label-sm">Min / séance</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="sstat-volume">0</div><div class="stat-label-sm">Volume total (kg)</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="sstat-calories">0</div><div class="stat-label-sm">Calories</div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Séances par semaine</span></div>
+          <div class="chart-canvas-wrap"><canvas id="chart-sport-sessions"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Volume total soulevé (kg)</span></div>
+          <div class="chart-canvas-wrap"><canvas id="chart-sport-volume"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Calories brûlées</span></div>
+          <div class="chart-canvas-wrap"><canvas id="chart-sport-calories"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Répartition par programme</span></div>
+          <div class="chart-canvas-wrap" style="height:160px;"><canvas id="chart-sport-progs"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Top exercices pratiqués</span></div>
+          <div class="chart-canvas-wrap"><canvas id="chart-sport-top-ex"></canvas></div>
+        </div>
+
+        <div class="chart-card" id="sport-pr-section">
+          <div class="chart-header"><span class="chart-title">Évolution du PR par exercice</span></div>
+          <select class="form-select" id="sport-pr-ex-select" style="margin-bottom:0.75rem;"></select>
+          <div class="chart-canvas-wrap"><canvas id="chart-sport-pr"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Répartition par groupe musculaire</span></div>
+          <div class="chart-canvas-wrap" style="height:180px;"><canvas id="chart-sport-muscles"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Muscles travaillés récemment</span></div>
+          <div id="muscle-heat-list"></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Équilibre Push / Pull</span></div>
+          <div class="chart-canvas-wrap" style="height:140px;"><canvas id="chart-sport-pushpull"></canvas></div>
+        </div>
+
+        <div class="chart-card" id="sport-cardio-section">
+          <div class="chart-header"><span class="chart-title">Cardio — Vitesse / Distance</span></div>
+          <div class="chart-canvas-wrap"><canvas id="chart-sport-cardio-speed"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Cardio — Durée cumulée</span></div>
+          <div class="chart-canvas-wrap"><canvas id="chart-sport-cardio-duration"></canvas></div>
         </div>
       </div>
     </div>
@@ -3224,6 +3318,350 @@
       showToast('Séance enregistrée 💪')
       closeSession()
     })
+
+
+
+    // ══════════════════════════════════════
+    // SPORT — STATS
+    // ══════════════════════════════════════
+    let sportStatsPeriod = 'week'
+    let sportCharts = {}
+
+    document.querySelectorAll('[data-sstat-period]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-sstat-period]').forEach(function(b) { b.classList.remove('active') })
+        btn.classList.add('active')
+        sportStatsPeriod = btn.dataset.sstatPeriod
+        renderAllSportStats()
+      })
+    })
+
+    document.getElementById('btn-sv-stats').addEventListener('click', function() {
+      document.getElementById('btn-sv-stats').classList.add('active')
+      document.getElementById('btn-sv-ex').classList.remove('active')
+      document.getElementById('btn-sv-prog').classList.remove('active')
+      document.getElementById('sv-stats').classList.add('active')
+      document.getElementById('sv-ex').classList.remove('active')
+      document.getElementById('sv-prog').classList.remove('active')
+      setTimeout(renderAllSportStats, 100)
+    })
+    // S'assurer que les autres boutons referment bien l'onglet stats
+    document.getElementById('btn-sv-ex').addEventListener('click', function() { document.getElementById('sv-stats').classList.remove('active') })
+    document.getElementById('btn-sv-prog').addEventListener('click', function() { document.getElementById('sv-stats').classList.remove('active') })
+
+    function sportDayRange(period) { return period === 'week' ? 7 : (period === 'month' ? 30 : 365) }
+
+    function workoutsInRange(days) {
+      const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - days)
+      const cutoffStr = toDateStr(cutoff)
+      return workoutHistory.filter(function(w) { return w.date >= cutoffStr })
+    }
+
+    function totalVolume(w) {
+      let v = 0
+      ;(w.exercises || []).forEach(function(ex) {
+        ;(ex.sets || []).forEach(function(s) { if (s.weight && s.reps) v += s.weight * s.reps })
+      })
+      return v
+    }
+    function totalCalories(w) {
+      let c = 0
+      ;(w.exercises || []).forEach(function(ex) { (ex.sets || []).forEach(function(s) { if (s.calories) c += s.calories }) })
+      return c
+    }
+
+    function renderSportStatCards() {
+      const days = sportDayRange(sportStatsPeriod)
+      const ws = workoutsInRange(days)
+      document.getElementById('sstat-sessions').textContent = ws.length
+      const avgDur = ws.length ? Math.round(ws.reduce(function(s,w){ return s + (w.duration||0) }, 0) / ws.length) : 0
+      document.getElementById('sstat-duration').textContent = avgDur
+      const vol = ws.reduce(function(s,w){ return s + totalVolume(w) }, 0)
+      document.getElementById('sstat-volume').textContent = vol >= 1000 ? (vol/1000).toFixed(1) + 'k' : vol
+      const cal = ws.reduce(function(s,w){ return s + totalCalories(w) }, 0)
+      document.getElementById('sstat-calories').textContent = cal
+    }
+
+    function sct() { return { grid: 'rgba(0,0,0,0.06)', text: '#9A9795' } }
+    function sdc(id) { if (sportCharts[id]) { sportCharts[id].destroy(); delete sportCharts[id] } }
+
+    function buildWeekBuckets(days) {
+      // regroupe les jours en semaines pour l'affichage (sauf vue semaine, où on garde le jour)
+      const buckets = []
+      if (days <= 7) {
+        for (let i = days - 1; i >= 0; i--) {
+          const d = new Date(); d.setDate(d.getDate() - i)
+          buckets.push({ label: d.toLocaleDateString('fr-FR', { weekday: 'short' }), start: toDateStr(d), end: toDateStr(d) })
+        }
+      } else if (days <= 30) {
+        for (let i = days - 1; i >= 0; i--) {
+          const d = new Date(); d.setDate(d.getDate() - i)
+          buckets.push({ label: d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }), start: toDateStr(d), end: toDateStr(d) })
+        }
+      } else {
+        for (let i = 11; i >= 0; i--) {
+          const d = new Date(); d.setMonth(d.getMonth() - i, 1)
+          const start = toDateStr(d)
+          const endD = new Date(d); endD.setMonth(endD.getMonth() + 1); endD.setDate(0)
+          buckets.push({ label: d.toLocaleDateString('fr-FR', { month: 'short' }), start: start, end: toDateStr(endD) })
+        }
+      }
+      return buckets
+    }
+
+    // 1. Séances par semaine/jour
+    function renderSportSessionsChart() {
+      sdc('sportSessions')
+      const ctx = document.getElementById('chart-sport-sessions')
+      if (!ctx) return
+      const c = sct()
+      const buckets = buildWeekBuckets(sportDayRange(sportStatsPeriod))
+      const data = buckets.map(function(b) { return workoutHistory.filter(function(w) { return w.date >= b.start && w.date <= b.end }).length })
+      sportCharts['sportSessions'] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: buckets.map(function(b){return b.label}), datasets: [{ data: data, backgroundColor: 'var(--accent)', borderRadius: 5, borderSkipped: false }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, stepSize: 1, font: { size: 10 } }, beginAtZero: true } } }
+      })
+    }
+
+    // 2. Volume total
+    function renderSportVolumeChart() {
+      sdc('sportVolume')
+      const ctx = document.getElementById('chart-sport-volume')
+      if (!ctx) return
+      const c = sct()
+      const buckets = buildWeekBuckets(sportDayRange(sportStatsPeriod))
+      const data = buckets.map(function(b) {
+        return workoutHistory.filter(function(w) { return w.date >= b.start && w.date <= b.end }).reduce(function(s,w){ return s + totalVolume(w) }, 0)
+      })
+      sportCharts['sportVolume'] = new Chart(ctx, {
+        type: 'line',
+        data: { labels: buckets.map(function(b){return b.label}), datasets: [{ data: data, borderColor: 'var(--pastel-purple-text)', backgroundColor: 'transparent', tension: 0.3, pointRadius: 2, pointBackgroundColor: 'var(--pastel-purple-text)' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } }, beginAtZero: true } } }
+      })
+    }
+
+    // 3. Calories
+    function renderSportCaloriesChart() {
+      sdc('sportCalories')
+      const ctx = document.getElementById('chart-sport-calories')
+      if (!ctx) return
+      const c = sct()
+      const buckets = buildWeekBuckets(sportDayRange(sportStatsPeriod))
+      const data = buckets.map(function(b) {
+        return workoutHistory.filter(function(w) { return w.date >= b.start && w.date <= b.end }).reduce(function(s,w){ return s + totalCalories(w) }, 0)
+      })
+      sportCharts['sportCalories'] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: buckets.map(function(b){return b.label}), datasets: [{ data: data, backgroundColor: 'var(--pastel-amber-text)', borderRadius: 5, borderSkipped: false }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } }, beginAtZero: true } } }
+      })
+    }
+
+    // 4. Répartition par programme
+    function renderSportProgsChart() {
+      sdc('sportProgs')
+      const ctx = document.getElementById('chart-sport-progs')
+      if (!ctx) return
+      const days = sportDayRange(sportStatsPeriod)
+      const ws = workoutsInRange(days)
+      const counts = {}
+      ws.forEach(function(w) { const k = w.programName || 'Sans programme'; counts[k] = (counts[k]||0) + 1 })
+      const labels = Object.keys(counts)
+      const data = labels.map(function(l) { return counts[l] })
+      if (!labels.length) { sportCharts['sportProgs'] = null; return }
+      const palette = ['var(--pastel-blue)','var(--pastel-pink)','var(--pastel-green)','var(--pastel-amber)','var(--pastel-purple)']
+      sportCharts['sportProgs'] = new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels: labels, datasets: [{ data: data, backgroundColor: palette, borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: sct().text, padding: 8, font: { size: 10 } } } } }
+      })
+    }
+
+    // 5. Top exercices
+    function renderSportTopExChart() {
+      sdc('sportTopEx')
+      const ctx = document.getElementById('chart-sport-top-ex')
+      if (!ctx) return
+      const c = sct()
+      const days = sportDayRange(sportStatsPeriod)
+      const ws = workoutsInRange(days)
+      const counts = {}
+      ws.forEach(function(w) { (w.exercises||[]).forEach(function(ex) { counts[ex.name] = (counts[ex.name]||0) + 1 }) })
+      const entries = Object.keys(counts).map(function(k){ return { name: k, count: counts[k] } }).sort(function(a,b){return b.count-a.count}).slice(0,8)
+      sportCharts['sportTopEx'] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: entries.map(function(e){return e.name}), datasets: [{ data: entries.map(function(e){return e.count}), backgroundColor: 'var(--accent)', borderRadius: 5, borderSkipped: false }] },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, stepSize: 1, font: { size: 10 } }, beginAtZero: true }, y: { grid: { display: false }, ticks: { color: c.text, font: { size: 10 } } } } }
+      })
+    }
+
+    // 6. Évolution PR par exercice
+    function populatePRSelect() {
+      const sel = document.getElementById('sport-pr-ex-select')
+      const exNames = [...new Set(workoutHistory.flatMap(function(w){ return (w.exercises||[]).map(function(ex){return ex.name}) }))]
+      if (!exNames.length) { sel.innerHTML = '<option>Aucune séance enregistrée</option>'; return }
+      sel.innerHTML = exNames.map(function(n) { return '<option value="' + n + '">' + n + '</option>' }).join('')
+    }
+    function renderSportPRChart() {
+      sdc('sportPR')
+      const ctx = document.getElementById('chart-sport-pr')
+      if (!ctx) return
+      const sel = document.getElementById('sport-pr-ex-select')
+      const exName = sel.value
+      if (!exName) return
+      const c = sct()
+      const points = []
+      workoutHistory.filter(function(w) { return (w.exercises||[]).some(function(ex){return ex.name===exName}) })
+        .sort(function(a,b){ return a.date.localeCompare(b.date) })
+        .forEach(function(w) {
+          const ex = w.exercises.find(function(e){return e.name===exName})
+          let maxW = null
+          ;(ex.sets||[]).forEach(function(s){ if (s.weight && (!maxW || s.weight>maxW)) maxW = s.weight })
+          if (maxW) points.push({ date: w.date, weight: maxW })
+        })
+      sportCharts['sportPR'] = new Chart(ctx, {
+        type: 'line',
+        data: { labels: points.map(function(p){ return new Date(p.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) }), datasets: [{ data: points.map(function(p){return p.weight}), borderColor: 'var(--pastel-amber-text)', backgroundColor: 'transparent', tension: 0.3, pointRadius: 3, pointBackgroundColor: 'var(--pastel-amber-text)' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, callback: function(v){return v+' kg'} } } } }
+      })
+    }
+    document.getElementById('sport-pr-ex-select').addEventListener('change', renderSportPRChart)
+
+    // 7. Répartition par groupe musculaire
+    function renderSportMusclesChart() {
+      sdc('sportMuscles')
+      const ctx = document.getElementById('chart-sport-muscles')
+      if (!ctx) return
+      const days = sportDayRange(sportStatsPeriod)
+      const ws = workoutsInRange(days)
+      const counts = {}
+      ws.forEach(function(w) {
+        ;(w.exercises||[]).forEach(function(wex) {
+          const libEx = exLibrary.find(function(e){return e.name===wex.name})
+          ;(libEx && libEx.muscles || []).forEach(function(m) { counts[m] = (counts[m]||0) + 1 })
+        })
+      })
+      const labels = Object.keys(counts)
+      if (!labels.length) { sportCharts['sportMuscles'] = null; return }
+      const data = labels.map(function(l){return counts[l]})
+      const palette = ['var(--pastel-blue)','var(--pastel-pink)','var(--pastel-green)','var(--pastel-amber)','var(--pastel-purple)','#E0E0E0','#D4D4D4','#C8C8C8']
+      sportCharts['sportMuscles'] = new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels: labels, datasets: [{ data: data, backgroundColor: palette, borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: sct().text, padding: 8, font: { size: 10 } } } } }
+      })
+    }
+
+    // 8. Muscles travaillés récemment (heatmap liste)
+    function renderMuscleHeatList() {
+      const el = document.getElementById('muscle-heat-list')
+      const days = sportDayRange(sportStatsPeriod)
+      const ws = workoutsInRange(days)
+      const counts = {}
+      ALL_MUSCLE_NAMES.forEach(function(m) { counts[m] = 0 })
+      ws.forEach(function(w) {
+        ;(w.exercises||[]).forEach(function(wex) {
+          const libEx = exLibrary.find(function(e){return e.name===wex.name})
+          ;(libEx && libEx.muscles || []).forEach(function(m) { if (counts[m] !== undefined) counts[m]++ })
+        })
+      })
+      const max = Math.max(1, ...Object.values(counts))
+      el.innerHTML = ALL_MUSCLE_NAMES.map(function(m) {
+        const pct = Math.round((counts[m]/max)*100)
+        return '<div class="muscle-heat-row"><div class="muscle-heat-name">' + m + '</div><div class="muscle-heat-bar-wrap"><div class="muscle-heat-bar" style="width:' + pct + '%;"></div></div><div class="muscle-heat-count">' + counts[m] + '</div></div>'
+      }).join('')
+    }
+
+    // 9. Équilibre Push/Pull
+    const PUSH_MUSCLES = ['Pectoraux', 'Épaules', 'Bras']
+    const PULL_MUSCLES = ['Dos']
+    function renderPushPullChart() {
+      sdc('sportPushPull')
+      const ctx = document.getElementById('chart-sport-pushpull')
+      if (!ctx) return
+      const days = sportDayRange(sportStatsPeriod)
+      const ws = workoutsInRange(days)
+      let push = 0, pull = 0, other = 0
+      ws.forEach(function(w) {
+        ;(w.exercises||[]).forEach(function(wex) {
+          const libEx = exLibrary.find(function(e){return e.name===wex.name})
+          const muscles = (libEx && libEx.muscles) || []
+          if (muscles.some(function(m){return PUSH_MUSCLES.includes(m)})) push++
+          else if (muscles.some(function(m){return PULL_MUSCLES.includes(m)})) pull++
+          else other++
+        })
+      })
+      if (push+pull+other === 0) { sportCharts['sportPushPull'] = null; return }
+      sportCharts['sportPushPull'] = new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels: ['Push', 'Pull', 'Autre'], datasets: [{ data: [push, pull, other], backgroundColor: ['var(--pastel-blue)','var(--pastel-pink)','var(--surface-2)'], borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: sct().text, padding: 8, font: { size: 10 } } } } }
+      })
+    }
+
+    // 10. Cardio vitesse/distance
+    function renderCardioSpeedChart() {
+      sdc('sportCardioSpeed')
+      const ctx = document.getElementById('chart-sport-cardio-speed')
+      if (!ctx) return
+      const c = sct()
+      const days = sportDayRange(sportStatsPeriod)
+      const ws = workoutsInRange(days).sort(function(a,b){return a.date.localeCompare(b.date)})
+      const points = []
+      ws.forEach(function(w) {
+        ;(w.exercises||[]).forEach(function(ex) {
+          ;(ex.sets||[]).forEach(function(s) { if (s.speed || s.distance) points.push({ date: w.date, speed: s.speed||0, distance: s.distance||0 }) })
+        })
+      })
+      sportCharts['sportCardioSpeed'] = new Chart(ctx, {
+        type: 'line',
+        data: { labels: points.map(function(p){return new Date(p.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}),
+          datasets: [
+            { label: 'Vitesse (km/h)', data: points.map(function(p){return p.speed}), borderColor: 'var(--pastel-blue-text)', backgroundColor: 'transparent', tension: 0.3, pointRadius: 2 },
+            { label: 'Distance (km)', data: points.map(function(p){return p.distance}), borderColor: 'var(--pastel-green-text)', backgroundColor: 'transparent', tension: 0.3, pointRadius: 2 }
+          ] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: c.text, font: { size: 10 } } } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } } } } }
+      })
+    }
+
+    // 11. Cardio durée cumulée
+    function renderCardioDurationChart() {
+      sdc('sportCardioDuration')
+      const ctx = document.getElementById('chart-sport-cardio-duration')
+      if (!ctx) return
+      const c = sct()
+      const buckets = buildWeekBuckets(sportDayRange(sportStatsPeriod))
+      const data = buckets.map(function(b) {
+        let sum = 0
+        workoutHistory.filter(function(w) { return w.date >= b.start && w.date <= b.end }).forEach(function(w) {
+          ;(w.exercises||[]).forEach(function(ex) { (ex.sets||[]).forEach(function(s) { if (s.duration) sum += s.duration }) })
+        })
+        return sum
+      })
+      sportCharts['sportCardioDuration'] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: buckets.map(function(b){return b.label}), datasets: [{ data: data, backgroundColor: 'var(--pastel-green-text)', borderRadius: 5, borderSkipped: false }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, callback: function(v){return v+' min'} }, beginAtZero: true } } }
+      })
+    }
+
+    function renderAllSportStats() {
+      if (typeof Chart === 'undefined') { setTimeout(renderAllSportStats, 300); return }
+      renderSportStatCards()
+      renderSportSessionsChart()
+      renderSportVolumeChart()
+      renderSportCaloriesChart()
+      renderSportProgsChart()
+      renderSportTopExChart()
+      populatePRSelect()
+      renderSportPRChart()
+      renderSportMusclesChart()
+      renderMuscleHeatList()
+      renderPushPullChart()
+      renderCardioSpeedChart()
+      renderCardioDurationChart()
+    }
 
 
     // ── HEADER ──
