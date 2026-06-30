@@ -4073,6 +4073,11 @@
       return g.type === 'program' ? g.items[iIdx] : g.item
     }
 
+    function refreshSweekIfVisible(dateStr) {
+      const card = document.getElementById('sweek-day-card')
+      if (card && card.style.display !== 'none' && sweekSelectedDate === dateStr) renderSweekDayCard()
+    }
+
     function toggleSdaySet(dateStr, gIdx, iIdx, setIdx) {
       const item = getPlanItem(dateStr, gIdx, iIdx)
       item.setsDone[setIdx] = !item.setsDone[setIdx]
@@ -4081,6 +4086,7 @@
       logSdayProgressToHistory(dateStr)
       renderSportDay()
       renderSweekGrid()
+      refreshSweekIfVisible(dateStr)
     }
 
     function seriesHasData(item) {
@@ -4101,6 +4107,7 @@
       logSdayProgressToHistory(dateStr)
       renderSportDay()
       renderSweekGrid()
+      refreshSweekIfVisible(dateStr)
     }
 
     // ── Quick log : demande/édite les valeurs de chaque série avant de cocher ──
@@ -4165,6 +4172,7 @@
       document.getElementById('modal-quick-log').classList.remove('open')
       renderSportDay()
       renderSweekGrid()
+      refreshSweekIfVisible(quickLogTarget.dateStr)
       quickLogTarget = null
     })
 
@@ -4245,20 +4253,45 @@
       } else {
         listEl.innerHTML = ''
         groups.forEach(function(g, gIdx) {
-          const row = document.createElement('div')
-          row.className = 'prog-lib-item'
-          const name = g.type === 'program' ? g.progEmoji + ' ' + g.progName : g.item.emoji + ' ' + g.item.name
-          const itemCount = g.type === 'program' ? g.items.length + ' exercices' : '1 exercice'
-          row.innerHTML = '<div class="prog-lib-info"><div class="prog-lib-name">' + name + '</div><div class="prog-lib-meta">' + itemCount + '</div></div>' +
-            '<button class="btn-icon" data-remove="' + gIdx + '"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>'
-          row.querySelector('[data-remove]').addEventListener('click', function(e) {
-            e.stopPropagation()
-            sportPlanning[sweekSelectedDate].splice(gIdx, 1)
-            saveSportPlanning()
-            renderSweekGrid()
-            renderSweekDayCard()
-          })
-          listEl.appendChild(row)
+          if (g.type === 'program') {
+            const groupWrap = document.createElement('div')
+            groupWrap.style.marginBottom = '0.875rem'
+            const headerRow = document.createElement('div')
+            headerRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;'
+            headerRow.innerHTML = '<div class="sday-prog-label" style="margin:0;">' + g.progEmoji + ' ' + g.progName + '</div>' +
+              '<button class="btn-icon" style="width:26px;height:26px;" data-remove-group="' + gIdx + '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>'
+            headerRow.querySelector('[data-remove-group]').addEventListener('click', function(e) {
+              e.stopPropagation()
+              sportPlanning[sweekSelectedDate].splice(gIdx, 1)
+              saveSportPlanning()
+              renderSweekGrid()
+              renderSweekDayCard()
+            })
+            groupWrap.appendChild(headerRow)
+            g.items.forEach(function(item, iIdx) {
+              groupWrap.appendChild(renderSdayExCard(sweekSelectedDate, gIdx, iIdx, item))
+            })
+            listEl.appendChild(groupWrap)
+          } else {
+            const wrap = document.createElement('div')
+            wrap.style.position = 'relative'
+            wrap.style.marginBottom = '0.625rem'
+            const exCard = renderSdayExCard(sweekSelectedDate, gIdx, null, g.item)
+            const removeBtn = document.createElement('button')
+            removeBtn.className = 'btn-icon'
+            removeBtn.style.cssText = 'position:absolute;top:0.5rem;right:2.75rem;width:26px;height:26px;'
+            removeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>'
+            removeBtn.addEventListener('click', function(e) {
+              e.stopPropagation()
+              sportPlanning[sweekSelectedDate].splice(gIdx, 1)
+              saveSportPlanning()
+              renderSweekGrid()
+              renderSweekDayCard()
+            })
+            wrap.appendChild(exCard)
+            wrap.appendChild(removeBtn)
+            listEl.appendChild(wrap)
+          }
         })
       }
       card.style.display = ''
