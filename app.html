@@ -1292,7 +1292,12 @@
           <option value="monthly">Mensuel</option>
           <option value="interval">Tous les X jours</option>
           <option value="weekdays">Jours spécifiques</option>
+          <option value="once">Ponctuelle (un seul jour)</option>
         </select>
+      </div>
+      <div class="form-group" id="freq-once-group" style="display:none;">
+        <label class="form-label">Date</label>
+        <input class="form-input" type="date" id="task-freq-once-date" />
       </div>
       <div class="form-group" id="freq-interval-group" style="display:none;">
         <label class="form-label">Intervalle (en jours)</label>
@@ -1454,7 +1459,11 @@
         const days = (task.freq_days || []).slice().sort()
         return days.map(function(d) { return names[d] }).join(', ') || 'Jours spécifiques'
       }
-      return { daily: 'Quotidien', weekly: 'Hebdomadaire', monthly: 'Mensuel', interval: 'Tous les X jours', weekdays: 'Jours spécifiques' }[f] || f
+      if (f === 'once' && task && task.freq_once_date) {
+        const d = new Date(task.freq_once_date + 'T12:00:00')
+        return 'Le ' + d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      }
+      return { daily: 'Quotidien', weekly: 'Hebdomadaire', monthly: 'Mensuel', interval: 'Tous les X jours', weekdays: 'Jours spécifiques', once: 'Ponctuelle' }[f] || f
     }
 
     // ── THEME ──
@@ -1710,6 +1719,9 @@
         const jsDay = d.getDay() // 0=dim ... 6=sam
         const isoDay = jsDay === 0 ? 7 : jsDay // 1=lun ... 7=dim
         return days.includes(isoDay)
+      }
+      if (task.frequency === 'once') {
+        return task.freq_once_date === dateStr
       }
       return true
     }
@@ -2359,6 +2371,7 @@
       const val = document.getElementById('task-freq-input').value
       document.getElementById('freq-interval-group').style.display = val === 'interval' ? '' : 'none'
       document.getElementById('freq-weekdays-group').style.display = val === 'weekdays' ? '' : 'none'
+      document.getElementById('freq-once-group').style.display = val === 'once' ? '' : 'none'
       if (val === 'weekdays') renderWeekdayPicker()
     }
     document.getElementById('task-freq-input').addEventListener('change', updateFreqFieldsVisibility)
@@ -2373,6 +2386,7 @@
       document.getElementById('task-name-input').value = ''
       document.getElementById('task-freq-input').value = 'daily'
       document.getElementById('task-freq-interval').value = ''
+      document.getElementById('task-freq-once-date').value = toDateStr(new Date())
       document.getElementById('modal-task-actions').innerHTML = `
         <button class="btn-secondary" id="modal-task-cancel">Annuler</button>
         <button class="btn-primary" id="modal-task-save">Créer la tâche</button>
@@ -2396,6 +2410,7 @@
       document.getElementById('task-name-input').value = task.name
       document.getElementById('task-freq-input').value = task.frequency
       document.getElementById('task-freq-interval').value = task.freq_interval || ''
+      document.getElementById('task-freq-once-date').value = task.freq_once_date || toDateStr(new Date())
       document.getElementById('modal-task-actions').innerHTML = `
         <button class="btn-danger" id="modal-task-delete">Supprimer</button>
         <button class="btn-primary" id="modal-task-save">Enregistrer</button>
@@ -2429,17 +2444,18 @@
       const freq = document.getElementById('task-freq-input').value
       const freqInterval = freq === 'interval' ? (parseInt(document.getElementById('task-freq-interval').value) || 1) : null
       const freqDays = freq === 'weekdays' ? [...selectedTaskWeekdays] : []
+      const freqOnceDate = freq === 'once' ? document.getElementById('task-freq-once-date').value : null
       const btn = document.getElementById('modal-task-save')
       btn.disabled = true
       const tagIds = [...selectedTaskTagIds]
 
       if (editingTaskId) {
-        await db.from('tasks').update({ name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays }).eq('id', editingTaskId)
+        await db.from('tasks').update({ name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays, freq_once_date: freqOnceDate }).eq('id', editingTaskId)
         const idx = tasks.findIndex(t => t.id === editingTaskId)
-        if (idx !== -1) tasks[idx] = { ...tasks[idx], name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays }
+        if (idx !== -1) tasks[idx] = { ...tasks[idx], name, frequency: freq, color: selectedTaskColor, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays, freq_once_date: freqOnceDate }
         showToast('Tâche modifiée')
       } else {
-        const { data } = await db.from('tasks').insert({ profile_id: profile.id, name, frequency: freq, color: selectedTaskColor, active: true, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays }).select().single()
+        const { data } = await db.from('tasks').insert({ profile_id: profile.id, name, frequency: freq, color: selectedTaskColor, active: true, tag_ids: tagIds, emoji: selectedTaskEmoji, freq_interval: freqInterval, freq_days: freqDays, freq_once_date: freqOnceDate }).select().single()
         if (data) tasks.push(data)
         showToast('Tâche créée')
       }
