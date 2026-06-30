@@ -1682,16 +1682,6 @@
         </div>
 
         <div class="chart-card">
-          <div class="chart-header"><span class="chart-title">Équilibre Push / Pull</span></div>
-          <div class="chart-canvas-wrap" style="height:140px;"><canvas id="chart-sport-pushpull"></canvas></div>
-        </div>
-
-        <div class="chart-card" id="sport-cardio-section">
-          <div class="chart-header"><span class="chart-title">Cardio — Vitesse / Distance</span></div>
-          <div class="chart-canvas-wrap"><canvas id="chart-sport-cardio-speed"></canvas></div>
-        </div>
-
-        <div class="chart-card">
           <div class="chart-header"><span class="chart-title">Cardio — Durée cumulée</span></div>
           <div class="chart-canvas-wrap"><canvas id="chart-sport-cardio-duration"></canvas></div>
         </div>
@@ -2950,7 +2940,8 @@
       if (!filtered.length) { listEl.innerHTML = '<div class="empty-state" style="padding:2.5rem;"><p>Aucun exercice trouvé.</p></div>'; return }
       listEl.innerHTML = ''
       filtered.forEach(function(ex) {
-        const pr = getExercisePR(ex.id)
+        const hasWeightMetric = (ex.metrics || ['reps']).includes('reps')
+        const pr = hasWeightMetric ? getExercisePR(ex.id) : null
         const div = document.createElement('div')
         div.className = 'ex-lib-item'
         const tagsHtml = (ex.muscles || []).map(function(m) { return '<span class="muscle-tag">' + m + '</span>' }).join('') +
@@ -2961,7 +2952,7 @@
           '<div class="ex-lib-meta">' + ex.cat + (ex.equip ? ' · ' + ex.equip : '') + '</div>' +
           (tagsHtml ? '<div class="ex-lib-tags">' + tagsHtml + '</div>' : '') +
           '</div>' +
-          '<div class="ex-lib-pr">' + (pr ? (Math.round(pr.weight * 10) / 10) + ' kg' : '—') + '<div class="ex-lib-pr-label">PR</div></div>'
+          (hasWeightMetric ? '<div class="ex-lib-pr">' + (pr ? (Math.round(pr.weight * 10) / 10) + ' kg' : '—') + '<div class="ex-lib-pr-label">PR</div></div>' : '')
         div.addEventListener('click', function() { openExDetail(ex.id) })
         listEl.appendChild(div)
       })
@@ -2974,7 +2965,8 @@
       const ex = exLibrary.find(function(e) { return e.id === id })
       if (!ex) return
       viewingExId = id
-      const pr = getExercisePR(id)
+      const hasWeightMetric = (ex.metrics || ['reps']).includes('reps')
+      const pr = hasWeightMetric ? getExercisePR(id) : null
       document.getElementById('ex-detail-title').textContent = ex.emoji + ' ' + ex.name
       const muscleTags = (ex.muscles || []).map(function(m) { return '<span class="muscle-tag">' + m + '</span>' }).join('') +
         (ex.submuscles || []).map(function(s) { return '<span class="muscle-tag sub">' + s + '</span>' }).join('')
@@ -2989,13 +2981,15 @@
       if (muscleTags) {
         html += '<div class="ex-detail-section"><div class="ex-detail-label">Muscles travaillés</div><div class="ex-lib-tags">' + muscleTags + '</div></div>'
       }
-      html += '<div class="ex-detail-section"><div class="ex-detail-label">Record personnel (PR)</div>'
-      if (pr) {
-        html += '<div class="ex-detail-pr-card"><div class="ex-detail-pr-value">' + (Math.round(pr.weight * 10) / 10) + ' kg</div><div class="ex-detail-pr-sub">' + (pr.reps ? Math.round(pr.reps) + ' répétitions · ' : '') + new Date(pr.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div></div>'
-      } else {
-        html += '<div class="ex-detail-pr-empty">Aucun PR enregistré pour l\'instant.<br/>Il se calculera automatiquement dès que tu logueras des séances avec cet exercice.</div>'
+      if (hasWeightMetric) {
+        html += '<div class="ex-detail-section"><div class="ex-detail-label">Record personnel (PR)</div>'
+        if (pr) {
+          html += '<div class="ex-detail-pr-card"><div class="ex-detail-pr-value">' + (Math.round(pr.weight * 10) / 10) + ' kg</div><div class="ex-detail-pr-sub">' + (pr.reps ? Math.round(pr.reps) + ' répétitions · ' : '') + new Date(pr.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div></div>'
+        } else {
+          html += '<div class="ex-detail-pr-empty">Aucun PR enregistré pour l\'instant.<br/>Il se calculera automatiquement dès que tu logueras des séances avec cet exercice.</div>'
+        }
+        html += '</div>'
       }
-      html += '</div>'
       document.getElementById('ex-detail-body').innerHTML = html
       document.getElementById('modal-ex-detail').classList.add('open')
     }
@@ -3693,7 +3687,7 @@
       const labels = Object.keys(counts)
       const data = labels.map(function(l) { return counts[l] })
       if (!labels.length) { sportCharts['sportProgs'] = null; return }
-      const palette = ['var(--pastel-blue)','var(--pastel-pink)','var(--pastel-green)','var(--pastel-amber)','var(--pastel-purple)']
+      const palette = ['#DCEAFB','#FBE3EC','#DFF3E3','#FBEAD2','#EBE2FB']
       sportCharts['sportProgs'] = new Chart(ctx, {
         type: 'doughnut',
         data: { labels: labels, datasets: [{ data: data, backgroundColor: palette, borderWidth: 0 }] },
@@ -3722,9 +3716,18 @@
     // 6. Évolution PR par exercice
     function populatePRSelect() {
       const sel = document.getElementById('sport-pr-ex-select')
+      const section = document.getElementById('sport-pr-section')
       const exNames = [...new Set(workoutHistory.flatMap(function(w){ return (w.exercises||[]).map(function(ex){return ex.name}) }))]
-      if (!exNames.length) { sel.innerHTML = '<option>Aucune séance enregistrée</option>'; return }
-      sel.innerHTML = exNames.map(function(n) { return '<option value="' + n + '">' + n + '</option>' }).join('')
+      const weightExNames = exNames.filter(function(name) {
+        return workoutHistory.some(function(w) {
+          return (w.exercises||[]).some(function(ex) {
+            return ex.name === name && (ex.metrics||[]).includes('reps') && (ex.sets||[]).some(function(s) { return s.weight != null })
+          })
+        })
+      })
+      if (!weightExNames.length) { if (section) section.style.display = 'none'; return }
+      if (section) section.style.display = ''
+      sel.innerHTML = weightExNames.map(function(n) { return '<option value="' + n + '">' + n + '</option>' }).join('')
     }
     function renderSportPRChart() {
       sdc('sportPR')
@@ -3746,7 +3749,7 @@
       sportCharts['sportPR'] = new Chart(ctx, {
         type: 'line',
         data: { labels: points.map(function(p){ return new Date(p.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) }), datasets: [{ data: points.map(function(p){return p.weight}), borderColor: 'var(--pastel-amber-text)', backgroundColor: 'transparent', tension: 0.3, pointRadius: 3, pointBackgroundColor: 'var(--pastel-amber-text)' }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, callback: function(v){return v+' kg'} } } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, stepSize: 10, callback: function(v){return v+' kg'} }, beginAtZero: true } } }
       })
     }
     document.getElementById('sport-pr-ex-select').addEventListener('change', renderSportPRChart)
@@ -3768,7 +3771,7 @@
       const labels = Object.keys(counts)
       if (!labels.length) { sportCharts['sportMuscles'] = null; return }
       const data = labels.map(function(l){return counts[l]})
-      const palette = ['var(--pastel-blue)','var(--pastel-pink)','var(--pastel-green)','var(--pastel-amber)','var(--pastel-purple)','#E0E0E0','#D4D4D4','#C8C8C8']
+      const palette = ['#DCEAFB','#FBE3EC','#DFF3E3','#FBEAD2','#EBE2FB','#E0E0E0','#D4D4D4','#C8C8C8']
       sportCharts['sportMuscles'] = new Chart(ctx, {
         type: 'doughnut',
         data: { labels: labels, datasets: [{ data: data, backgroundColor: palette, borderWidth: 0 }] },
@@ -3796,59 +3799,7 @@
       }).join('')
     }
 
-    // 9. Équilibre Push/Pull
-    const PUSH_MUSCLES = ['Pectoraux', 'Épaules', 'Bras']
-    const PULL_MUSCLES = ['Dos']
-    function renderPushPullChart() {
-      sdc('sportPushPull')
-      const ctx = document.getElementById('chart-sport-pushpull')
-      if (!ctx) return
-      const days = sportDayRange(sportStatsPeriod)
-      const ws = workoutsInRange(days)
-      let push = 0, pull = 0, other = 0
-      ws.forEach(function(w) {
-        ;(w.exercises||[]).forEach(function(wex) {
-          const libEx = exLibrary.find(function(e){return e.name===wex.name})
-          const muscles = (libEx && libEx.muscles) || []
-          if (muscles.some(function(m){return PUSH_MUSCLES.includes(m)})) push++
-          else if (muscles.some(function(m){return PULL_MUSCLES.includes(m)})) pull++
-          else other++
-        })
-      })
-      if (push+pull+other === 0) { sportCharts['sportPushPull'] = null; return }
-      sportCharts['sportPushPull'] = new Chart(ctx, {
-        type: 'doughnut',
-        data: { labels: ['Push', 'Pull', 'Autre'], datasets: [{ data: [push, pull, other], backgroundColor: ['var(--pastel-blue)','var(--pastel-pink)','var(--surface-2)'], borderWidth: 0 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: sct().text, padding: 8, font: { size: 10 } } } } }
-      })
-    }
-
-    // 10. Cardio vitesse/distance
-    function renderCardioSpeedChart() {
-      sdc('sportCardioSpeed')
-      const ctx = document.getElementById('chart-sport-cardio-speed')
-      if (!ctx) return
-      const c = sct()
-      const days = sportDayRange(sportStatsPeriod)
-      const ws = workoutsInRange(days).sort(function(a,b){return a.date.localeCompare(b.date)})
-      const points = []
-      ws.forEach(function(w) {
-        ;(w.exercises||[]).forEach(function(ex) {
-          ;(ex.sets||[]).forEach(function(s) { if (s.speed || s.distance) points.push({ date: w.date, speed: s.speed||0, distance: s.distance||0 }) })
-        })
-      })
-      sportCharts['sportCardioSpeed'] = new Chart(ctx, {
-        type: 'line',
-        data: { labels: points.map(function(p){return new Date(p.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}),
-          datasets: [
-            { label: 'Vitesse (km/h)', data: points.map(function(p){return p.speed}), borderColor: 'var(--pastel-blue-text)', backgroundColor: 'transparent', tension: 0.3, pointRadius: 2 },
-            { label: 'Distance (km)', data: points.map(function(p){return p.distance}), borderColor: 'var(--pastel-green-text)', backgroundColor: 'transparent', tension: 0.3, pointRadius: 2 }
-          ] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: c.text, font: { size: 10 } } } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } } } } }
-      })
-    }
-
-    // 11. Cardio durée cumulée
+    // 10. Cardio durée cumulée
     function renderCardioDurationChart() {
       sdc('sportCardioDuration')
       const ctx = document.getElementById('chart-sport-cardio-duration')
@@ -3881,8 +3832,6 @@
       renderSportPRChart()
       renderSportMusclesChart()
       renderMuscleHeatList()
-      renderPushPullChart()
-      renderCardioSpeedChart()
       renderCardioDurationChart()
     }
 
