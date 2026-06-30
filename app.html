@@ -2051,1020 +2051,1161 @@
 
     // ══════════════════════════════════════
 
+
     // ══════════════════════════════════════
-    // SPORT — JS COMPLET
+    // SPORT JS
     // ══════════════════════════════════════
 
     const SPORT_TYPES = ['Musculation','Cardio','Yoga','Running','Vélo','Natation','HIIT','Crossfit','Marche','Escalade','Tennis','Autre']
     const ALL_MUSCLES = ['Pectoraux','Dos','Épaules','Biceps','Triceps','Avant-bras','Jambes','Quadriceps','Ischio-jambiers','Fessiers','Mollets','Abdos','Lombaires','Full Body']
     const METRIC_TYPES = [
-      { id:'reps_weight', label:'Répétitions + Poids (kg)' },
-      { id:'duration', label:'Durée (min/sec)' },
-      { id:'distance', label:'Distance (km)' },
-      { id:'speed', label:'Vitesse (km/h)' },
-      { id:'resistance', label:'Résistance (niveau)' },
-      { id:'incline', label:'Inclinaison (%)' },
-      { id:'calories', label:'Calories' },
+      { id: 'reps_kg', label: 'Répétitions + Poids (kg)' },
+      { id: 'duration', label: 'Durée (min/sec)' },
+      { id: 'distance', label: 'Distance (km)' },
+      { id: 'speed', label: 'Vitesse (km/h)' },
+      { id: 'resistance', label: 'Résistance (niveau)' },
+      { id: 'incline', label: 'Inclinaison (%)' },
+      { id: 'calories', label: 'Calories' }
     ]
 
-    // Base d'exercices pré-remplie (stockée en localStorage)
     const DEFAULT_EXERCISES = [
-      { id:'e1', name:'Développé couché', emoji:'🏋️', cat:'Musculation', muscles:['Pectoraux','Triceps','Épaules'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e2', name:'Développé incliné', emoji:'💪', cat:'Musculation', muscles:['Pectoraux','Épaules'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e3', name:'Écarté haltères', emoji:'🦋', cat:'Musculation', muscles:['Pectoraux'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e4', name:'Tractions', emoji:'🧗', cat:'Musculation', muscles:['Dos','Biceps'], metrics:['reps_weight'], defaultSets:4 },
-      { id:'e5', name:'Rowing barre', emoji:'🚣', cat:'Musculation', muscles:['Dos','Biceps'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e6', name:'Tirage poulie haute', emoji:'⬇️', cat:'Musculation', muscles:['Dos','Biceps'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e7', name:'Rowing haltère', emoji:'💪', cat:'Musculation', muscles:['Dos'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e8', name:'Curl biceps barre', emoji:'💪', cat:'Musculation', muscles:['Biceps'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e9', name:'Curl haltères', emoji:'💪', cat:'Musculation', muscles:['Biceps','Avant-bras'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e10', name:'Extensions triceps', emoji:'💪', cat:'Musculation', muscles:['Triceps'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e11', name:'Dips', emoji:'⬇️', cat:'Musculation', muscles:['Triceps','Pectoraux'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e12', name:'Développé militaire', emoji:'🏋️', cat:'Musculation', muscles:['Épaules','Triceps'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e13', name:'Élévations latérales', emoji:'🦋', cat:'Musculation', muscles:['Épaules'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e14', name:'Face pull', emoji:'🎯', cat:'Musculation', muscles:['Épaules','Dos'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e15', name:'Squat barre', emoji:'🦵', cat:'Musculation', muscles:['Quadriceps','Fessiers','Lombaires'], metrics:['reps_weight'], defaultSets:4 },
-      { id:'e16', name:'Leg press', emoji:'🦵', cat:'Musculation', muscles:['Quadriceps','Fessiers'], metrics:['reps_weight'], defaultSets:4 },
-      { id:'e17', name:'Fentes', emoji:'🦵', cat:'Musculation', muscles:['Quadriceps','Fessiers'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e18', name:'Soulevé de terre', emoji:'🏋️', cat:'Musculation', muscles:['Dos','Fessiers','Ischio-jambiers','Lombaires'], metrics:['reps_weight'], defaultSets:4 },
-      { id:'e19', name:'Hip thrust', emoji:'🍑', cat:'Musculation', muscles:['Fessiers'], metrics:['reps_weight'], defaultSets:4 },
-      { id:'e20', name:'Leg curl', emoji:'🦵', cat:'Musculation', muscles:['Ischio-jambiers'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e21', name:'Mollets debout', emoji:'🦵', cat:'Musculation', muscles:['Mollets'], metrics:['reps_weight'], defaultSets:4 },
-      { id:'e22', name:'Crunch', emoji:'🎯', cat:'Musculation', muscles:['Abdos'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e23', name:'Planche', emoji:'🧘', cat:'Musculation', muscles:['Abdos','Lombaires'], metrics:['duration'], defaultSets:3 },
-      { id:'e24', name:'Russian twist', emoji:'🌀', cat:'Musculation', muscles:['Abdos'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e25', name:'Tapis de course', emoji:'🏃', cat:'Cardio', muscles:['Full Body','Mollets'], metrics:['duration','distance','speed','calories'], defaultSets:1 },
-      { id:'e26', name:'Vélo elliptique', emoji:'🚴', cat:'Cardio', muscles:['Full Body'], metrics:['duration','resistance','calories'], defaultSets:1 },
-      { id:'e27', name:'Rameur', emoji:'🚣', cat:'Cardio', muscles:['Full Body','Dos'], metrics:['duration','distance','calories'], defaultSets:1 },
-      { id:'e28', name:'Corde à sauter', emoji:'🪢', cat:'Cardio', muscles:['Full Body','Mollets'], metrics:['duration','calories'], defaultSets:3 },
-      { id:'e29', name:'Burpees', emoji:'🔥', cat:'Fonctionnel', muscles:['Full Body'], metrics:['reps_weight','duration'], defaultSets:3 },
-      { id:'e30', name:'Pompes', emoji:'💪', cat:'Fonctionnel', muscles:['Pectoraux','Triceps'], metrics:['reps_weight'], defaultSets:3 },
-      { id:'e31', name:'Squat sauté', emoji:'🦘', cat:'Fonctionnel', muscles:['Jambes','Full Body'], metrics:['reps_weight','duration'], defaultSets:3 },
-      { id:'e32', name:'Gainage latéral', emoji:'🧘', cat:'Fonctionnel', muscles:['Abdos','Lombaires'], metrics:['duration'], defaultSets:2 },
-      { id:'e33', name:'Running', emoji:'🏃', cat:'Cardio', muscles:['Jambes','Mollets'], metrics:['duration','distance','speed','calories'], defaultSets:1 },
-      { id:'e34', name:'Natation', emoji:'🏊', cat:'Cardio', muscles:['Full Body'], metrics:['duration','distance','calories'], defaultSets:1 },
-      { id:'e35', name:'Yoga flow', emoji:'🧘', cat:'Yoga', muscles:['Full Body'], metrics:['duration'], defaultSets:1 },
-      { id:'e36', name:'Étirements', emoji:'🌿', cat:'Yoga', muscles:['Full Body'], metrics:['duration'], defaultSets:1 },
+      { id:'de1', name:'Développé couché', emoji:'🏋️', cat:'Musculation', muscles:['Pectoraux','Triceps','Épaules'], metrics:['reps_kg'], sets:3 },
+      { id:'de2', name:'Développé incliné', emoji:'💪', cat:'Musculation', muscles:['Pectoraux','Épaules'], metrics:['reps_kg'], sets:3 },
+      { id:'de3', name:'Écarté haltères', emoji:'🦋', cat:'Musculation', muscles:['Pectoraux'], metrics:['reps_kg'], sets:3 },
+      { id:'de4', name:'Tractions', emoji:'🧗', cat:'Musculation', muscles:['Dos','Biceps'], metrics:['reps_kg'], sets:4 },
+      { id:'de5', name:'Rowing barre', emoji:'🚣', cat:'Musculation', muscles:['Dos','Biceps'], metrics:['reps_kg'], sets:3 },
+      { id:'de6', name:'Tirage poulie', emoji:'⬇️', cat:'Musculation', muscles:['Dos','Biceps'], metrics:['reps_kg'], sets:3 },
+      { id:'de7', name:'Curl biceps', emoji:'💪', cat:'Musculation', muscles:['Biceps'], metrics:['reps_kg'], sets:3 },
+      { id:'de8', name:'Extensions triceps', emoji:'💪', cat:'Musculation', muscles:['Triceps'], metrics:['reps_kg'], sets:3 },
+      { id:'de9', name:'Dips', emoji:'⬇️', cat:'Musculation', muscles:['Triceps','Pectoraux'], metrics:['reps_kg'], sets:3 },
+      { id:'de10', name:'Développé militaire', emoji:'🏋️', cat:'Musculation', muscles:['Épaules','Triceps'], metrics:['reps_kg'], sets:3 },
+      { id:'de11', name:'Élévations latérales', emoji:'🦋', cat:'Musculation', muscles:['Épaules'], metrics:['reps_kg'], sets:3 },
+      { id:'de12', name:'Squat barre', emoji:'🦵', cat:'Musculation', muscles:['Quadriceps','Fessiers','Lombaires'], metrics:['reps_kg'], sets:4 },
+      { id:'de13', name:'Leg press', emoji:'🦵', cat:'Musculation', muscles:['Quadriceps','Fessiers'], metrics:['reps_kg'], sets:4 },
+      { id:'de14', name:'Fentes', emoji:'🦵', cat:'Musculation', muscles:['Quadriceps','Fessiers'], metrics:['reps_kg'], sets:3 },
+      { id:'de15', name:'Soulevé de terre', emoji:'🏋️', cat:'Musculation', muscles:['Dos','Fessiers','Ischio-jambiers'], metrics:['reps_kg'], sets:4 },
+      { id:'de16', name:'Hip thrust', emoji:'🍑', cat:'Musculation', muscles:['Fessiers'], metrics:['reps_kg'], sets:4 },
+      { id:'de17', name:'Crunch', emoji:'🎯', cat:'Musculation', muscles:['Abdos'], metrics:['reps_kg'], sets:3 },
+      { id:'de18', name:'Planche', emoji:'🧘', cat:'Musculation', muscles:['Abdos','Lombaires'], metrics:['duration'], sets:3 },
+      { id:'de19', name:'Mollets debout', emoji:'🦵', cat:'Musculation', muscles:['Mollets'], metrics:['reps_kg'], sets:4 },
+      { id:'de20', name:'Tapis de course', emoji:'🏃', cat:'Cardio', muscles:['Jambes','Mollets'], metrics:['duration','distance','speed','calories'], sets:1 },
+      { id:'de21', name:'Vélo elliptique', emoji:'🚴', cat:'Cardio', muscles:['Full Body'], metrics:['duration','resistance','calories'], sets:1 },
+      { id:'de22', name:'Rameur', emoji:'🚣', cat:'Cardio', muscles:['Full Body','Dos'], metrics:['duration','distance','calories'], sets:1 },
+      { id:'de23', name:'Corde à sauter', emoji:'🪢', cat:'Cardio', muscles:['Full Body','Mollets'], metrics:['duration','calories'], sets:3 },
+      { id:'de24', name:'Running', emoji:'🏃', cat:'Cardio', muscles:['Jambes','Mollets'], metrics:['duration','distance','speed','calories'], sets:1 },
+      { id:'de25', name:'Natation', emoji:'🏊', cat:'Cardio', muscles:['Full Body'], metrics:['duration','distance','calories'], sets:1 },
+      { id:'de26', name:'Burpees', emoji:'🔥', cat:'Fonctionnel', muscles:['Full Body'], metrics:['reps_kg','duration'], sets:3 },
+      { id:'de27', name:'Pompes', emoji:'💪', cat:'Fonctionnel', muscles:['Pectoraux','Triceps'], metrics:['reps_kg'], sets:3 },
+      { id:'de28', name:'Gainage latéral', emoji:'🧘', cat:'Fonctionnel', muscles:['Abdos','Lombaires'], metrics:['duration'], sets:2 },
+      { id:'de29', name:'Yoga flow', emoji:'🧘', cat:'Yoga', muscles:['Full Body'], metrics:['duration'], sets:1 },
+      { id:'de30', name:'Étirements', emoji:'🌿', cat:'Yoga', muscles:['Full Body'], metrics:['duration'], sets:1 }
     ]
 
     let workouts = []
-    let exerciseLibrary = []
+    let exLibrary = []
     let sportTemplates = []
-    let sportExercises = [] // exercices dans le modal séance
-    let templateExercises = []
+    let seanceExos = []
+    let tmplExos = []
     let selectedSportType = 'Musculation'
-    let selectedTemplateType = 'Musculation'
-    let editingSportId = null
-    let editingTemplateId = null
+    let selectedTmplType = 'Musculation'
+    let editingSeanceId = null
     let editingExId = null
+    let editingTmplId = null
     let selectedExMuscles = []
-    let selectedExMetrics = ['reps_weight']
+    let selectedExMetrics = ['reps_kg']
     let weekOffset = 0
     let monthOffset = 0
-    let agendaSelectedDate = toDateStr(new Date())
-    let agendaView = 'week' // 'week' | 'month'
+    let agendaDate = toDateStr(new Date())
+    let agendaView = 'week'
     let sportCharts = {}
-    let freqP='month', volP='month', typesP='month', durP='month', musclesP='week'
-    let sessionData = { workoutId:null, title:'', date:'', exercises:[] }
-    let sessionStartTime = null
-    let sessionTimerInt = null
-    let sessionViewMode = 'list'
-    let focusExIdx = 0, focusSetIdx = 0
-    let pickCallback = null // callback when picking exercise from library
+    let sessionData = null
+    let sessionTimer = null
+    let sessionStart = null
+    let sessionView = 'list'
+    let focusExIdx = 0
+    let focusSetIdx = 0
+    let pickCb = null
+    let pickFilterCat = 'Tous'
+    let exFilterCat = 'Tous'
+    let exFilterMuscle = 'Tous'
+    let exSearch = ''
 
-    function toDateStr(d) { return d.toISOString().split('T')[0] }
+    // Storage
+    function loadExLibrary() {
+      const s = localStorage.getItem('tdv_ex_' + profile.id)
+      exLibrary = s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT_EXERCISES))
+    }
+    function saveExLibrary() { localStorage.setItem('tdv_ex_' + profile.id, JSON.stringify(exLibrary)) }
 
-    // ── Chargement ──
+    function loadTmpls() {
+      const s = localStorage.getItem('tdv_tmpls_' + profile.id)
+      sportTemplates = s ? JSON.parse(s) : []
+    }
+    function saveTmpls() { localStorage.setItem('tdv_tmpls_' + profile.id, JSON.stringify(sportTemplates)) }
+
+    // Load workouts
     async function loadWorkouts() {
-      const { data } = await db.from('workouts').select('*, workout_exercises(*)').eq('profile_id', profile.id).order('date', { ascending:false }).limit(100)
+      const { data } = await db.from('workouts').select('*, workout_exercises(*)').eq('profile_id', profile.id).order('date', { ascending: false }).limit(100)
       workouts = data || []
     }
 
-    function loadExerciseLibrary() {
-      const saved = localStorage.getItem('tdv_exercises_' + profile.id)
-      exerciseLibrary = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_EXERCISES))
+    // Stats
+    function updateSportStats() {
+      const now = new Date()
+      const ms = new Date(now.getFullYear(), now.getMonth(), 1)
+      const ws = new Date(now); ws.setDate(now.getDate() - ((now.getDay() + 6) % 7))
+      const tm = workouts.filter(function(w) { return new Date(w.date) >= ms })
+      const tw = workouts.filter(function(w) { return new Date(w.date) >= ws })
+      document.getElementById('ss-seances').textContent = tm.length
+      document.getElementById('ss-week').textContent = tw.length
+      document.getElementById('ss-exos').textContent = tm.reduce(function(s, w) { return s + (w.workout_exercises || []).length }, 0)
+      document.getElementById('ss-series').textContent = tm.reduce(function(s, w) {
+        return s + (w.workout_exercises || []).reduce(function(t, ex) {
+          return t + (Array.isArray(ex.sets) ? ex.sets.length : 0)
+        }, 0)
+      }, 0)
+      if (workouts.length) {
+        const tc = {}
+        workouts.forEach(function(w) { tc[w.type] = (tc[w.type] || 0) + 1 })
+        const best = Object.entries(tc).sort(function(a, b) { return b[1] - a[1] })[0]
+        document.getElementById('ss-type').textContent = best ? '+ fréq : ' + best[0] : '—'
+      }
+      document.getElementById('sport-subtitle').textContent = workouts.length + ' séance' + (workouts.length > 1 ? 's' : '')
     }
 
-    function saveExerciseLibrary() {
-      localStorage.setItem('tdv_exercises_' + profile.id, JSON.stringify(exerciseLibrary))
-    }
-
-    function loadSportTemplates() {
-      const saved = localStorage.getItem('tdv_templates_' + profile.id)
-      sportTemplates = saved ? JSON.parse(saved) : []
-    }
-
-    function saveSportTemplates() {
-      localStorage.setItem('tdv_templates_' + profile.id, JSON.stringify(sportTemplates))
-    }
-
-    // ── Sport tabs ──
+    // Sport tabs
     function initSportTabs() {
-      document.querySelectorAll('[data-sport-tab]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const tab = btn.dataset.sportTab
-          document.querySelectorAll('[data-sport-tab]').forEach(b => b.classList.remove('active'))
+      document.querySelectorAll('[data-stab]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const tab = btn.dataset.stab
+          document.querySelectorAll('[data-stab]').forEach(function(b) { b.classList.remove('active') })
           btn.classList.add('active')
-          document.querySelectorAll('.sport-view').forEach(v => v.classList.remove('active'))
-          document.getElementById('sport-view-' + tab)?.classList.add('active')
+          document.querySelectorAll('.sport-view').forEach(function(v) { v.classList.remove('active') })
+          document.getElementById('sv-' + tab).classList.add('active')
           if (tab === 'stats') setTimeout(renderAllCharts, 100)
-          if (tab === 'exercices') renderExerciseLibrary()
-          if (tab === 'programmes') renderTemplatesList()
+          if (tab === 'exercices') renderExLibrary()
+          if (tab === 'programmes') renderTemplates()
+          if (tab === 'historique') renderWorkoutsList()
           if (tab === 'agenda') renderAgendaView()
         })
       })
     }
 
-    // ── Stats rapides ──
-    function updateSportStats() {
-      const now = new Date()
-      const ms = new Date(now.getFullYear(), now.getMonth(), 1)
-      const ws = new Date(now); ws.setDate(now.getDate() - ((now.getDay()+6)%7))
-      const tm = workouts.filter(w => new Date(w.date) >= ms)
-      const tw = workouts.filter(w => new Date(w.date) >= ws)
-      const totalEx = tm.reduce((s,w) => s + (w.workout_exercises||[]).length, 0)
-      const totalSets = tm.reduce((s,w) => (w.workout_exercises||[]).reduce((t,ex) => t + (Array.isArray(ex.sets)?ex.sets.length:0), s), 0)
-      document.getElementById('s-stat-seances').textContent = tm.length
-      document.getElementById('s-stat-week').textContent = tw.length
-      document.getElementById('s-stat-exos').textContent = totalEx
-      document.getElementById('s-stat-series').textContent = totalSets
-      if (workouts.length) {
-        const tc = {}; workouts.forEach(w => { tc[w.type]=(tc[w.type]||0)+1 })
-        const best = Object.entries(tc).sort((a,b)=>b[1]-a[1])[0]
-        document.getElementById('s-stat-type').textContent = best ? '+ fréq : ' + best[0] : '—'
+    // Agenda
+    function renderAgendaView() {
+      if (agendaView === 'week') {
+        document.getElementById('sv-week').style.display = ''
+        document.getElementById('sv-month').style.display = 'none'
+        renderWeek()
+      } else {
+        document.getElementById('sv-week').style.display = 'none'
+        document.getElementById('sv-month').style.display = ''
+        renderMonth()
       }
-      document.getElementById('sport-subtitle').textContent = workouts.length + ' séance' + (workouts.length > 1 ? 's' : '')
     }
 
-    // ── Historique ──
+    document.getElementById('btn-sw').addEventListener('click', function() {
+      agendaView = 'week'
+      document.getElementById('btn-sw').classList.add('active')
+      document.getElementById('btn-sm').classList.remove('active')
+      renderAgendaView()
+    })
+    document.getElementById('btn-sm').addEventListener('click', function() {
+      agendaView = 'month'
+      document.getElementById('btn-sm').classList.add('active')
+      document.getElementById('btn-sw').classList.remove('active')
+      renderAgendaView()
+    })
+    document.getElementById('btn-wp').addEventListener('click', function() { weekOffset--; renderWeek() })
+    document.getElementById('btn-wn').addEventListener('click', function() { weekOffset++; renderWeek() })
+    document.getElementById('btn-mp').addEventListener('click', function() { monthOffset--; renderMonth() })
+    document.getElementById('btn-mn').addEventListener('click', function() { monthOffset++; renderMonth() })
+
+    function renderWeek() {
+      const now = new Date()
+      const mon = new Date(now)
+      mon.setDate(now.getDate() - ((now.getDay() + 6) % 7) + weekOffset * 7)
+      const sun = new Date(mon); sun.setDate(mon.getDate() + 6)
+      document.getElementById('week-title').textContent =
+        mon.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' – ' +
+        sun.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      const grid = document.getElementById('week-grid')
+      grid.innerHTML = ''
+      const todayStr = toDateStr(new Date())
+      const labels = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(mon); d.setDate(mon.getDate() + i)
+        const str = toDateStr(d)
+        const hasDone = workouts.some(function(w) { return w.date === str })
+        const isToday = str === todayStr
+        const isSel = str === agendaDate
+        let cls = 'week-day-cell'
+        if (hasDone) cls += ' has-done'
+        else if (isToday) cls += ' is-today'
+        if (isSel && !hasDone) cls += ' is-selected'
+        const col = document.createElement('div')
+        col.className = 'week-day-col'
+        col.innerHTML = '<div class="week-day-label">' + labels[i] + '</div><div class="' + cls + '"><span class="week-day-num">' + d.getDate() + '</span>' + (hasDone ? '<span class="week-day-dot"></span>' : '') + '</div>'
+        col.querySelector('.week-day-cell').addEventListener('click', function() {
+          agendaDate = str
+          renderWeek()
+          renderDayDetail('week-day-label', 'week-day-detail')
+        })
+        grid.appendChild(col)
+      }
+      renderDayDetail('week-day-label', 'week-day-detail')
+    }
+
+    function renderMonth() {
+      const now = new Date()
+      const display = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1)
+      document.getElementById('month-title').textContent = display.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+      const grid = document.getElementById('month-grid')
+      grid.innerHTML = ''
+      const todayStr = toDateStr(new Date())
+      const first = new Date(display.getFullYear(), display.getMonth(), 1)
+      const last = new Date(display.getFullYear(), display.getMonth() + 1, 0)
+      const startOff = (first.getDay() + 6) % 7
+      const total = Math.ceil((startOff + last.getDate()) / 7) * 7
+      for (let i = 0; i < total; i++) {
+        const d = new Date(display.getFullYear(), display.getMonth(), 1 - startOff + i)
+        const str = toDateStr(d)
+        const isCurr = d.getMonth() === display.getMonth()
+        const hasDone = workouts.some(function(w) { return w.date === str })
+        const isToday = str === todayStr
+        const isSel = str === agendaDate
+        let cls = 'month-cell'
+        if (!isCurr) cls += ' other-month'
+        if (isToday && !isSel) cls += ' is-today'
+        if (isSel) cls += ' is-selected'
+        if (hasDone) cls += ' has-done'
+        const cell = document.createElement('div')
+        cell.className = cls
+        cell.textContent = d.getDate()
+        cell.addEventListener('click', function() {
+          agendaDate = str
+          renderMonth()
+          renderDayDetail('month-day-label', 'month-day-detail')
+        })
+        grid.appendChild(cell)
+      }
+      renderDayDetail('month-day-label', 'month-day-detail')
+    }
+
+    function renderDayDetail(labelId, detailId) {
+      const lbl = document.getElementById(labelId)
+      const det = document.getElementById(detailId)
+      if (!lbl || !det) return
+      const d = new Date(agendaDate + 'T12:00:00')
+      const isToday = agendaDate === toDateStr(new Date())
+      lbl.textContent = isToday ? "Aujourd'hui" : d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+      const dayW = workouts.filter(function(w) { return w.date === agendaDate })
+      if (dayW.length === 0) {
+        det.innerHTML = '<div style="display:flex;gap:0.5rem;padding:0.5rem 0;">' +
+          '<button onclick="openAddSeance(\'' + agendaDate + '\')" style="flex:1;padding:0.5rem;border-radius:var(--radius-sm);border:0.5px solid var(--border-strong);background:transparent;font-size:0.8125rem;font-family:inherit;cursor:pointer;color:var(--text-secondary);">+ Séance libre</button>' +
+          '</div>'
+        return
+      }
+      det.innerHTML = ''
+      dayW.forEach(function(w) {
+        const exs = w.workout_exercises || []
+        const vol = exs.reduce(function(t, ex) {
+          return t + (Array.isArray(ex.sets) ? ex.sets : []).reduce(function(s, set) {
+            return s + ((set.reps || 0) * (set.weight || 0))
+          }, 0)
+        }, 0)
+        const div = document.createElement('div')
+        div.className = 'day-workout-item'
+        div.innerHTML = '<div style="flex:1;">' +
+          '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">' +
+          '<span class="workout-type-badge" style="background:#16A34A;">' + w.type + '</span>' +
+          '<span style="font-size:0.75rem;color:var(--text-muted);">' + (w.duration_minutes ? w.duration_minutes + ' min' : '') + (vol ? ' · ' + Math.round(vol) + ' kg' : '') + '</span>' +
+          '</div>' +
+          exs.map(function(ex) {
+            const libEx = exLibrary.find(function(e) { return e.name === ex.name }) || {}
+            const sets = Array.isArray(ex.sets) ? ex.sets : []
+            return '<div class="day-ex-row">' + (libEx.emoji || ex.emoji || '•') + ' ' + ex.name + ' — ' + sets.length + ' série' + (sets.length > 1 ? 's' : '') + '</div>'
+          }).join('') +
+          '</div>' +
+          '<button onclick="startSession(\'' + w.id + '\')" style="padding:0.3rem 0.625rem;border-radius:100px;border:0.5px solid var(--border-strong);background:transparent;font-size:0.75rem;font-family:inherit;cursor:pointer;">▶</button>'
+        det.appendChild(div)
+      })
+    }
+
+    // Historique
     function renderWorkoutsList() {
       const list = document.getElementById('workouts-list')
       if (!list) return
-      if (!workouts.length) { list.innerHTML = `<div class="empty-state"><p>Aucune séance.<br/>Ajoute ta première séance.</p></div>`; return }
+      if (!workouts.length) {
+        list.innerHTML = '<div class="empty-state"><p>Aucune séance.</p></div>'
+        return
+      }
       list.innerHTML = ''
-      workouts.slice(0,30).forEach(w => {
+      workouts.slice(0, 30).forEach(function(w) {
         const exs = w.workout_exercises || []
-        const d = new Date(w.date+'T12:00:00')
-        const ds = d.toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' })
-        const vol = exs.reduce((t,ex) => t + (Array.isArray(ex.sets)?ex.sets:[]).reduce((s,set) => s+((set.reps||0)*(set.weight||0)),0), 0)
+        const d = new Date(w.date + 'T12:00:00')
+        const ds = d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })
+        const vol = exs.reduce(function(t, ex) {
+          return t + (Array.isArray(ex.sets) ? ex.sets : []).reduce(function(s, set) {
+            return s + ((set.reps || 0) * (set.weight || 0))
+          }, 0)
+        }, 0)
+        const totalSets = exs.reduce(function(s, ex) { return s + (Array.isArray(ex.sets) ? ex.sets.length : 0) }, 0)
         const card = document.createElement('div')
         card.className = 'workout-card'
-        card.innerHTML = `
-          <div class="workout-card-header">
-            <span class="workout-type-badge">${w.type}</span>
-            <div class="workout-meta">
-              <div class="workout-date">${ds}</div>
-              <div class="workout-duration">${w.duration_minutes?w.duration_minutes+' min':''} · ${exs.length} ex. · ${exs.reduce((s,ex)=>s+(Array.isArray(ex.sets)?ex.sets.length:0),0)} séries${vol?' · '+Math.round(vol)+'kg':''}</div>
-            </div>
-            <div class="workout-chevron"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>
-          </div>
-          <div class="workout-body">
-            ${exs.map(ex => {
-              const libEx = exerciseLibrary.find(e => e.name === ex.name)
-              const sets = Array.isArray(ex.sets)?ex.sets:[]
-              return `<div class="ex-detail-row">
-                <span class="ex-emoji">${libEx?.emoji||ex.emoji||'•'}</span>
-                <div style="flex:1;">
-                  <div class="ex-detail-name">${ex.name}</div>
-                  <div class="ex-sets-row">${sets.map(s=>formatSetPill(s)).join('')}</div>
-                </div>
-              </div>`
-            }).join('')}
-            ${w.notes?`<div style="font-size:0.8125rem;color:var(--text-muted);margin-top:0.625rem;font-style:italic;">${w.notes}</div>`:''}
-            <div style="display:flex;gap:0.5rem;margin-top:0.875rem;padding-top:0.875rem;border-top:0.5px solid var(--border);">
-              <button class="btn-secondary" style="flex:1;font-size:0.8125rem;" onclick="openEditWorkout('${w.id}')">Modifier</button>
-              <button class="btn-danger" style="font-size:0.8125rem;" onclick="deleteWorkout('${w.id}')">Supprimer</button>
-            </div>
-          </div>`
+        card.innerHTML = '<div class="workout-card-header">' +
+          '<span class="workout-type-badge">' + w.type + '</span>' +
+          '<div class="workout-meta"><div class="workout-date">' + ds + '</div>' +
+          '<div class="workout-sub">' + exs.length + ' ex. · ' + totalSets + ' séries' + (vol ? ' · ' + Math.round(vol) + ' kg' : '') + (w.duration_minutes ? ' · ' + w.duration_minutes + ' min' : '') + '</div></div>' +
+          '<div class="workout-chevron"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div></div>' +
+          '<div class="workout-body">' +
+          exs.map(function(ex) {
+            const libEx = exLibrary.find(function(e) { return e.name === ex.name }) || {}
+            const sets = Array.isArray(ex.sets) ? ex.sets : []
+            return '<div class="ex-row"><span class="ex-emoji">' + (libEx.emoji || ex.emoji || '•') + '</span>' +
+              '<span class="ex-name">' + ex.name + '</span>' +
+              '<div class="ex-sets-wrap">' + sets.map(function(s) { return '<span class="set-pill">' + formatSet(s) + '</span>' }).join('') + '</div></div>'
+          }).join('') +
+          (w.notes ? '<div style="font-size:0.8125rem;color:var(--text-muted);margin-top:0.5rem;font-style:italic;">' + w.notes + '</div>' : '') +
+          '<div style="display:flex;gap:0.5rem;margin-top:0.875rem;padding-top:0.875rem;border-top:0.5px solid var(--border);">' +
+          '<button class="btn-secondary" style="flex:1;font-size:0.8125rem;" onclick="openEditSeance(\'' + w.id + '\')">Modifier</button>' +
+          '<button class="btn-danger" style="font-size:0.8125rem;" onclick="deleteWorkout(\'' + w.id + '\')">Supprimer</button>' +
+          '</div></div>'
         const hdr = card.querySelector('.workout-card-header')
         const body = card.querySelector('.workout-body')
         const chev = card.querySelector('.workout-chevron')
-        hdr.addEventListener('click', () => { body.classList.toggle('open'); chev.classList.toggle('open') })
+        hdr.addEventListener('click', function() { body.classList.toggle('open'); chev.classList.toggle('open') })
         list.appendChild(card)
       })
     }
 
-    function formatSetPill(s) {
+    function formatSet(s) {
       const parts = []
-      if (s.reps) parts.push(s.reps+'r')
-      if (s.weight) parts.push(s.weight+'kg')
-      if (s.duration) parts.push(s.duration+'\'')
-      if (s.distance) parts.push(s.distance+'km')
-      if (s.speed) parts.push(s.speed+'km/h')
-      if (s.resistance) parts.push('R'+s.resistance)
-      if (s.incline) parts.push(s.incline+'%')
-      if (s.calories) parts.push(s.calories+'kcal')
-      return `<span class="set-pill${s.done?' done':''}">${parts.join('·')||'—'}</span>`
+      if (s.reps) parts.push(s.reps + 'r')
+      if (s.weight) parts.push(s.weight + 'kg')
+      if (s.duration) parts.push(s.duration + 'min')
+      if (s.distance) parts.push(s.distance + 'km')
+      if (s.speed) parts.push(s.speed + 'km/h')
+      if (s.resistance) parts.push('R' + s.resistance)
+      if (s.incline) parts.push(s.incline + '%')
+      if (s.calories) parts.push(s.calories + 'kcal')
+      return parts.join('·') || '—'
     }
 
-    // ── AGENDA ──
-    function renderAgendaView() {
-      if (agendaView === 'week') {
-        document.getElementById('agenda-semaine').style.display = ''
-        document.getElementById('agenda-mois').style.display = 'none'
-        renderWeekView()
-      } else {
-        document.getElementById('agenda-semaine').style.display = 'none'
-        document.getElementById('agenda-mois').style.display = ''
-        renderMonthView()
-      }
-    }
-
-    // Toggle semaine/mois
-    document.getElementById('btn-agenda-week').addEventListener('click', () => {
-      agendaView = 'week'
-      document.getElementById('btn-agenda-week').classList.add('active')
-      document.getElementById('btn-agenda-month').classList.remove('active')
-      renderAgendaView()
-    })
-    document.getElementById('btn-agenda-month').addEventListener('click', () => {
-      agendaView = 'month'
-      document.getElementById('btn-agenda-month').classList.add('active')
-      document.getElementById('btn-agenda-week').classList.remove('active')
-      renderAgendaView()
-    })
-
-    // Vue Semaine
-    function renderWeekView() {
-      const now = new Date()
-      const mon = new Date(now); mon.setDate(now.getDate() - ((now.getDay()+6)%7) + weekOffset*7)
-      const sun = new Date(mon); sun.setDate(mon.getDate()+6)
-      document.getElementById('week-range-title').textContent =
-        mon.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) + ' – ' + sun.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})
-      const grid = document.getElementById('week-grid')
-      grid.innerHTML = ''
-      const labels = ['L','M','M','J','V','S','D']
-      const todayStr = toDateStr(new Date())
-      const planned = JSON.parse(localStorage.getItem('tdv_sport_planned_'+profile.id)||'{}')
-      for (let i=0;i<7;i++) {
-        const d = new Date(mon); d.setDate(mon.getDate()+i)
-        const str = toDateStr(d)
-        const isToday = str === todayStr
-        const isSel = str === agendaSelectedDate
-        const hasDone = workouts.some(w=>w.date===str)
-        const hasPlanned = !!planned[str]
-        const col = document.createElement('div')
-        col.className = 'week-day-col'
-        let cls = 'week-day-cell'
-        if (hasDone) cls += ' has-done'
-        else if (isToday) cls += ' is-today'
-        if (isSel) cls += ' is-selected'
-        col.innerHTML = `<div class="week-day-label">${labels[i]}</div>
-          <div class="${cls}">
-            <span class="week-day-num">${d.getDate()}</span>
-            ${(hasDone||hasPlanned)?'<span class="week-day-dot"></span>':''}
-          </div>`
-        col.querySelector('.week-day-cell').addEventListener('click', () => {
-          agendaSelectedDate = str
-          renderWeekView()
-          renderDayDetail('week-day-label','week-day-detail')
-        })
-        grid.appendChild(col)
-      }
-      renderDayDetail('week-day-label','week-day-detail')
-    }
-
-    // Vue Mois
-    function renderMonthView() {
-      const now = new Date()
-      const display = new Date(now.getFullYear(), now.getMonth()+monthOffset, 1)
-      document.getElementById('month-title').textContent = display.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})
-      const grid = document.getElementById('month-grid')
-      grid.innerHTML = ''
-      const todayStr = toDateStr(new Date())
-      const planned = JSON.parse(localStorage.getItem('tdv_sport_planned_'+profile.id)||'{}')
-      const firstDay = new Date(display.getFullYear(), display.getMonth(), 1)
-      const lastDay = new Date(display.getFullYear(), display.getMonth()+1, 0)
-      const startOff = (firstDay.getDay()+6)%7
-      const total = Math.ceil((startOff+lastDay.getDate())/7)*7
-      for (let i=0;i<total;i++) {
-        const d = new Date(display.getFullYear(), display.getMonth(), 1-startOff+i)
-        const str = toDateStr(d)
-        const isCurr = d.getMonth()===display.getMonth()
-        const isToday = str===todayStr
-        const isSel = str===agendaSelectedDate
-        const hasDone = workouts.some(w=>w.date===str)
-        const hasPlanned = !!planned[str]
-        let cls = 'month-cell'
-        if (!isCurr) cls += ' other-month'
-        if (isToday&&!isSel) cls += ' is-today'
-        if (isSel) cls += ' is-selected'
-        if (hasDone) cls += ' has-done'
-        else if (hasPlanned) cls += ' has-planned'
-        const cell = document.createElement('div')
-        cell.className = cls
-        cell.textContent = d.getDate()
-        cell.addEventListener('click', () => {
-          agendaSelectedDate = str
-          renderMonthView()
-          renderDayDetail('month-day-label','month-day-detail')
-        })
-        grid.appendChild(cell)
-      }
-      renderDayDetail('month-day-label','month-day-detail')
-    }
-
-    // Détail d'un jour (partagé semaine/mois)
-    function renderDayDetail(labelId, detailId) {
-      const labelEl = document.getElementById(labelId)
-      const detailEl = document.getElementById(detailId)
-      if (!labelEl||!detailEl) return
-      const d = new Date(agendaSelectedDate+'T12:00:00')
-      const isToday = agendaSelectedDate===toDateStr(new Date())
-      labelEl.textContent = isToday ? "Aujourd'hui" : d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})
-      const planned = JSON.parse(localStorage.getItem('tdv_sport_planned_'+profile.id)||'{}')
-      const dayW = workouts.filter(w=>w.date===agendaSelectedDate)
-      const dayP = planned[agendaSelectedDate]
-      let html = ''
-      if (dayW.length) {
-        dayW.forEach(w => {
-          const exs = w.workout_exercises||[]
-          html += `<div class="day-workout-row">
-            <span class="workout-type-badge" style="background:#16A34A;">${w.type}</span>
-            <div style="flex:1;">
-              <div style="font-size:0.8125rem;font-weight:500;">${w.duration_minutes?w.duration_minutes+' min':''}</div>
-              <div class="day-ex-list">${exs.map(ex=>{
-                const libEx=exerciseLibrary.find(e=>e.name===ex.name)
-                const sets=Array.isArray(ex.sets)?ex.sets:[]
-                return `<div class="day-ex-item">${libEx?.emoji||'•'} ${ex.name} — ${sets.length} série${sets.length>1?'s':''}</div>`
-              }).join('')}</div>
-            </div>
-            <button onclick="startLiveSession('${w.id}')" style="padding:0.3rem 0.625rem;border-radius:100px;border:0.5px solid var(--border-strong);background:transparent;font-size:0.75rem;font-family:inherit;cursor:pointer;">▶</button>
-          </div>`
-        })
-      } else if (dayP) {
-        html = `<div class="day-workout-row">
-          <span class="workout-type-badge">${dayP}</span>
-          <span style="flex:1;font-size:0.8125rem;color:var(--text-muted);">Planifiée</span>
-          <button onclick="startPlannedSession('${agendaSelectedDate}','${dayP}')" style="padding:0.3rem 0.875rem;border-radius:100px;border:none;background:var(--accent);color:var(--bg);font-size:0.75rem;font-family:inherit;cursor:pointer;font-weight:600;">Démarrer</button>
-        </div>`
-      } else {
-        html = `<div style="display:flex;gap:0.5rem;padding:0.5rem 0;">
-          <button onclick="openAddWorkout('${agendaSelectedDate}')" style="flex:1;padding:0.5rem;border-radius:var(--radius-sm);border:0.5px solid var(--border-strong);background:transparent;font-size:0.8125rem;font-family:inherit;cursor:pointer;color:var(--text-secondary);">+ Séance libre</button>
-          <button onclick="planDay('${agendaSelectedDate}')" style="flex:1;padding:0.5rem;border-radius:var(--radius-sm);border:0.5px solid var(--border-strong);background:transparent;font-size:0.8125rem;font-family:inherit;cursor:pointer;color:var(--text-secondary);">📅 Planifier</button>
-        </div>`
-      }
-      detailEl.innerHTML = html
-    }
-
-    window.planDay = function(date) {
-      const type = prompt('Quel type de séance ?\n'+SPORT_TYPES.join(', '))
-      if (!type) return
-      const p = JSON.parse(localStorage.getItem('tdv_sport_planned_'+profile.id)||'{}')
-      p[date]=type; localStorage.setItem('tdv_sport_planned_'+profile.id,JSON.stringify(p))
-      renderAgendaView(); showToast('Séance planifiée')
-    }
-
-    // Navigation
-    document.getElementById('btn-week-prev').addEventListener('click',()=>{weekOffset--;renderWeekView()})
-    document.getElementById('btn-week-next').addEventListener('click',()=>{weekOffset++;renderWeekView()})
-    document.getElementById('btn-month-prev').addEventListener('click',()=>{monthOffset--;renderMonthView()})
-    document.getElementById('btn-month-next').addEventListener('click',()=>{monthOffset++;renderMonthView()})
-
-    // ── BIBLIOTHÈQUE EXERCICES ──
-    let exFilterCat = 'Tous', exFilterMuscle = 'Tous', exSearch = ''
-
-    function renderExerciseLibrary() {
-      // Filtres catégories
+    // Exercise library
+    function renderExLibrary() {
       const catEl = document.getElementById('ex-filter-cats')
       if (catEl) {
-        const cats = ['Tous', ...new Set(exerciseLibrary.map(e=>e.cat))]
-        catEl.innerHTML = cats.map(c=>`<button class="filter-chip${c===exFilterCat?' active':''}" data-cat="${c}">${c}</button>`).join('')
-        catEl.querySelectorAll('[data-cat]').forEach(btn=>{
-          btn.addEventListener('click',()=>{exFilterCat=btn.dataset.cat;renderExerciseLibrary()})
-        })
+        const cats = ['Tous'].concat(Array.from(new Set(exLibrary.map(function(e) { return e.cat }))))
+        catEl.innerHTML = cats.map(function(c) {
+          return '<button class="filter-chip' + (c === exFilterCat ? ' active' : '') + '" onclick="setExCat(\'' + c + '\')">' + c + '</button>'
+        }).join('')
       }
-      // Filtres muscles
       const musEl = document.getElementById('ex-filter-muscles')
       if (musEl) {
         const mset = new Set(['Tous'])
-        exerciseLibrary.forEach(e=>(e.muscles||[]).forEach(m=>mset.add(m)))
-        musEl.innerHTML = [...mset].map(m=>`<button class="filter-chip${m===exFilterMuscle?' active':''}" data-mus="${m}">${m}</button>`).join('')
-        musEl.querySelectorAll('[data-mus]').forEach(btn=>{
-          btn.addEventListener('click',()=>{exFilterMuscle=btn.dataset.mus;renderExerciseLibrary()})
-        })
+        exLibrary.forEach(function(e) { (e.muscles || []).forEach(function(m) { mset.add(m) }) })
+        musEl.innerHTML = Array.from(mset).map(function(m) {
+          return '<button class="filter-chip' + (m === exFilterMuscle ? ' active' : '') + '" onclick="setExMuscle(\'' + m + '\')">' + m + '</button>'
+        }).join('')
       }
-      // Liste filtrée
-      const listEl = document.getElementById('ex-library-list')
+      const listEl = document.getElementById('ex-list')
       if (!listEl) return
-      let filtered = exerciseLibrary.filter(e=>{
-        const matchCat = exFilterCat==='Tous'||e.cat===exFilterCat
-        const matchMus = exFilterMuscle==='Tous'||(e.muscles||[]).includes(exFilterMuscle)
-        const matchSearch = !exSearch||e.name.toLowerCase().includes(exSearch.toLowerCase())
-        return matchCat&&matchMus&&matchSearch
+      const filtered = exLibrary.filter(function(e) {
+        const mc = exFilterCat === 'Tous' || e.cat === exFilterCat
+        const mm = exFilterMuscle === 'Tous' || (e.muscles || []).includes(exFilterMuscle)
+        const ms = !exSearch || e.name.toLowerCase().includes(exSearch.toLowerCase())
+        return mc && mm && ms
       })
-      if (!filtered.length) { listEl.innerHTML=`<div class="empty-state" style="padding:2rem;"><p>Aucun exercice trouvé.</p></div>`; return }
+      if (!filtered.length) { listEl.innerHTML = '<div class="empty-state" style="padding:2rem;"><p>Aucun exercice.</p></div>'; return }
       listEl.innerHTML = ''
-      filtered.forEach(ex=>{
-        const div=document.createElement('div')
-        div.className='ex-lib-item'
-        div.innerHTML=`
-          <div class="ex-lib-emoji">${ex.emoji||'•'}</div>
-          <div class="ex-lib-info">
-            <div class="ex-lib-name">${ex.name}</div>
-            <div class="ex-lib-meta">${ex.cat}${ex.muscles?.length?' · '+ex.muscles.join(', '):''}</div>
-            <div class="ex-lib-muscles">${(ex.metrics||[]).map(m=>METRIC_TYPES.find(t=>t.id===m)?.label||m).map(l=>`<span class="muscle-tag">${l}</span>`).join('')}</div>
-          </div>
-          <button class="btn-icon" onclick="openEditExercise('${ex.id}')" style="width:32px;height:32px;flex-shrink:0;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>`
+      filtered.forEach(function(ex) {
+        const div = document.createElement('div')
+        div.className = 'ex-lib-item'
+        div.innerHTML = '<div class="ex-lib-emoji">' + (ex.emoji || '•') + '</div>' +
+          '<div class="ex-lib-info"><div class="ex-lib-name">' + ex.name + '</div>' +
+          '<div class="ex-lib-meta">' + ex.cat + (ex.muscles && ex.muscles.length ? ' · ' + ex.muscles.join(', ') : '') + '</div>' +
+          '<div>' + (ex.metrics || []).map(function(m) {
+            const mt = METRIC_TYPES.find(function(t) { return t.id === m })
+            return mt ? '<span class="muscle-tag">' + mt.label + '</span>' : ''
+          }).join('') + '</div></div>' +
+          '<button class="btn-icon" onclick="openEditEx(\'' + ex.id + '\')" style="width:32px;height:32px;flex-shrink:0;">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'
         listEl.appendChild(div)
       })
     }
 
-    document.getElementById('ex-search').addEventListener('input',e=>{exSearch=e.target.value;renderExerciseLibrary()})
+    window.setExCat = function(c) { exFilterCat = c; renderExLibrary() }
+    window.setExMuscle = function(m) { exFilterMuscle = m; renderExLibrary() }
+    document.getElementById('ex-search').addEventListener('input', function(e) { exSearch = e.target.value; renderExLibrary() })
 
     // Modal exercice
-    function openNewExercise() {
+    function openNewEx() {
       editingExId = null
       selectedExMuscles = []
-      selectedExMetrics = ['reps_weight']
+      selectedExMetrics = ['reps_kg']
       document.getElementById('modal-ex-title').textContent = 'Nouvel exercice'
-      document.getElementById('ex-name-input').value = ''
-      document.getElementById('ex-emoji-input').value = ''
-      document.getElementById('ex-cat-input').value = 'Musculation'
-      document.getElementById('ex-default-sets').value = '3'
-      document.getElementById('modal-ex-actions').innerHTML = `<button class="btn-secondary" id="modal-ex-cancel">Annuler</button><button class="btn-primary" id="modal-ex-save">Enregistrer</button>`
-      bindExModalButtons()
-      renderExMusclesPicker(); renderExMetricsPicker()
-      document.getElementById('modal-exercise').classList.add('open')
+      document.getElementById('ex-nom').value = ''
+      document.getElementById('ex-emoji').value = ''
+      document.getElementById('ex-cat').value = 'Musculation'
+      document.getElementById('ex-def-sets').value = '3'
+      document.getElementById('ex-editing-id').value = ''
+      document.getElementById('ex-actions').innerHTML = '<button class="btn-secondary" onclick="closeExModal()">Annuler</button><button class="btn-primary" onclick="saveEx()">Enregistrer</button>'
+      renderExMusclesPicker()
+      renderExMetricsPicker()
+      document.getElementById('modal-exercice').classList.add('open')
     }
 
-    window.openEditExercise = function(id) {
-      const ex = exerciseLibrary.find(e=>e.id===id)
+    window.openEditEx = function(id) {
+      const ex = exLibrary.find(function(e) { return e.id === id })
       if (!ex) return
       editingExId = id
-      selectedExMuscles = [...(ex.muscles||[])]
-      selectedExMetrics = [...(ex.metrics||['reps_weight'])]
-      document.getElementById('modal-ex-title').textContent = 'Modifier l\'exercice'
-      document.getElementById('ex-name-input').value = ex.name
-      document.getElementById('ex-emoji-input').value = ex.emoji||''
-      document.getElementById('ex-cat-input').value = ex.cat||'Musculation'
-      document.getElementById('ex-default-sets').value = ex.defaultSets||3
-      document.getElementById('modal-ex-actions').innerHTML = `<button class="btn-danger" id="modal-ex-delete">Supprimer</button><button class="btn-primary" id="modal-ex-save">Enregistrer</button>`
-      bindExModalButtons()
-      renderExMusclesPicker(); renderExMetricsPicker()
-      document.getElementById('modal-exercise').classList.add('open')
+      selectedExMuscles = (ex.muscles || []).slice()
+      selectedExMetrics = (ex.metrics || ['reps_kg']).slice()
+      document.getElementById('modal-ex-title').textContent = "Modifier l'exercice"
+      document.getElementById('ex-nom').value = ex.name
+      document.getElementById('ex-emoji').value = ex.emoji || ''
+      document.getElementById('ex-cat').value = ex.cat || 'Musculation'
+      document.getElementById('ex-def-sets').value = ex.sets || 3
+      document.getElementById('ex-editing-id').value = id
+      document.getElementById('ex-actions').innerHTML = '<button class="btn-danger" onclick="deleteEx(\'' + id + '\')">Supprimer</button><button class="btn-primary" onclick="saveEx()">Enregistrer</button>'
+      renderExMusclesPicker()
+      renderExMetricsPicker()
+      document.getElementById('modal-exercice').classList.add('open')
     }
 
-    function closeExModal() { document.getElementById('modal-exercise').classList.remove('open') }
-
-    function bindExModalButtons() {
-      document.getElementById('modal-ex-cancel')?.addEventListener('click', closeExModal)
-      document.getElementById('modal-ex-delete')?.addEventListener('click', () => {
-        exerciseLibrary = exerciseLibrary.filter(e=>e.id!==editingExId)
-        saveExerciseLibrary(); closeExModal(); renderExerciseLibrary(); showToast('Exercice supprimé')
-      })
-      document.getElementById('modal-ex-save').addEventListener('click', saveExercise)
-    }
+    window.closeExModal = function() { document.getElementById('modal-exercice').classList.remove('open') }
 
     function renderExMusclesPicker() {
       const el = document.getElementById('ex-muscles-picker')
       if (!el) return
-      el.innerHTML = ALL_MUSCLES.map(m=>{
+      el.innerHTML = ALL_MUSCLES.map(function(m) {
         const sel = selectedExMuscles.includes(m)
-        return `<button style="padding:0.3rem 0.625rem;border-radius:100px;border:0.5px solid ${sel?'var(--accent)':'var(--border-strong)'};background:${sel?'var(--accent)':'transparent'};color:${sel?'var(--bg)':'var(--text-secondary)'};font-size:0.75rem;font-family:inherit;cursor:pointer;transition:all 0.18s;" onclick="toggleExMuscle('${m}')">${m}</button>`
+        return '<button style="padding:0.3rem 0.625rem;border-radius:100px;border:0.5px solid ' + (sel ? 'var(--accent)' : 'var(--border-strong)') + ';background:' + (sel ? 'var(--accent)' : 'transparent') + ';color:' + (sel ? 'var(--bg)' : 'var(--text-secondary)') + ';font-size:0.75rem;font-family:inherit;cursor:pointer;margin:2px;" onclick="toggleExMuscle(\'' + m + '\')">' + m + '</button>'
       }).join('')
     }
-
     window.toggleExMuscle = function(m) {
-      selectedExMuscles = selectedExMuscles.includes(m) ? selectedExMuscles.filter(x=>x!==m) : [...selectedExMuscles,m]
+      if (selectedExMuscles.includes(m)) selectedExMuscles = selectedExMuscles.filter(function(x) { return x !== m })
+      else selectedExMuscles.push(m)
       renderExMusclesPicker()
     }
 
     function renderExMetricsPicker() {
       const el = document.getElementById('ex-metrics-picker')
       if (!el) return
-      el.innerHTML = METRIC_TYPES.map(mt=>{
+      el.innerHTML = METRIC_TYPES.map(function(mt) {
         const sel = selectedExMetrics.includes(mt.id)
-        return `<label style="display:flex;align-items:center;gap:0.625rem;cursor:pointer;padding:0.375rem 0;">
-          <input type="checkbox" ${sel?'checked':''} onchange="toggleExMetric('${mt.id}',this.checked)" style="accent-color:var(--accent);width:16px;height:16px;" />
-          <span style="font-size:0.875rem;">${mt.label}</span>
-        </label>`
+        return '<label class="metric-option"><input type="checkbox" ' + (sel ? 'checked' : '') + ' onchange="toggleExMetric(\'' + mt.id + '\',this.checked)" /><span>' + mt.label + '</span></label>'
       }).join('')
     }
-
     window.toggleExMetric = function(id, checked) {
-      selectedExMetrics = checked ? [...selectedExMetrics,id] : selectedExMetrics.filter(x=>x!==id)
+      if (checked) selectedExMetrics.push(id)
+      else selectedExMetrics = selectedExMetrics.filter(function(x) { return x !== id })
     }
 
-    function saveExercise() {
-      const name = document.getElementById('ex-name-input').value.trim()
+    window.saveEx = function() {
+      const name = document.getElementById('ex-nom').value.trim()
       if (!name) return
       const ex = {
-        id: editingExId || ('e'+Date.now()),
-        name,
-        emoji: document.getElementById('ex-emoji-input').value.trim()||'•',
-        cat: document.getElementById('ex-cat-input').value,
-        muscles: [...selectedExMuscles],
-        metrics: [...selectedExMetrics],
-        defaultSets: parseInt(document.getElementById('ex-default-sets').value)||3
+        id: editingExId || ('ex' + Date.now()),
+        name: name,
+        emoji: document.getElementById('ex-emoji').value.trim() || '•',
+        cat: document.getElementById('ex-cat').value,
+        muscles: selectedExMuscles.slice(),
+        metrics: selectedExMetrics.slice(),
+        sets: parseInt(document.getElementById('ex-def-sets').value) || 3
       }
-      if (editingExId) exerciseLibrary = exerciseLibrary.map(e=>e.id===editingExId?ex:e)
-      else exerciseLibrary.push(ex)
-      saveExerciseLibrary(); closeExModal(); renderExerciseLibrary(); showToast('Exercice enregistré')
+      if (editingExId) exLibrary = exLibrary.map(function(e) { return e.id === editingExId ? ex : e })
+      else exLibrary.push(ex)
+      saveExLibrary()
+      closeExModal()
+      renderExLibrary()
+      showToast('Exercice enregistré')
+    }
+
+    window.deleteEx = function(id) {
+      exLibrary = exLibrary.filter(function(e) { return e.id !== id })
+      saveExLibrary()
+      closeExModal()
+      renderExLibrary()
+      showToast('Exercice supprimé')
     }
 
     document.getElementById('modal-ex-close').addEventListener('click', closeExModal)
-    document.getElementById('modal-exercise').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeExModal() })
-    document.getElementById('btn-new-exercise').addEventListener('click', openNewExercise)
+    document.getElementById('modal-exercice').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeExModal() })
+    document.getElementById('btn-new-ex').addEventListener('click', openNewEx)
 
-    // ── PICK EXERCISE FROM LIBRARY ──
-    let pickFilterCat = 'Tous'
-
-    function openPickExercise(callback) {
-      pickCallback = callback
+    // Pick exercise
+    function openPickEx(cb) {
+      pickCb = cb
       pickFilterCat = 'Tous'
       document.getElementById('pick-search').value = ''
       renderPickList('')
-      document.getElementById('modal-pick-exercise').classList.add('open')
+      document.getElementById('modal-pick-ex').classList.add('open')
     }
 
     function renderPickList(search) {
-      const filterEl = document.getElementById('pick-filter')
-      const cats = ['Tous',...new Set(exerciseLibrary.map(e=>e.cat))]
-      filterEl.innerHTML = cats.map(c=>`<button class="filter-chip${c===pickFilterCat?' active':''}" onclick="setPickCat('${c}')">${c}</button>`).join('')
+      const cats = ['Tous'].concat(Array.from(new Set(exLibrary.map(function(e) { return e.cat }))))
+      document.getElementById('pick-filter-cats').innerHTML = cats.map(function(c) {
+        return '<button class="filter-chip' + (c === pickFilterCat ? ' active' : '') + '" onclick="setPickCat(\'' + c + '\')">' + c + '</button>'
+      }).join('')
       const listEl = document.getElementById('pick-list')
-      const filtered = exerciseLibrary.filter(e=>{
-        const matchCat = pickFilterCat==='Tous'||e.cat===pickFilterCat
-        const matchSearch = !search||e.name.toLowerCase().includes(search.toLowerCase())
-        return matchCat&&matchSearch
+      const filtered = exLibrary.filter(function(e) {
+        const mc = pickFilterCat === 'Tous' || e.cat === pickFilterCat
+        const ms = !search || e.name.toLowerCase().includes(search.toLowerCase())
+        return mc && ms
       })
       listEl.innerHTML = ''
-      filtered.forEach(ex=>{
-        const div=document.createElement('div')
-        div.className='ex-lib-item'
-        div.style.cursor='pointer'
-        div.innerHTML=`<div class="ex-lib-emoji">${ex.emoji||'•'}</div>
-          <div class="ex-lib-info">
-            <div class="ex-lib-name">${ex.name}</div>
-            <div class="ex-lib-meta">${ex.muscles?.join(', ')||''}</div>
-          </div>`
-        div.addEventListener('click',()=>{
-          if (pickCallback) pickCallback(ex)
-          document.getElementById('modal-pick-exercise').classList.remove('open')
+      filtered.forEach(function(ex) {
+        const div = document.createElement('div')
+        div.className = 'ex-lib-item'
+        div.style.cursor = 'pointer'
+        div.innerHTML = '<div class="ex-lib-emoji">' + (ex.emoji || '•') + '</div><div class="ex-lib-info"><div class="ex-lib-name">' + ex.name + '</div><div class="ex-lib-meta">' + (ex.muscles || []).join(', ') + '</div></div>'
+        div.addEventListener('click', function() {
+          if (pickCb) pickCb(ex)
+          document.getElementById('modal-pick-ex').classList.remove('open')
         })
         listEl.appendChild(div)
       })
     }
 
-    window.setPickCat = function(c) { pickFilterCat=c; renderPickList(document.getElementById('pick-search').value) }
-    document.getElementById('pick-search').addEventListener('input',e=>renderPickList(e.target.value))
-    document.getElementById('modal-pick-close').addEventListener('click',()=>document.getElementById('modal-pick-exercise').classList.remove('open'))
-    document.getElementById('modal-pick-exercise').addEventListener('click',e=>{ if(e.target===e.currentTarget) document.getElementById('modal-pick-exercise').classList.remove('open') })
+    window.setPickCat = function(c) { pickFilterCat = c; renderPickList(document.getElementById('pick-search').value) }
+    document.getElementById('pick-search').addEventListener('input', function(e) { renderPickList(e.target.value) })
+    document.getElementById('modal-pick-close').addEventListener('click', function() { document.getElementById('modal-pick-ex').classList.remove('open') })
+    document.getElementById('modal-pick-ex').addEventListener('click', function(e) { if (e.target === e.currentTarget) document.getElementById('modal-pick-ex').classList.remove('open') })
 
-    // ── MODAL SÉANCE ──
-    function renderSportTypeGrid(containerId, selected) {
-      const g = document.getElementById(containerId)
-      if (!g) return
-      g.innerHTML = ''
-      SPORT_TYPES.forEach(t=>{
-        const btn=document.createElement('button')
-        btn.className='sport-type-btn'+(t===selected?' selected':'')
-        btn.textContent=t
-        btn.addEventListener('click',()=>{
-          if (containerId==='sport-type-grid') selectedSportType=t
-          else selectedTemplateType=t
-          renderSportTypeGrid(containerId,t)
-        })
-        g.appendChild(btn)
-      })
-    }
-
-    function renderExercisesBuilder(containerId, exList) {
-      const builder = document.getElementById(containerId)
-      if (!builder) return
-      builder.innerHTML = ''
-      exList.forEach((ex,exIdx)=>{
-        const libEx = exerciseLibrary.find(e=>e.name===ex.name)||{}
-        const metrics = libEx.metrics||['reps_weight']
-        const div=document.createElement('div')
-        div.className='exercise-builder'
-        div.innerHTML=`
-          <div class="exercise-builder-header">
-            <span style="font-size:1.125rem;flex-shrink:0;">${ex.emoji||libEx.emoji||'•'}</span>
-            <input class="set-input" style="flex:1;padding:0.375rem 0.5rem;font-weight:500;font-size:0.9375rem;" placeholder="Nom" value="${ex.name}" />
-            <button class="btn-remove-set" data-remove="${exIdx}">×</button>
-          </div>
-          <div class="sets-list">
-            ${ex.sets.map((s,sIdx)=>`
-              <div class="set-row">
-                <span class="set-num">${sIdx+1}</span>
-                ${renderSetInputs(s, exIdx, sIdx, metrics)}
-                <button class="btn-remove-set" data-rmset="${sIdx}" data-ex="${exIdx}">×</button>
-              </div>`).join('')}
-          </div>
-          <button class="btn-add-set" data-addset="${exIdx}">+ Série</button>`
-        div.querySelector('input').addEventListener('input',e=>{ exList[exIdx].name=e.target.value })
-        div.querySelectorAll('[data-rmset]').forEach(btn=>{ btn.addEventListener('click',()=>{ exList[+btn.dataset.ex].sets.splice(+btn.dataset.rmset,1); renderExercisesBuilder(containerId,exList) }) })
-        div.querySelectorAll('[data-remove]').forEach(btn=>{ btn.addEventListener('click',()=>{ exList.splice(+btn.dataset.remove,1); renderExercisesBuilder(containerId,exList) }) })
-        div.querySelectorAll('[data-addset]').forEach(btn=>{ btn.addEventListener('click',()=>{ exList[+btn.dataset.addset].sets.push({}); renderExercisesBuilder(containerId,exList) }) })
-        div.querySelectorAll('[data-field]').forEach(inp=>{ inp.addEventListener('input',e=>{ exList[+e.target.dataset.ex].sets[+e.target.dataset.set][e.target.dataset.field]=e.target.value }) })
-        builder.appendChild(div)
-      })
-    }
-
-    function renderSetInputs(s, exIdx, sIdx, metrics) {
-      return metrics.map(m=>{
-        const cfg = {
-          reps_weight: [{f:'reps',p:'Reps'},{f:'weight',p:'kg'}],
-          duration: [{f:'duration',p:'min'}],
-          distance: [{f:'distance',p:'km'}],
-          speed: [{f:'speed',p:'km/h'}],
-          resistance: [{f:'resistance',p:'Rés.'}],
-          incline: [{f:'incline',p:'%'}],
-          calories: [{f:'calories',p:'kcal'}],
-        }[m]||[]
-        return cfg.map(c=>`<input class="set-input" type="number" placeholder="${c.p}" value="${s[c.f]||''}" min="0" step="${c.f==='weight'||c.f==='distance'?'0.5':'1'}" data-ex="${exIdx}" data-set="${sIdx}" data-field="${c.f}" style="width:60px;" />`).join('')
+    // Seance modal
+    function buildSetInputs(s, exIdx, sIdx, metrics) {
+      const fields = {
+        reps_kg: [{ f: 'reps', p: 'Reps', w: '55px' }, { f: 'weight', p: 'kg', w: '55px' }],
+        duration: [{ f: 'duration', p: 'min', w: '70px' }],
+        distance: [{ f: 'distance', p: 'km', w: '70px' }],
+        speed: [{ f: 'speed', p: 'km/h', w: '70px' }],
+        resistance: [{ f: 'resistance', p: 'Rés.', w: '70px' }],
+        incline: [{ f: 'incline', p: '%', w: '70px' }],
+        calories: [{ f: 'calories', p: 'kcal', w: '70px' }]
+      }
+      return (metrics || ['reps_kg']).map(function(m) {
+        return (fields[m] || []).map(function(c) {
+          return '<input class="ex-set-input" type="number" placeholder="' + c.p + '" value="' + (s[c.f] || '') + '" min="0" step="' + (c.f === 'weight' || c.f === 'distance' ? '0.5' : '1') + '" style="width:' + c.w + ';" onchange="updateSeanceSet(' + exIdx + ',' + sIdx + ',\'' + c.f + '\',this.value)" />'
+        }).join('')
       }).join('')
     }
 
-    window.openAddWorkout = function(date) {
-      editingSportId=null; selectedSportType='Musculation'; sportExercises=[]
-      document.getElementById('modal-sport-title').textContent='Nouvelle séance'
-      document.getElementById('sport-date-input').value=date||toDateStr(new Date())
-      document.getElementById('sport-duration-input').value=''
-      document.getElementById('sport-notes-input').value=''
-      const sel=document.getElementById('sport-template-select')
-      sel.innerHTML='<option value="">Séance libre</option>'
-      sportTemplates.forEach((t,i)=>{ sel.innerHTML+=`<option value="${i}">${t.emoji||''} ${t.name}</option>` })
-      sel.onchange=()=>{
-        const idx=parseInt(sel.value)
-        if (!isNaN(idx)&&sportTemplates[idx]) {
-          const t=sportTemplates[idx]; selectedSportType=t.type
-          renderSportTypeGrid('sport-type-grid',t.type)
-          sportExercises=(t.exercises||[]).map(e=>({...e,sets:(e.sets||[{}]).map(s=>({...s}))}))
-          renderExercisesBuilder('sport-exercises-builder',sportExercises)
+    function renderSeanceBuilder(containerId, exList) {
+      const el = document.getElementById(containerId)
+      if (!el) return
+      el.innerHTML = ''
+      exList.forEach(function(ex, exIdx) {
+        const libEx = exLibrary.find(function(e) { return e.name === ex.name }) || {}
+        const metrics = libEx.metrics || ex.metrics || ['reps_kg']
+        const div = document.createElement('div')
+        div.className = 'ex-builder'
+        const setsHtml = ex.sets.map(function(s, sIdx) {
+          return '<div class="ex-set-row"><span class="ex-set-num">' + (sIdx + 1) + '</span>' + buildSetInputs(s, exIdx, sIdx, metrics) + '<button class="btn-rm" onclick="removeSeanceSet(' + exIdx + ',' + sIdx + ')">×</button></div>'
+        }).join('')
+        div.innerHTML = '<div class="ex-builder-top">' +
+          '<span style="font-size:1.125rem;">' + (ex.emoji || libEx.emoji || '•') + '</span>' +
+          '<input class="ex-set-input" style="flex:1;font-weight:500;font-size:0.9375rem;" placeholder="Nom" value="' + ex.name + '" onchange="seanceExos[' + exIdx + '].name=this.value" />' +
+          '<button class="btn-rm" onclick="removeSeanceEx(' + exIdx + ')">×</button></div>' +
+          '<div class="ex-sets">' + setsHtml + '</div>' +
+          '<button class="btn-add-set" onclick="addSeanceSet(' + exIdx + ')">+ Série</button>'
+        el.appendChild(div)
+      })
+    }
+
+    window.updateSeanceSet = function(exIdx, sIdx, field, val) {
+      seanceExos[exIdx].sets[sIdx][field] = parseFloat(val) || 0
+    }
+    window.removeSeanceSet = function(exIdx, sIdx) {
+      seanceExos[exIdx].sets.splice(sIdx, 1)
+      renderSeanceBuilder('seance-exos-builder', seanceExos)
+    }
+    window.removeSeanceEx = function(exIdx) {
+      seanceExos.splice(exIdx, 1)
+      renderSeanceBuilder('seance-exos-builder', seanceExos)
+    }
+    window.addSeanceSet = function(exIdx) {
+      const last = seanceExos[exIdx].sets.slice(-1)[0] || {}
+      seanceExos[exIdx].sets.push(Object.assign({}, last))
+      renderSeanceBuilder('seance-exos-builder', seanceExos)
+    }
+
+    function renderSportTypeGrid(containerId, selected) {
+      const g = document.getElementById(containerId)
+      if (!g) return
+      g.innerHTML = SPORT_TYPES.map(function(t) {
+        return '<button class="sport-type-btn' + (t === selected ? ' selected' : '') + '" onclick="selectSportType(\'' + containerId + '\',\'' + t + '\')">' + t + '</button>'
+      }).join('')
+    }
+    window.selectSportType = function(containerId, t) {
+      if (containerId === 'seance-type-grid') selectedSportType = t
+      else selectedTmplType = t
+      renderSportTypeGrid(containerId, t)
+    }
+
+    window.openAddSeance = function(date) {
+      editingSeanceId = null
+      selectedSportType = 'Musculation'
+      seanceExos = []
+      document.getElementById('modal-seance-title').textContent = 'Nouvelle séance'
+      document.getElementById('seance-date').value = date || toDateStr(new Date())
+      document.getElementById('seance-dur').value = ''
+      document.getElementById('seance-notes').value = ''
+      document.getElementById('seance-editing-id').value = ''
+      const sel = document.getElementById('seance-tmpl')
+      sel.innerHTML = '<option value="">Séance libre</option>'
+      sportTemplates.forEach(function(t, i) { sel.innerHTML += '<option value="' + i + '">' + (t.emoji || '') + ' ' + t.name + '</option>' })
+      sel.onchange = function() {
+        const idx = parseInt(sel.value)
+        if (!isNaN(idx) && sportTemplates[idx]) {
+          const t = sportTemplates[idx]
+          selectedSportType = t.type
+          renderSportTypeGrid('seance-type-grid', t.type)
+          seanceExos = (t.exos || []).map(function(e) { return Object.assign({}, e, { sets: (e.sets || [{}]).map(function(s) { return Object.assign({}, s) }) }) })
+          renderSeanceBuilder('seance-exos-builder', seanceExos)
         }
       }
-      document.getElementById('modal-sport-actions').innerHTML=`<button class="btn-secondary" id="modal-sport-cancel">Annuler</button><button class="btn-primary" id="modal-sport-save">Enregistrer</button>`
-      bindSportModalButtons()
-      renderSportTypeGrid('sport-type-grid',selectedSportType)
-      renderExercisesBuilder('sport-exercises-builder',sportExercises)
-      document.getElementById('modal-sport').classList.add('open')
+      document.getElementById('seance-actions').innerHTML = '<button class="btn-secondary" onclick="closeSeanceModal()">Annuler</button><button class="btn-primary" onclick="saveSeance()">Enregistrer</button>'
+      renderSportTypeGrid('seance-type-grid', selectedSportType)
+      renderSeanceBuilder('seance-exos-builder', seanceExos)
+      document.getElementById('modal-seance').classList.add('open')
     }
 
-    window.openEditWorkout = function(id) {
-      const w=workouts.find(x=>x.id===id); if(!w) return
-      editingSportId=id; selectedSportType=w.type
-      sportExercises=(w.workout_exercises||[]).map(ex=>({
-        name:ex.name, emoji:ex.emoji||'',
-        sets:Array.isArray(ex.sets)?ex.sets.map(s=>({...s})):[{}]
-      }))
-      document.getElementById('modal-sport-title').textContent='Modifier la séance'
-      document.getElementById('sport-date-input').value=w.date
-      document.getElementById('sport-duration-input').value=w.duration_minutes||''
-      document.getElementById('sport-notes-input').value=w.notes||''
-      document.getElementById('modal-sport-actions').innerHTML=`<button class="btn-danger" id="modal-sport-delete">Supprimer</button><button class="btn-primary" id="modal-sport-save">Enregistrer</button>`
-      bindSportModalButtons()
-      renderSportTypeGrid('sport-type-grid',selectedSportType)
-      renderExercisesBuilder('sport-exercises-builder',sportExercises)
-      document.getElementById('modal-sport').classList.add('open')
+    window.openEditSeance = function(id) {
+      const w = workouts.find(function(x) { return x.id === id })
+      if (!w) return
+      editingSeanceId = id
+      selectedSportType = w.type
+      seanceExos = (w.workout_exercises || []).map(function(ex) {
+        const libEx = exLibrary.find(function(e) { return e.name === ex.name }) || {}
+        return { name: ex.name, emoji: ex.emoji || libEx.emoji || '•', metrics: libEx.metrics || ['reps_kg'], sets: Array.isArray(ex.sets) ? ex.sets.map(function(s) { return Object.assign({}, s) }) : [{}] }
+      })
+      document.getElementById('modal-seance-title').textContent = 'Modifier la séance'
+      document.getElementById('seance-date').value = w.date
+      document.getElementById('seance-dur').value = w.duration_minutes || ''
+      document.getElementById('seance-notes').value = w.notes || ''
+      document.getElementById('seance-editing-id').value = id
+      document.getElementById('seance-actions').innerHTML = '<button class="btn-danger" onclick="deleteWorkout(\'' + id + '\');closeSeanceModal()">Supprimer</button><button class="btn-primary" onclick="saveSeance()">Enregistrer</button>'
+      renderSportTypeGrid('seance-type-grid', selectedSportType)
+      renderSeanceBuilder('seance-exos-builder', seanceExos)
+      document.getElementById('modal-seance').classList.add('open')
     }
 
-    function closeSportModal() { document.getElementById('modal-sport').classList.remove('open') }
+    window.closeSeanceModal = function() { document.getElementById('modal-seance').classList.remove('open') }
 
-    function bindSportModalButtons() {
-      document.getElementById('modal-sport-cancel')?.addEventListener('click',closeSportModal)
-      document.getElementById('modal-sport-delete')?.addEventListener('click',async()=>{ if(editingSportId){await deleteWorkout(editingSportId);closeSportModal()} })
-      document.getElementById('modal-sport-save').addEventListener('click',saveWorkout)
-    }
-
-    async function saveWorkout() {
-      const date=document.getElementById('sport-date-input').value
+    window.saveSeance = async function() {
+      const date = document.getElementById('seance-date').value
       if (!date) return
-      const duration=parseInt(document.getElementById('sport-duration-input').value)||null
-      const notes=document.getElementById('sport-notes-input').value.trim()
-      const btn=document.getElementById('modal-sport-save'); btn.disabled=true
-      const exData=sportExercises.filter(e=>e.name)
-      if (editingSportId) {
-        await db.from('workouts').update({type:selectedSportType,date,duration_minutes:duration,notes}).eq('id',editingSportId)
-        await db.from('workout_exercises').delete().eq('workout_id',editingSportId)
-        if (exData.length) await db.from('workout_exercises').insert(exData.map((e,i)=>({workout_id:editingSportId,name:e.name,emoji:e.emoji,sets:e.sets,order_index:i})))
+      const duration = parseInt(document.getElementById('seance-dur').value) || null
+      const notes = document.getElementById('seance-notes').value.trim()
+      const exData = seanceExos.filter(function(e) { return e.name })
+      if (editingSeanceId) {
+        await db.from('workouts').update({ type: selectedSportType, date: date, duration_minutes: duration, notes: notes }).eq('id', editingSeanceId)
+        await db.from('workout_exercises').delete().eq('workout_id', editingSeanceId)
+        if (exData.length) await db.from('workout_exercises').insert(exData.map(function(e, i) { return { workout_id: editingSeanceId, name: e.name, emoji: e.emoji, sets: e.sets, order_index: i } }))
         showToast('Séance modifiée')
       } else {
-        const {data:w}=await db.from('workouts').insert({profile_id:profile.id,type:selectedSportType,date,duration_minutes:duration,notes}).select().single()
-        if (w&&exData.length) await db.from('workout_exercises').insert(exData.map((e,i)=>({workout_id:w.id,name:e.name,emoji:e.emoji,sets:e.sets,order_index:i})))
+        const { data: w } = await db.from('workouts').insert({ profile_id: profile.id, type: selectedSportType, date: date, duration_minutes: duration, notes: notes }).select().single()
+        if (w && exData.length) await db.from('workout_exercises').insert(exData.map(function(e, i) { return { workout_id: w.id, name: e.name, emoji: e.emoji, sets: e.sets, order_index: i } }))
         showToast('Séance enregistrée')
       }
-      closeSportModal()
-      await loadWorkouts(); renderWorkoutsList(); updateSportStats(); renderAgendaView()
-      btn.disabled=false
+      closeSeanceModal()
+      await loadWorkouts()
+      renderWorkoutsList()
+      updateSportStats()
+      renderAgendaView()
     }
 
     window.deleteWorkout = async function(id) {
-      await db.from('workout_exercises').delete().eq('workout_id',id)
-      await db.from('workouts').delete().eq('id',id)
-      workouts=workouts.filter(w=>w.id!==id)
-      renderWorkoutsList(); updateSportStats(); renderAgendaView(); showToast('Séance supprimée')
+      await db.from('workout_exercises').delete().eq('workout_id', id)
+      await db.from('workouts').delete().eq('id', id)
+      workouts = workouts.filter(function(w) { return w.id !== id })
+      renderWorkoutsList()
+      updateSportStats()
+      renderAgendaView()
+      showToast('Séance supprimée')
     }
 
-    document.getElementById('modal-sport-close').addEventListener('click',closeSportModal)
-    document.getElementById('modal-sport').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeSportModal() })
-    document.getElementById('btn-add-exercise-from-lib').addEventListener('click',()=>{
-      openPickExercise(ex=>{
-        sportExercises.push({name:ex.name,emoji:ex.emoji||'',sets:Array(ex.defaultSets||3).fill(null).map(()=>({}))})
-        renderExercisesBuilder('sport-exercises-builder',sportExercises)
+    document.getElementById('modal-seance-close').addEventListener('click', closeSeanceModal)
+    document.getElementById('modal-seance').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeSeanceModal() })
+    document.getElementById('btn-seance-from-lib').addEventListener('click', function() {
+      openPickEx(function(ex) {
+        seanceExos.push({ name: ex.name, emoji: ex.emoji || '•', metrics: ex.metrics || ['reps_kg'], sets: Array(ex.sets || 3).fill(null).map(function() { return {} }) })
+        renderSeanceBuilder('seance-exos-builder', seanceExos)
       })
     })
-    document.getElementById('btn-add-exercise-free').addEventListener('click',()=>{
-      sportExercises.push({name:'',emoji:'',sets:[{}]})
-      renderExercisesBuilder('sport-exercises-builder',sportExercises)
+    document.getElementById('btn-seance-free').addEventListener('click', function() {
+      seanceExos.push({ name: '', emoji: '•', metrics: ['reps_kg'], sets: [{}] })
+      renderSeanceBuilder('seance-exos-builder', seanceExos)
     })
 
-    // ── PROGRAMMES ──
-    function renderTemplatesList() {
-      const list=document.getElementById('templates-list'); if(!list) return
-      if (!sportTemplates.length) { list.innerHTML=`<div class="empty-state"><p>Aucun programme.</p></div>`; return }
-      list.innerHTML=''
-      sportTemplates.forEach((t,idx)=>{
-        const card=document.createElement('div'); card.className='template-card'
-        card.innerHTML=`
-          <div class="template-badge">${t.emoji||'💪'}</div>
-          <div class="template-info">
-            <div class="template-name">${t.name}</div>
-            <div class="template-detail">${t.type} · ${(t.exercises||[]).length} exercices</div>
-          </div>
-          <button class="btn-icon" onclick="openEditTemplate(${idx})" style="width:32px;height:32px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>`
+    // Session en cours
+    window.startSession = function(workoutId) {
+      const w = workouts.find(function(x) { return x.id === workoutId })
+      if (!w) return
+      sessionData = {
+        workoutId: workoutId,
+        title: w.type,
+        date: w.date,
+        exercises: (w.workout_exercises || []).map(function(ex) {
+          const libEx = exLibrary.find(function(e) { return e.name === ex.name }) || {}
+          return {
+            name: ex.name,
+            emoji: ex.emoji || libEx.emoji || '•',
+            metrics: libEx.metrics || ['reps_kg'],
+            sets: (Array.isArray(ex.sets) ? ex.sets : [{}]).map(function(s) { return Object.assign({}, s, { done: false }) })
+          }
+        })
+      }
+      openSession()
+    }
+
+    function openSession() {
+      focusExIdx = 0; focusSetIdx = 0; sessionView = 'list'
+      sessionStart = Date.now()
+      document.getElementById('session-title').textContent = sessionData.title
+      document.getElementById('session-overlay').classList.add('open')
+      document.getElementById('btn-sl').classList.add('active')
+      document.getElementById('btn-sf').classList.remove('active')
+      renderSessionBody()
+      clearInterval(sessionTimer)
+      sessionTimer = setInterval(function() {
+        const e = Math.floor((Date.now() - sessionStart) / 1000)
+        document.getElementById('session-timer').textContent = Math.floor(e / 60) + ':' + String(e % 60).padStart(2, '0')
+      }, 1000)
+    }
+
+    function renderSessionBody() {
+      const body = document.getElementById('session-body')
+      if (!body) return
+      if (sessionView === 'list') {
+        body.innerHTML = ''
+        if (!sessionData.exercises.length) {
+          body.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-muted);">Aucun exercice.</div>'
+          return
+        }
+        sessionData.exercises.forEach(function(ex, exIdx) {
+          const done = ex.sets.filter(function(s) { return s.done }).length
+          const metrics = ex.metrics || ['reps_kg']
+          const block = document.createElement('div')
+          block.className = 'session-ex-block'
+          const metricHeaders = {
+            reps_kg: 'Reps · kg', duration: 'min', distance: 'km',
+            speed: 'km/h', resistance: 'Rés.', incline: '%', calories: 'kcal'
+          }
+          const headerCols = metrics.map(function(m) { return metricHeaders[m] || m }).join(' / ')
+          const gridCols = '28px 1fr ' + metrics.length + 'fr 32px'
+          const setsHtml = ex.sets.map(function(s, sIdx) {
+            const inputs = metrics.map(function(m) {
+              const fs = { reps_kg: [{ f: 'reps', p: 'Reps' }, { f: 'weight', p: 'kg' }], duration: [{ f: 'duration', p: 'min' }], distance: [{ f: 'distance', p: 'km' }], speed: [{ f: 'speed', p: 'km/h' }], resistance: [{ f: 'resistance', p: 'Rés.' }], incline: [{ f: 'incline', p: '%' }], calories: [{ f: 'calories', p: 'kcal' }] }[m] || []
+              return fs.map(function(c) { return '<input class="session-set-input" type="number" placeholder="' + c.p + '" value="' + (s[c.f] || '') + '" min="0" style="width:55px;" onchange="updateSessSet(' + exIdx + ',' + sIdx + ',\'' + c.f + '\',this.value)" />' }).join('')
+            }).join('')
+            return '<div class="session-set-row' + (s.done ? ' done' : '') + '" style="grid-template-columns:' + gridCols + ';">' +
+              '<span class="session-set-num">' + (sIdx + 1) + '</span>' +
+              '<div style="display:flex;gap:0.375rem;flex-wrap:wrap;">' + inputs + '</div>' +
+              '<button class="session-check' + (s.done ? ' done' : '') + '" onclick="toggleSessSet(' + exIdx + ',' + sIdx + ')">' +
+              '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button></div>'
+          }).join('')
+          block.innerHTML = '<div class="session-ex-header"><span class="session-ex-emoji">' + ex.emoji + '</span><span class="session-ex-name">' + ex.name + '</span><span class="session-ex-progress">' + done + '/' + ex.sets.length + '</span></div>' +
+            '<div class="session-set-header" style="grid-template-columns:' + gridCols + ';"><span>#</span><span>' + headerCols + '</span></div>' +
+            setsHtml +
+            '<div style="padding:0.375rem 1.25rem;border-top:0.5px solid var(--border);"><button onclick="addSessSet(' + exIdx + ')" style="font-size:0.8125rem;color:var(--accent);font-weight:600;background:transparent;border:none;cursor:pointer;font-family:inherit;">+ Série</button></div>'
+          body.appendChild(block)
+        })
+      } else {
+        renderFocusView()
+      }
+    }
+
+    window.updateSessSet = function(exIdx, sIdx, field, val) {
+      sessionData.exercises[exIdx].sets[sIdx][field] = parseFloat(val) || 0
+    }
+    window.toggleSessSet = function(exIdx, sIdx) {
+      sessionData.exercises[exIdx].sets[sIdx].done = !sessionData.exercises[exIdx].sets[sIdx].done
+      renderSessionBody()
+    }
+    window.addSessSet = function(exIdx) {
+      const last = sessionData.exercises[exIdx].sets.slice(-1)[0] || {}
+      sessionData.exercises[exIdx].sets.push(Object.assign({}, Object.fromEntries(Object.entries(last).filter(function(e) { return e[0] !== 'done' })), { done: false }))
+      renderSessionBody()
+    }
+
+    function renderFocusView() {
+      const body = document.getElementById('session-body')
+      if (!body || !sessionData.exercises.length) return
+      const ex = sessionData.exercises[focusExIdx]
+      if (!ex) return
+      const set = ex.sets[focusSetIdx] || {}
+      const total = sessionData.exercises.reduce(function(s, e) { return s + e.sets.length }, 0)
+      const done = sessionData.exercises.reduce(function(s, e) { return s + e.sets.filter(function(x) { return x.done }).length }, 0)
+      const metrics = ex.metrics || ['reps_kg']
+      const inputsHtml = metrics.map(function(m) {
+        const fs = { reps_kg: [{ f: 'reps', p: 'Répétitions' }, { f: 'weight', p: 'Poids (kg)' }], duration: [{ f: 'duration', p: 'Durée (min)' }], distance: [{ f: 'distance', p: 'Distance (km)' }], speed: [{ f: 'speed', p: 'Vitesse (km/h)' }], resistance: [{ f: 'resistance', p: 'Résistance' }], incline: [{ f: 'incline', p: 'Inclinaison (%)' }], calories: [{ f: 'calories', p: 'Calories' }] }[m] || []
+        return fs.map(function(c) {
+          return '<div class="focus-input-group"><label class="focus-input-label">' + c.p + '</label><input class="focus-input" type="number" value="' + (set[c.f] || '') + '" id="fi-' + c.f + '" min="0" /></div>'
+        }).join('')
+      }).join('')
+      body.innerHTML = '<div class="focus-view">' +
+        '<div class="focus-emoji">' + ex.emoji + '</div>' +
+        '<div class="focus-name">' + ex.name + '</div>' +
+        '<div class="focus-progress">Série ' + (focusSetIdx + 1) + '/' + ex.sets.length + ' · Ex. ' + (focusExIdx + 1) + '/' + sessionData.exercises.length + ' · ' + done + '/' + total + ' total</div>' +
+        '<div class="focus-inputs">' + inputsHtml + '</div>' +
+        '<div class="focus-btns">' +
+        '<button onclick="focusPrev()" style="flex:1;padding:0.75rem;border-radius:var(--radius-sm);border:0.5px solid var(--border-strong);background:transparent;font-family:inherit;cursor:pointer;">← Préc.</button>' +
+        '<button onclick="focusDone()" style="flex:2;padding:0.75rem;border-radius:var(--radius-sm);border:none;background:' + (set.done ? '#16A34A' : 'var(--accent)') + ';color:var(--bg);font-weight:600;font-family:inherit;cursor:pointer;">' + (set.done ? '✓ Faite' : 'Valider →') + '</button>' +
+        '</div></div>'
+    }
+
+    window.focusDone = function() {
+      const ex = sessionData.exercises[focusExIdx]
+      const set = ex.sets[focusSetIdx]
+      const metrics = ex.metrics || ['reps_kg']
+      const allFields = ['reps', 'weight', 'duration', 'distance', 'speed', 'resistance', 'incline', 'calories']
+      allFields.forEach(function(f) { const el = document.getElementById('fi-' + f); if (el) set[f] = parseFloat(el.value) || 0 })
+      set.done = true
+      focusSetIdx++
+      if (focusSetIdx >= ex.sets.length) {
+        focusExIdx = Math.min(focusExIdx + 1, sessionData.exercises.length - 1)
+        focusSetIdx = 0
+      }
+      renderFocusView()
+    }
+    window.focusPrev = function() {
+      focusSetIdx--
+      if (focusSetIdx < 0) {
+        focusExIdx = Math.max(0, focusExIdx - 1)
+        focusSetIdx = Math.max(0, sessionData.exercises[focusExIdx].sets.length - 1)
+      }
+      renderFocusView()
+    }
+
+    document.getElementById('btn-sl').addEventListener('click', function() {
+      sessionView = 'list'
+      document.getElementById('btn-sl').classList.add('active')
+      document.getElementById('btn-sf').classList.remove('active')
+      renderSessionBody()
+    })
+    document.getElementById('btn-sf').addEventListener('click', function() {
+      sessionView = 'focus'
+      document.getElementById('btn-sf').classList.add('active')
+      document.getElementById('btn-sl').classList.remove('active')
+      renderFocusView()
+    })
+
+    window.finishSession = async function() {
+      clearInterval(sessionTimer)
+      const elapsed = sessionStart ? Math.floor((Date.now() - sessionStart) / 60000) : null
+      const exData = sessionData.exercises.filter(function(e) { return e.name })
+      if (sessionData.workoutId) {
+        await db.from('workouts').update({ duration_minutes: elapsed }).eq('id', sessionData.workoutId)
+        await db.from('workout_exercises').delete().eq('workout_id', sessionData.workoutId)
+        if (exData.length) {
+          await db.from('workout_exercises').insert(exData.map(function(e, i) {
+            return { workout_id: sessionData.workoutId, name: e.name, emoji: e.emoji, sets: e.sets.map(function(s) { const r = Object.assign({}, s); delete r.done; return r }), order_index: i }
+          }))
+        }
+      }
+      document.getElementById('session-overlay').classList.remove('open')
+      await loadWorkouts()
+      renderWorkoutsList()
+      updateSportStats()
+      renderAgendaView()
+      showToast('Séance terminée 💪')
+    }
+
+    document.getElementById('session-finish').addEventListener('click', finishSession)
+    document.getElementById('session-cancel').addEventListener('click', function() {
+      clearInterval(sessionTimer)
+      document.getElementById('session-overlay').classList.remove('open')
+    })
+    document.getElementById('session-close').addEventListener('click', function() {
+      clearInterval(sessionTimer)
+      document.getElementById('session-overlay').classList.remove('open')
+    })
+
+    // Templates
+    function renderTemplates() {
+      const list = document.getElementById('templates-list')
+      if (!list) return
+      if (!sportTemplates.length) { list.innerHTML = '<div class="empty-state"><p>Aucun programme.</p></div>'; return }
+      list.innerHTML = ''
+      sportTemplates.forEach(function(t, idx) {
+        const card = document.createElement('div')
+        card.className = 'template-card'
+        card.innerHTML = '<div class="template-emoji">' + (t.emoji || '💪') + '</div>' +
+          '<div class="template-info"><div class="template-name">' + t.name + '</div><div class="template-detail">' + t.type + ' · ' + (t.exos || []).length + ' exercices</div></div>' +
+          '<button class="btn-icon" onclick="openEditTmpl(' + idx + ')" style="width:32px;height:32px;">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'
         list.appendChild(card)
       })
     }
 
-    function openNewTemplate() {
-      editingTemplateId=null; selectedTemplateType='Musculation'; templateExercises=[]
-      document.getElementById('modal-template-title').textContent='Nouveau programme'
-      document.getElementById('template-name-input').value=''
-      document.getElementById('template-emoji-input').value='💪'
-      document.getElementById('modal-template-actions').innerHTML=`<button class="btn-secondary" id="modal-template-cancel">Annuler</button><button class="btn-primary" id="modal-template-save">Enregistrer</button>`
-      bindTemplateButtons()
-      renderSportTypeGrid('template-type-grid',selectedTemplateType)
-      renderExercisesBuilder('template-exercises-builder',templateExercises)
-      document.getElementById('modal-template').classList.add('open')
+    function openNewTmpl() {
+      editingTmplId = null; selectedTmplType = 'Musculation'; tmplExos = []
+      document.getElementById('modal-tmpl-title').textContent = 'Nouveau programme'
+      document.getElementById('tmpl-nom').value = ''
+      document.getElementById('tmpl-emoji').value = '💪'
+      document.getElementById('tmpl-actions').innerHTML = '<button class="btn-secondary" onclick="closeTmplModal()">Annuler</button><button class="btn-primary" onclick="saveTmpl()">Enregistrer</button>'
+      renderSportTypeGrid('tmpl-type-grid', selectedTmplType)
+      renderTmplBuilder()
+      document.getElementById('modal-tmpl').classList.add('open')
     }
 
-    window.openEditTemplate = function(idx) {
-      const t=sportTemplates[idx]; editingTemplateId=idx; selectedTemplateType=t.type
-      templateExercises=(t.exercises||[]).map(e=>({...e,sets:(e.sets||[{}]).map(s=>({...s}))}))
-      document.getElementById('modal-template-title').textContent='Modifier le programme'
-      document.getElementById('template-name-input').value=t.name
-      document.getElementById('template-emoji-input').value=t.emoji||'💪'
-      document.getElementById('modal-template-actions').innerHTML=`<button class="btn-danger" id="modal-template-delete">Supprimer</button><button class="btn-primary" id="modal-template-save">Enregistrer</button>`
-      bindTemplateButtons()
-      renderSportTypeGrid('template-type-grid',selectedTemplateType)
-      renderExercisesBuilder('template-exercises-builder',templateExercises)
-      document.getElementById('modal-template').classList.add('open')
+    window.openEditTmpl = function(idx) {
+      const t = sportTemplates[idx]
+      editingTmplId = idx; selectedTmplType = t.type
+      tmplExos = (t.exos || []).map(function(e) { return Object.assign({}, e, { sets: (e.sets || [{}]).map(function(s) { return Object.assign({}, s) }) }) })
+      document.getElementById('modal-tmpl-title').textContent = 'Modifier le programme'
+      document.getElementById('tmpl-nom').value = t.name
+      document.getElementById('tmpl-emoji').value = t.emoji || '💪'
+      document.getElementById('tmpl-actions').innerHTML = '<button class="btn-danger" onclick="deleteTmpl(' + idx + ')">Supprimer</button><button class="btn-primary" onclick="saveTmpl()">Enregistrer</button>'
+      renderSportTypeGrid('tmpl-type-grid', selectedTmplType)
+      renderTmplBuilder()
+      document.getElementById('modal-tmpl').classList.add('open')
     }
 
-    function closeTemplateModal() { document.getElementById('modal-template').classList.remove('open') }
+    window.closeTmplModal = function() { document.getElementById('modal-tmpl').classList.remove('open') }
 
-    function bindTemplateButtons() {
-      document.getElementById('modal-template-cancel')?.addEventListener('click',closeTemplateModal)
-      document.getElementById('modal-template-delete')?.addEventListener('click',()=>{
-        sportTemplates.splice(editingTemplateId,1); saveSportTemplates(); closeTemplateModal(); renderTemplatesList(); showToast('Programme supprimé')
+    function renderTmplBuilder() {
+      const el = document.getElementById('tmpl-exos-builder')
+      if (!el) return
+      el.innerHTML = ''
+      tmplExos.forEach(function(ex, exIdx) {
+        const libEx = exLibrary.find(function(e) { return e.name === ex.name }) || {}
+        const metrics = libEx.metrics || ex.metrics || ['reps_kg']
+        const div = document.createElement('div')
+        div.className = 'ex-builder'
+        div.innerHTML = '<div class="ex-builder-top">' +
+          '<span style="font-size:1.125rem;">' + (ex.emoji || libEx.emoji || '•') + '</span>' +
+          '<input class="ex-set-input" style="flex:1;font-weight:500;font-size:0.9375rem;" placeholder="Nom" value="' + ex.name + '" onchange="tmplExos[' + exIdx + '].name=this.value" />' +
+          '<button class="btn-rm" onclick="removeTmplEx(' + exIdx + ')">×</button></div>' +
+          '<div class="ex-sets">' +
+          ex.sets.map(function(s, sIdx) {
+            return '<div class="ex-set-row"><span class="ex-set-num">' + (sIdx + 1) + '</span>' +
+              buildTmplSetInputs(s, exIdx, sIdx, metrics) +
+              '<button class="btn-rm" onclick="removeTmplSet(' + exIdx + ',' + sIdx + ')">×</button></div>'
+          }).join('') + '</div>' +
+          '<button class="btn-add-set" onclick="addTmplSet(' + exIdx + ')">+ Série</button>'
+        el.appendChild(div)
       })
-      document.getElementById('modal-template-save').addEventListener('click',()=>{
-        const name=document.getElementById('template-name-input').value.trim(); if(!name) return
-        const t={name,emoji:document.getElementById('template-emoji-input').value.trim()||'💪',type:selectedTemplateType,exercises:templateExercises.filter(e=>e.name)}
-        if (editingTemplateId!==null) sportTemplates[editingTemplateId]=t; else sportTemplates.push(t)
-        saveSportTemplates(); closeTemplateModal(); renderTemplatesList(); showToast('Programme enregistré')
-      })
     }
 
-    document.getElementById('modal-template-close').addEventListener('click',closeTemplateModal)
-    document.getElementById('modal-template').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeTemplateModal() })
-    document.getElementById('btn-new-template').addEventListener('click',openNewTemplate)
-    document.getElementById('btn-add-template-ex-lib').addEventListener('click',()=>{
-      openPickExercise(ex=>{ templateExercises.push({name:ex.name,emoji:ex.emoji||'',sets:Array(ex.defaultSets||3).fill(null).map(()=>({}))}); renderExercisesBuilder('template-exercises-builder',templateExercises) })
-    })
-    document.getElementById('btn-add-template-ex-free').addEventListener('click',()=>{
-      templateExercises.push({name:'',emoji:'',sets:[{}]}); renderExercisesBuilder('template-exercises-builder',templateExercises)
-    })
-
-    // ── MODE SÉANCE EN COURS ──
-    window.startLiveSession = function(workoutId) {
-      const w=workouts.find(x=>x.id===workoutId); if(!w) return
-      sessionData={workoutId,title:w.type,date:w.date,exercises:(w.workout_exercises||[]).map(ex=>({
-        name:ex.name,emoji:ex.emoji||exerciseLibrary.find(e=>e.name===ex.name)?.emoji||'•',
-        metrics:exerciseLibrary.find(e=>e.name===ex.name)?.metrics||['reps_weight'],
-        sets:(Array.isArray(ex.sets)?ex.sets:[{}]).map(s=>({...s,done:!!s.done}))
-      }))}
-      openLiveSession()
-    }
-
-    window.startPlannedSession = function(date,type) {
-      const tmpl=sportTemplates.find(t=>t.type===type)
-      sessionData={workoutId:null,title:type,date,exercises:(tmpl?.exercises||[]).map(ex=>({
-        name:ex.name,emoji:ex.emoji||exerciseLibrary.find(e=>e.name===ex.name)?.emoji||'•',
-        metrics:exerciseLibrary.find(e=>e.name===ex.name)?.metrics||['reps_weight'],
-        sets:Array(ex.defaultSets||3).fill(null).map(()=>({}))
-      }))}
-      openLiveSession()
-    }
-
-    function openLiveSession() {
-      focusExIdx=0; focusSetIdx=0; sessionViewMode='list'
-      sessionStartTime=Date.now()
-      document.getElementById('session-live-title').textContent=sessionData.title
-      document.getElementById('session-live').classList.add('open')
-      document.getElementById('btn-session-list').classList.add('active')
-      document.getElementById('btn-session-focus').classList.remove('active')
-      renderSessionBody()
-      clearInterval(sessionTimerInt)
-      sessionTimerInt=setInterval(()=>{
-        const e=Math.floor((Date.now()-sessionStartTime)/1000)
-        document.getElementById('session-timer').textContent=Math.floor(e/60)+':'+(e%60).toString().padStart(2,'0')
-      },1000)
-    }
-
-    function renderSessionBody() {
-      const body=document.getElementById('session-body'); if(!body) return
-      if (sessionViewMode==='list') {
-        body.innerHTML=''
-        if (!sessionData.exercises.length) {
-          body.innerHTML=`<div style="padding:2rem;text-align:center;color:var(--text-muted);">Aucun exercice.<br/><button onclick="addSessionEx()" style="margin-top:1rem;padding:0.5rem 1rem;border-radius:var(--radius-sm);border:0.5px dashed var(--border-strong);background:transparent;cursor:pointer;font-family:inherit;color:var(--text-secondary);">+ Ajouter</button></div>`
-          return
-        }
-        sessionData.exercises.forEach((ex,exIdx)=>{
-          const done=ex.sets.filter(s=>s.done).length
-          const block=document.createElement('div'); block.className='session-exercise-block'
-          const metrics=ex.metrics||['reps_weight']
-          const inputHeaders=metrics.map(m=>({reps_weight:'Reps · kg',duration:'min',distance:'km',speed:'km/h',resistance:'Rés.',incline:'%',calories:'kcal'}[m]||m)).join(' / ')
-          block.innerHTML=`
-            <div class="session-ex-header">
-              <span class="session-ex-emoji">${ex.emoji||'•'}</span>
-              <span class="session-ex-title">${ex.name}</span>
-              <span class="session-ex-progress">${done}/${ex.sets.length}</span>
-            </div>
-            <div style="display:grid;grid-template-columns:28px 1fr 32px;gap:0.375rem;padding:0.375rem 1.25rem;background:var(--surface-2);">
-              <span style="font-size:0.625rem;color:var(--text-muted);font-weight:600;">#</span>
-              <span style="font-size:0.625rem;color:var(--text-muted);font-weight:600;">${inputHeaders}</span>
-              <span></span>
-            </div>
-            ${ex.sets.map((set,sIdx)=>{
-              const inputs=metrics.map(m=>{
-                const cfg={reps_weight:[{f:'reps',p:'Reps',w:'55px'},{f:'weight',p:'kg',w:'55px'}],duration:[{f:'duration',p:'min',w:'70px'}],distance:[{f:'distance',p:'km',w:'70px'}],speed:[{f:'speed',p:'km/h',w:'70px'}],resistance:[{f:'resistance',p:'Rés.',w:'70px'}],incline:[{f:'incline',p:'%',w:'70px'}],calories:[{f:'calories',p:'kcal',w:'70px'}]}[m]||[]
-                return cfg.map(c=>`<input class="session-set-input" type="number" placeholder="${c.p}" value="${set[c.f]||''}" min="0" step="${c.f==='weight'||c.f==='distance'?'0.5':'1'}" style="width:${c.w};" onchange="updateSessSet(${exIdx},${sIdx},'${c.f}',this.value)" />`).join('')
-              }).join('')
-              return `<div class="session-set-row${set.done?' done':''}" style="grid-template-columns:28px 1fr 32px;">
-                <span class="session-set-num">${sIdx+1}</span>
-                <div style="display:flex;gap:0.375rem;flex-wrap:wrap;">${inputs}</div>
-                <button class="session-set-check${set.done?' done':''}" onclick="toggleSessSet(${exIdx},${sIdx})">
-                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                </button>
-              </div>`
-            }).join('')}
-            <div style="padding:0.375rem 1.25rem;border-top:0.5px solid var(--border);">
-              <button onclick="addSessSet(${exIdx})" style="font-size:0.8125rem;color:var(--accent);font-weight:600;background:transparent;border:none;cursor:pointer;font-family:inherit;padding:0.25rem 0;">+ Série</button>
-            </div>`
-          body.appendChild(block)
-        })
-        const addBtn=document.createElement('div'); addBtn.style.cssText='padding:0.5rem 1.25rem 1rem;'
-        addBtn.innerHTML=`<button onclick="addSessionEx()" style="width:100%;padding:0.625rem;border-radius:var(--radius-sm);border:0.5px dashed var(--border-strong);background:transparent;cursor:pointer;font-family:inherit;color:var(--text-secondary);">+ Ajouter un exercice</button>`
-        body.appendChild(addBtn)
-      } else { renderFocusView() }
-    }
-
-    window.updateSessSet=function(exIdx,sIdx,field,val){ sessionData.exercises[exIdx].sets[sIdx][field]=field==='reps'?parseInt(val)||0:parseFloat(val)||0 }
-    window.toggleSessSet=function(exIdx,sIdx){ sessionData.exercises[exIdx].sets[sIdx].done=!sessionData.exercises[exIdx].sets[sIdx].done; renderSessionBody() }
-    window.addSessSet=function(exIdx){ const last=sessionData.exercises[exIdx].sets.slice(-1)[0]||{}; sessionData.exercises[exIdx].sets.push({...Object.fromEntries(Object.entries(last).filter(([k])=>k!=='done')),done:false}); renderSessionBody() }
-    window.addSessionEx=function(){ openPickExercise(ex=>{ sessionData.exercises.push({name:ex.name,emoji:ex.emoji||'•',metrics:ex.metrics||['reps_weight'],sets:[{}]}); renderSessionBody() }) }
-
-    function renderFocusView() {
-      const body=document.getElementById('session-body'); if(!body||!sessionData.exercises.length) return
-      const ex=sessionData.exercises[focusExIdx]; if(!ex) return
-      const set=ex.sets[focusSetIdx]||{}
-      const total=sessionData.exercises.reduce((s,e)=>s+e.sets.length,0)
-      const done=sessionData.exercises.reduce((s,e)=>s+e.sets.filter(x=>x.done).length,0)
-      const metrics=ex.metrics||['reps_weight']
-      const inputs=metrics.map(m=>{
-        const cfg={reps_weight:[{f:'reps',p:'Répétitions'},{f:'weight',p:'Poids (kg)'}],duration:[{f:'duration',p:'Durée (min)'}],distance:[{f:'distance',p:'Distance (km)'}],speed:[{f:'speed',p:'Vitesse (km/h)'}],resistance:[{f:'resistance',p:'Résistance'}],incline:[{f:'incline',p:'Inclinaison (%)'}],calories:[{f:'calories',p:'Calories'}]}[m]||[]
-        return cfg.map(c=>`<div class="focus-input-group"><label class="focus-input-label">${c.p}</label><input class="focus-input" type="number" value="${set[c.f]||''}" placeholder="0" id="fi-${c.f}" min="0" step="${c.f==='weight'||c.f==='distance'?'0.5':'1'}" /></div>`).join('')
+    function buildTmplSetInputs(s, exIdx, sIdx, metrics) {
+      const fields = { reps_kg: [{ f: 'reps', p: 'Reps' }, { f: 'weight', p: 'kg' }], duration: [{ f: 'duration', p: 'min' }], distance: [{ f: 'distance', p: 'km' }], speed: [{ f: 'speed', p: 'km/h' }], resistance: [{ f: 'resistance', p: 'Rés.' }], incline: [{ f: 'incline', p: '%' }], calories: [{ f: 'calories', p: 'kcal' }] }
+      return metrics.map(function(m) {
+        return (fields[m] || []).map(function(c) {
+          return '<input class="ex-set-input" type="number" placeholder="' + c.p + '" value="' + (s[c.f] || '') + '" onchange="tmplExos[' + exIdx + '].sets[' + sIdx + '][\'' + c.f + '\']=parseFloat(this.value)||0" />'
+        }).join('')
       }).join('')
-      body.innerHTML=`
-        <div class="focus-view">
-          <div style="font-size:1.25rem;margin-bottom:0.25rem;">${ex.emoji||'•'}</div>
-          <div class="focus-ex-name">${ex.name}</div>
-          <div class="focus-ex-progress">Série ${focusSetIdx+1}/${ex.sets.length} · Ex. ${focusExIdx+1}/${sessionData.exercises.length} · ${done}/${total} total</div>
-          <div class="focus-inputs" style="grid-template-columns:repeat(${Math.min(metrics.length*2,4)},1fr);">${inputs}</div>
-          <div class="focus-nav">
-            <button onclick="focusPrev()" style="flex:1;padding:0.75rem;border-radius:var(--radius-sm);border:0.5px solid var(--border-strong);background:transparent;font-family:inherit;cursor:pointer;">← Préc.</button>
-            <button onclick="focusDone()" style="flex:2;padding:0.75rem;border-radius:var(--radius-sm);border:none;background:${set.done?'#16A34A':'var(--accent)'};color:var(--bg);font-weight:600;font-family:inherit;cursor:pointer;">${set.done?'✓ Faite':'Valider →'}</button>
-          </div>
-        </div>`
     }
 
-    window.focusDone=function(){
-      const ex=sessionData.exercises[focusExIdx]; const set=ex.sets[focusSetIdx]
-      const metrics=ex.metrics||['reps_weight']
-      const fields={reps_weight:['reps','weight'],duration:['duration'],distance:['distance'],speed:['speed'],resistance:['resistance'],incline:['incline'],calories:['calories']}
-      metrics.forEach(m=>{ (fields[m]||[]).forEach(f=>{ const el=document.getElementById('fi-'+f); if(el) set[f]=parseFloat(el.value)||0 }) })
-      set.done=true
-      focusSetIdx++
-      if (focusSetIdx>=ex.sets.length) { focusExIdx=Math.min(focusExIdx+1,sessionData.exercises.length-1); focusSetIdx=0 }
-      renderFocusView()
+    window.removeTmplEx = function(i) { tmplExos.splice(i, 1); renderTmplBuilder() }
+    window.removeTmplSet = function(ei, si) { tmplExos[ei].sets.splice(si, 1); renderTmplBuilder() }
+    window.addTmplSet = function(ei) { tmplExos[ei].sets.push({}); renderTmplBuilder() }
+
+    window.saveTmpl = function() {
+      const name = document.getElementById('tmpl-nom').value.trim()
+      if (!name) return
+      const t = { name: name, emoji: document.getElementById('tmpl-emoji').value.trim() || '💪', type: selectedTmplType, exos: tmplExos.filter(function(e) { return e.name }) }
+      if (editingTmplId !== null) sportTemplates[editingTmplId] = t
+      else sportTemplates.push(t)
+      saveTmpls()
+      closeTmplModal()
+      renderTemplates()
+      showToast('Programme enregistré')
     }
-    window.focusPrev=function(){ focusSetIdx--; if(focusSetIdx<0){ focusExIdx=Math.max(0,focusExIdx-1); focusSetIdx=Math.max(0,sessionData.exercises[focusExIdx].sets.length-1) }; renderFocusView() }
 
-    document.getElementById('btn-session-list').addEventListener('click',()=>{ sessionViewMode='list'; document.getElementById('btn-session-list').classList.add('active'); document.getElementById('btn-session-focus').classList.remove('active'); renderSessionBody() })
-    document.getElementById('btn-session-focus').addEventListener('click',()=>{ sessionViewMode='focus'; document.getElementById('btn-session-focus').classList.add('active'); document.getElementById('btn-session-list').classList.remove('active'); renderFocusView() })
+    window.deleteTmpl = function(idx) {
+      sportTemplates.splice(idx, 1)
+      saveTmpls()
+      closeTmplModal()
+      renderTemplates()
+      showToast('Programme supprimé')
+    }
 
-    async function finishSession() {
-      clearInterval(sessionTimerInt)
-      const elapsed=sessionStartTime?Math.floor((Date.now()-sessionStartTime)/60000):null
-      const exData=sessionData.exercises.filter(e=>e.name)
-      if (sessionData.workoutId) {
-        await db.from('workouts').update({duration_minutes:elapsed}).eq('id',sessionData.workoutId)
-        await db.from('workout_exercises').delete().eq('workout_id',sessionData.workoutId)
-        if (exData.length) await db.from('workout_exercises').insert(exData.map((e,i)=>({workout_id:sessionData.workoutId,name:e.name,emoji:e.emoji,sets:e.sets.map(s=>{const{done,...rest}=s;return rest}),order_index:i})))
-      } else {
-        const {data:w}=await db.from('workouts').insert({profile_id:profile.id,type:sessionData.title,date:sessionData.date||toDateStr(new Date()),duration_minutes:elapsed}).select().single()
-        if (w&&exData.length) await db.from('workout_exercises').insert(exData.map((e,i)=>({workout_id:w.id,name:e.name,emoji:e.emoji,sets:e.sets.map(s=>{const{done,...rest}=s;return rest}),order_index:i})))
-        if (sessionData.date) { const p=JSON.parse(localStorage.getItem('tdv_sport_planned_'+profile.id)||'{}'); delete p[sessionData.date]; localStorage.setItem('tdv_sport_planned_'+profile.id,JSON.stringify(p)) }
+    document.getElementById('modal-tmpl-close').addEventListener('click', closeTmplModal)
+    document.getElementById('modal-tmpl').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeTmplModal() })
+    document.getElementById('btn-new-tmpl').addEventListener('click', openNewTmpl)
+    document.getElementById('btn-tmpl-from-lib').addEventListener('click', function() {
+      openPickEx(function(ex) {
+        tmplExos.push({ name: ex.name, emoji: ex.emoji || '•', metrics: ex.metrics || ['reps_kg'], sets: Array(ex.sets || 3).fill(null).map(function() { return {} }) })
+        renderTmplBuilder()
+      })
+    })
+    document.getElementById('btn-tmpl-free').addEventListener('click', function() {
+      tmplExos.push({ name: '', emoji: '•', metrics: ['reps_kg'], sets: [{}] })
+      renderTmplBuilder()
+    })
+
+    // Charts
+    function getMonthWeeks() {
+      var r = []
+      for (var i = 3; i >= 0; i--) {
+        var s = new Date(); s.setDate(s.getDate() - i * 7 - 6)
+        var e = new Date(); e.setDate(e.getDate() - i * 7)
+        var wn = getWeekNum(s)
+        r.push({ label: 'S' + wn, start: s, end: e })
       }
-      document.getElementById('session-live').classList.remove('open')
-      await loadWorkouts(); renderWorkoutsList(); updateSportStats(); renderAgendaView()
-      showToast('Séance terminée 💪')
+      return r
+    }
+    function getYearMonths() {
+      var y = new Date().getFullYear()
+      return ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'].map(function(l, i) { return { label: l, month: i, year: y } })
+    }
+    function getWeekNum(d) {
+      var dt = new Date(d)
+      dt.setHours(0,0,0,0)
+      dt.setDate(dt.getDate() + 3 - (dt.getDay() + 6) % 7)
+      var w1 = new Date(dt.getFullYear(), 0, 4)
+      return 1 + Math.round(((dt - w1) / 86400000 - 3 + (w1.getDay() + 6) % 7) / 7)
+    }
+    function cc() { return { grid: 'rgba(0,0,0,0.06)', text: '#9A9795' } }
+    function dc(id) { if (sportCharts[id]) { sportCharts[id].destroy(); delete sportCharts[id] } }
+
+    function calcVol(w) {
+      return (w.workout_exercises || []).reduce(function(s, ex) {
+        return s + (Array.isArray(ex.sets) ? ex.sets : []).reduce(function(t, set) {
+          return t + ((set.reps || 0) * (set.weight || 0))
+        }, 0)
+      }, 0)
     }
 
-    document.getElementById('session-finish-btn').addEventListener('click',finishSession)
-    document.getElementById('session-cancel-btn').addEventListener('click',()=>{ clearInterval(sessionTimerInt); document.getElementById('session-live').classList.remove('open') })
-    document.getElementById('session-close-btn').addEventListener('click',()=>{ clearInterval(sessionTimerInt); document.getElementById('session-live').classList.remove('open') })
-
-    // ── GRAPHIQUES ──
-    function getWk(d){ const dt=new Date(d);dt.setHours(0,0,0,0);dt.setDate(dt.getDate()+3-(dt.getDay()+6)%7);const w1=new Date(dt.getFullYear(),0,4);return 1+Math.round(((dt-w1)/86400000-3+(w1.getDay()+6)%7)/7) }
-    function chartColors(){ return { grid:'rgba(0,0,0,0.06)', text:'#9A9795' } }
-    function destroyChart(id){ if(sportCharts[id]){ sportCharts[id].destroy(); delete sportCharts[id] } }
-    const PALETTE=['#1A1814','#DC2626','#EA580C','#D97706','#16A34A','#0891B2','#7C3AED','#DB2777','#64748B','#059669']
-
-    function getMonthWeeks(){ const r=[];for(let i=3;i>=0;i--){const s=new Date();s.setDate(s.getDate()-i*7-6);const e=new Date();e.setDate(e.getDate()-i*7);r.push({label:'S'+getWk(s),start:s,end:e})}; return r }
-    function getYearMonths(){ const y=new Date().getFullYear();return['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'].map((l,i)=>({label:l,month:i,year:y})) }
-
-    function renderFreqChart(p){ destroyChart('freq'); const ctx=document.getElementById('chart-freq'); if(!ctx) return; const c=chartColors(); let labels,data; if(p==='month'){const ws=getMonthWeeks();labels=ws.map(w=>w.label);data=ws.map(w=>workouts.filter(x=>{const d=new Date(x.date);return d>=w.start&&d<=w.end}).length)}else{const ms=getYearMonths();labels=ms.map(m=>m.label);data=ms.map(m=>workouts.filter(x=>{const d=new Date(x.date);return d.getFullYear()===m.year&&d.getMonth()===m.month}).length)}; sportCharts['freq']=new Chart(ctx,{type:'bar',data:{labels,datasets:[{data,backgroundColor:'var(--accent)',borderRadius:5,borderSkipped:false}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:c.grid},ticks:{color:c.text,font:{size:10}}},y:{grid:{color:c.grid},ticks:{color:c.text,stepSize:1,font:{size:10}},beginAtZero:true}}}}) }
-
-    function renderVolChart(p) {
-      destroyChart('volume')
-      const ctx = document.getElementById('chart-volume')
-      if (!ctx) return
-      const c = chartColors()
-      const labels = []
-      const data = []
-      function volForWorkouts(list) {
-        return Math.round(list.reduce(function(t, wk) {
-          return t + (wk.workout_exercises||[]).reduce(function(s, ex) {
-            return s + (Array.isArray(ex.sets)?ex.sets:[]).reduce(function(u, set) {
-              return u + ((set.reps||0) * (set.weight||0))
-            }, 0)
-          }, 0)
-        }, 0))
-      }
+    function renderFreqChart(p) {
+      dc('freq'); var ctx = document.getElementById('chart-freq'); if (!ctx) return
+      var c = cc(); var labels = []; var data = []
       if (p === 'month') {
         getMonthWeeks().forEach(function(w) {
           labels.push(w.label)
-          data.push(volForWorkouts(workouts.filter(function(x) {
-            const d = new Date(x.date)
-            return d >= w.start && d <= w.end
-          })))
+          data.push(workouts.filter(function(x) { var d = new Date(x.date); return d >= w.start && d <= w.end }).length)
         })
       } else {
         getYearMonths().forEach(function(m) {
           labels.push(m.label)
-          data.push(volForWorkouts(workouts.filter(function(x) {
-            const d = new Date(x.date)
-            return d.getFullYear() === m.year && d.getMonth() === m.month
-          })))
+          data.push(workouts.filter(function(x) { var d = new Date(x.date); return d.getFullYear() === m.year && d.getMonth() === m.month }).length)
         })
       }
-      sportCharts['volume'] = new Chart(ctx, {
-        type: 'line',
-        data: { labels: labels, datasets: [{ data: data, borderColor: 'var(--accent)', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, pointBackgroundColor: 'var(--accent)' }] },
-        options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } }, beginAtZero: true } } }
+      sportCharts['freq'] = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ data: data, backgroundColor: 'var(--accent)', borderRadius: 5, borderSkipped: false }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } } }, y: { grid: { color: c.grid }, ticks: { color: c.text, stepSize: 1, font: { size: 10 } }, beginAtZero: true } } } })
+    }
+
+    function renderVolChart(p) {
+      dc('vol'); var ctx = document.getElementById('chart-vol'); if (!ctx) return
+      var c = cc(); var labels = []; var data = []
+      if (p === 'month') {
+        getMonthWeeks().forEach(function(w) {
+          labels.push(w.label)
+          data.push(Math.round(workouts.filter(function(x) { var d = new Date(x.date); return d >= w.start && d <= w.end }).reduce(function(t, wk) { return t + calcVol(wk) }, 0)))
+        })
+      } else {
+        getYearMonths().forEach(function(m) {
+          labels.push(m.label)
+          data.push(Math.round(workouts.filter(function(x) { var d = new Date(x.date); return d.getFullYear() === m.year && d.getMonth() === m.month }).reduce(function(t, wk) { return t + calcVol(wk) }, 0)))
+        })
+      }
+      sportCharts['vol'] = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: data, borderColor: 'var(--accent)', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, pointBackgroundColor: 'var(--accent)' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } }, beginAtZero: true } } } })
+    }
+
+    function renderTypesChart(p) {
+      dc('types'); var ctx = document.getElementById('chart-types'); if (!ctx) return
+      var now = new Date(); var filtered
+      if (p === 'month') { var s = new Date(now.getFullYear(), now.getMonth(), 1); filtered = workouts.filter(function(w) { return new Date(w.date) >= s }) }
+      else { filtered = workouts.filter(function(w) { return new Date(w.date).getFullYear() === now.getFullYear() }) }
+      var tc = {}; filtered.forEach(function(w) { tc[w.type] = (tc[w.type] || 0) + 1 })
+      var labels = Object.keys(tc); var data = Object.values(tc)
+      var pal = ['#1A1814','#DC2626','#EA580C','#D97706','#16A34A','#0891B2','#7C3AED','#DB2777','#64748B','#059669']
+      sportCharts['types'] = new Chart(ctx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: pal.slice(0, labels.length), borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: cc().text, padding: 8, font: { size: 10 } } } } } })
+    }
+
+    function renderDurChart(p) {
+      dc('dur'); var ctx = document.getElementById('chart-dur'); if (!ctx) return
+      var c = cc(); var labels = []; var data = []
+      if (p === 'month') {
+        getMonthWeeks().forEach(function(w) {
+          labels.push(w.label)
+          var g = workouts.filter(function(x) { var d = new Date(x.date); return d >= w.start && d <= w.end && x.duration_minutes })
+          data.push(g.length ? Math.round(g.reduce(function(s, wk) { return s + (wk.duration_minutes || 0) }, 0) / g.length) : 0)
+        })
+      } else {
+        getYearMonths().forEach(function(m) {
+          labels.push(m.label)
+          var g = workouts.filter(function(x) { var d = new Date(x.date); return d.getFullYear() === m.year && d.getMonth() === m.month && x.duration_minutes })
+          data.push(g.length ? Math.round(g.reduce(function(s, wk) { return s + (wk.duration_minutes || 0) }, 0) / g.length) : 0)
+        })
+      }
+      sportCharts['dur'] = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ data: data, backgroundColor: '#0891B2', borderRadius: 5, borderSkipped: false }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } }, beginAtZero: true } } } })
+    }
+
+    function renderProgChart(exName) {
+      dc('prog'); var ctx = document.getElementById('chart-prog'); if (!ctx || !exName) return
+      var c = cc(); var pts = []
+      workouts.forEach(function(w) {
+        var ex = (w.workout_exercises || []).find(function(e) { return e.name === exName })
+        if (ex) {
+          var sets = Array.isArray(ex.sets) ? ex.sets : []
+          var mx = Math.max.apply(null, sets.map(function(s) { return s.weight || 0 }))
+          if (mx > 0) pts.push({ date: w.date, weight: mx })
+        }
+      })
+      pts.sort(function(a, b) { return a.date.localeCompare(b.date) })
+      sportCharts['prog'] = new Chart(ctx, { type: 'line', data: { labels: pts.map(function(p) { return new Date(p.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) }), datasets: [{ data: pts.map(function(p) { return p.weight }), borderColor: '#7C3AED', backgroundColor: 'transparent', tension: 0.4, pointRadius: 4, pointBackgroundColor: '#7C3AED' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, callback: function(v) { return v + 'kg' } }, beginAtZero: false } } } })
+    }
+
+    function renderMuscleGrid(p) {
+      var g = document.getElementById('muscle-grid'); if (!g) return
+      var now = new Date(); var start = new Date(now)
+      if (p === 'week') start.setDate(now.getDate() - 7)
+      else start.setDate(now.getDate() - 30)
+      var filtered = workouts.filter(function(w) { return new Date(w.date) >= start })
+      var counts = {}; ALL_MUSCLES.forEach(function(m) { counts[m] = 0 })
+      filtered.forEach(function(w) {
+        (w.workout_exercises || []).forEach(function(ex) {
+          var libEx = exLibrary.find(function(e) { return e.name === ex.name })
+          if (libEx) (libEx.muscles || []).forEach(function(m) { if (counts[m] !== undefined) counts[m]++ })
+        })
+      })
+      var maxVal = Math.max(1, Math.max.apply(null, Object.values(counts)))
+      var nonZero = Object.entries(counts).filter(function(e) { return e[1] > 0 }).sort(function(a, b) { return b[1] - a[1] })
+      g.innerHTML = ''
+      if (!nonZero.length) { g.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:0.875rem;padding:1rem;">Pas de données</div>'; return }
+      nonZero.forEach(function(entry) {
+        var m = entry[0]; var count = entry[1]
+        var pct = Math.round(count / maxVal * 100)
+        var div = document.createElement('div'); div.className = 'muscle-row'
+        div.innerHTML = '<div class="muscle-row-top"><span class="muscle-row-name">' + m + '</span><span class="muscle-row-count">' + count + 'x</span></div><div class="muscle-track"><div class="muscle-fill" style="width:' + pct + '%"></div></div>'
+        g.appendChild(div)
       })
     }
 
-    function renderTypesChart(p){ destroyChart('types'); const ctx=document.getElementById('chart-types'); if(!ctx) return; const now=new Date(); let filtered; if(p==='month'){const s=new Date(now.getFullYear(),now.getMonth(),1);filtered=workouts.filter(w=>new Date(w.date)>=s)}else{filtered=workouts.filter(w=>new Date(w.date).getFullYear()===now.getFullYear())}; const tc={};filtered.forEach(w=>{tc[w.type]=(tc[w.type]||0)+1}); const labels=Object.keys(tc),data=Object.values(tc); sportCharts['types']=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:PALETTE.slice(0,labels.length),borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:chartColors().text,padding:8,font:{size:10}}}}}}) }
+    function populateExSelect() {
+      var sel = document.getElementById('chart-ex-sel'); if (!sel) return
+      var exs = new Set(); workouts.forEach(function(w) { (w.workout_exercises || []).forEach(function(ex) { exs.add(ex.name) }) })
+      sel.innerHTML = '<option value="">Choisir un exercice…</option>'
+      exs.forEach(function(e) { sel.innerHTML += '<option value="' + e + '">' + e + '</option>' })
+      sel.onchange = function() { renderProgChart(sel.value) }
+    }
 
-    function renderDurChart(p){ destroyChart('dur'); const ctx=document.getElementById('chart-dur'); if(!ctx) return; const c=chartColors(); let labels,data; if(p==='month'){const ws=getMonthWeeks();labels=ws.map(w=>w.label);data=ws.map(w=>{const g=workouts.filter(x=>{const d=new Date(x.date);return d>=w.start&&d<=w.end&&x.duration_minutes});return g.length?Math.round(g.reduce((s,w)=>s+(w.duration_minutes||0),0)/g.length):0})}else{const ms=getYearMonths();labels=ms.map(m=>m.label);data=ms.map(m=>{const g=workouts.filter(x=>{const d=new Date(x.date);return d.getFullYear()===m.year&&d.getMonth()===m.month&&x.duration_minutes});return g.length?Math.round(g.reduce((s,w)=>s+(w.duration_minutes||0),0)/g.length):0})}; sportCharts['dur']=new Chart(ctx,{type:'bar',data:{labels,datasets:[{data,backgroundColor:'#0891B2',borderRadius:5,borderSkipped:false}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:c.grid},ticks:{color:c.text,font:{size:10}}},y:{grid:{color:c.grid},ticks:{color:c.text,font:{size:10}},beginAtZero:true}}}}) }
+    var freqP = 'month'; var volP = 'month'; var typesP = 'month'; var durP = 'month'; var musclesP = 'week'
 
-    function renderProgChart(exName){ destroyChart('prog'); const ctx=document.getElementById('chart-prog'); if(!ctx||!exName) return; const c=chartColors(); const pts=[]; workouts.forEach(w=>{const ex=(w.workout_exercises||[]).find(e=>e.name===exName); if(ex){const sets=Array.isArray(ex.sets)?ex.sets:[]; const mx=Math.max(...sets.map(s=>s.weight||0)); if(mx>0) pts.push({date:w.date,weight:mx})}}); pts.sort((a,b)=>a.date.localeCompare(b.date)); sportCharts['prog']=new Chart(ctx,{type:'line',data:{labels:pts.map(p=>new Date(p.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'})),datasets:[{data:pts.map(p=>p.weight),borderColor:'#7C3AED',backgroundColor:'transparent',tension:0.4,pointRadius:4,pointBackgroundColor:'#7C3AED'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:c.grid},ticks:{color:c.text,font:{size:10}}},y:{grid:{color:c.grid},ticks:{color:c.text,callback:v=>v+'kg',font:{size:10}},beginAtZero:false}}}}) }
+    function renderAllCharts() {
+      if (typeof Chart === 'undefined') return
+      renderFreqChart(freqP)
+      renderVolChart(volP)
+      renderTypesChart(typesP)
+      renderDurChart(durP)
+      renderMuscleGrid(musclesP)
+      populateExSelect()
+    }
 
-    function renderMuscleGrid(p){ const g=document.getElementById('muscle-grid'); if(!g) return; const now=new Date(); const start=new Date(now); if(p==='week') start.setDate(now.getDate()-7); else start.setDate(now.getDate()-30); const filtered=workouts.filter(w=>new Date(w.date)>=start); const counts={}; ALL_MUSCLES.forEach(m=>{counts[m]=0}); filtered.forEach(w=>{ (w.workout_exercises||[]).forEach(ex=>{ const libEx=exerciseLibrary.find(e=>e.name===ex.name); (libEx?.muscles||[]).forEach(m=>{if(counts[m]!==undefined)counts[m]++}) }) }); const max=Math.max(1,...Object.values(counts)); g.innerHTML=''; Object.entries(counts).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1]).forEach(([m,c])=>{ const pct=Math.round(c/max*100); const d=document.createElement('div'); d.className='muscle-bar-row'; d.innerHTML=`<div class="muscle-bar-label"><span class="muscle-bar-name">${m}</span><span class="muscle-bar-pct">${c}x</span></div><div class="muscle-bar-track"><div class="muscle-bar-fill" style="width:${pct}%"></div></div>`; g.appendChild(d) }); if (!Object.values(counts).some(c=>c>0)) g.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:0.875rem;padding:1rem;">Pas de données pour cette période</div>' }
-
-    function populateExSelect(){ const sel=document.getElementById('chart-ex-select'); if(!sel) return; const exs=new Set(); workouts.forEach(w=>(w.workout_exercises||[]).forEach(ex=>exs.add(ex.name))); sel.innerHTML='<option value="">Choisir un exercice…</option>'; exs.forEach(e=>{ sel.innerHTML+=`<option value="${e}">${e}</option>` }); sel.onchange=()=>renderProgChart(sel.value) }
-
-    function renderAllCharts(){ if(typeof Chart==='undefined') return; renderFreqChart(freqP); renderVolChart(volP); renderTypesChart(typesP); renderDurChart(durP); renderMuscleGrid(musclesP); populateExSelect() }
-
-    document.querySelectorAll('.period-btn').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const chart=btn.dataset.chart, period=btn.dataset.period
-        btn.closest('.chart-period').querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'))
+    document.querySelectorAll('.period-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var chart = btn.dataset.chart; var period = btn.dataset.period
+        btn.closest('.chart-period').querySelectorAll('.period-btn').forEach(function(b) { b.classList.remove('active') })
         btn.classList.add('active')
-        if(chart==='freq'){freqP=period;renderFreqChart(period)}
-        else if(chart==='volume'){volP=period;renderVolChart(period)}
-        else if(chart==='types'){typesP=period;renderTypesChart(period)}
-        else if(chart==='dur'){durP=period;renderDurChart(period)}
-        else if(chart==='muscles'){musclesP=period;renderMuscleGrid(period)}
+        if (chart === 'freq') { freqP = period; renderFreqChart(period) }
+        else if (chart === 'vol') { volP = period; renderVolChart(period) }
+        else if (chart === 'types') { typesP = period; renderTypesChart(period) }
+        else if (chart === 'dur') { durP = period; renderDurChart(period) }
+        else if (chart === 'muscles') { musclesP = period; renderMuscleGrid(period) }
       })
     })
 
@@ -3090,8 +3231,8 @@
       updateStats()
 
       // Sport
-      loadExerciseLibrary()
-      loadSportTemplates()
+      loadExLibrary()
+      loadTmpls()
       await loadWorkouts()
       renderWorkoutsList()
       updateSportStats()
@@ -3101,7 +3242,7 @@
       // FAB
       document.getElementById('fab').addEventListener('click', () => {
         if (activeTab === 'tasks') openAddTask()
-        else if (activeTab === 'sport') openAddWorkout()
+        else if (activeTab === 'sport') openAddSeance()
       })
 
       // Chart.js
