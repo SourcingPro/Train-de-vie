@@ -1306,6 +1306,13 @@
     .book-progress-fill { height: 100%; border-radius: 100px; background: #4A7FC2; }
     .book-progress-label { font-size: 0.6875rem; color: var(--text-muted); white-space: nowrap; }
     .book-rating-stars { font-size: 0.875rem; }
+    .book-monthly-row { display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:0.5px solid var(--border); }
+    .book-monthly-row:last-child { border-bottom:none; }
+    .book-monthly-label { flex:0 0 52px;font-size:0.8125rem;font-weight:500;color:var(--text-secondary); }
+    .book-monthly-bar-wrap { flex:1;height:22px;background:var(--surface-2);border-radius:6px;overflow:hidden;position:relative; }
+    .book-monthly-bar { height:100%;border-radius:6px;background:#4A7FC2;transition:width 0.4s; }
+    .book-monthly-goal-line { position:absolute;top:0;bottom:0;width:2px;background:#C2832E;opacity:0.7; }
+    .book-monthly-count { flex:0 0 28px;text-align:right;font-size:0.8125rem;font-weight:700; }
     .book-rating-picker { display: flex; gap: 0.5rem; }
     .book-star {
       font-size: 1.5rem; cursor: pointer; opacity: 0.3;
@@ -1752,31 +1759,64 @@
         <div class="page-subtitle" id="reading-subtitle">Ma bibliothèque</div>
       </div>
 
-      <!-- Toggle statuts -->
+      <!-- Toggle statuts + Stats -->
       <div class="task-view-toggle" style="overflow-x:auto;scrollbar-width:none;">
         <button class="task-view-btn active" id="btn-book-all">Tous</button>
         <button class="task-view-btn" id="btn-book-reading">En cours</button>
         <button class="task-view-btn" id="btn-book-toread">À lire</button>
         <button class="task-view-btn" id="btn-book-done">Terminés</button>
+        <button class="task-view-btn" id="btn-book-stats">Stats</button>
       </div>
 
-      <!-- Recherche + ajout -->
-      <div class="ex-lib-search-row">
-        <input class="form-input" style="flex:1;" placeholder="Rechercher un livre…" id="book-search" />
-        <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-book">+ Ajouter</button>
+      <!-- VUE LISTE -->
+      <div id="book-list-view">
+        <div class="ex-lib-search-row">
+          <input class="form-input" style="flex:1;" placeholder="Rechercher un livre…" id="book-search" />
+          <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-book">+ Ajouter</button>
+        </div>
+        <div class="stats-grid-4" style="margin:0 1.25rem 0.875rem;">
+          <div class="stat-card-sm"><div class="stat-value-sm" id="book-stat-total">0</div><div class="stat-label-sm">Total</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="book-stat-reading">0</div><div class="stat-label-sm">En cours</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="book-stat-done">0</div><div class="stat-label-sm">Terminés</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="book-stat-pages">0</div><div class="stat-label-sm">Pages lues</div></div>
+        </div>
+        <div class="card" style="padding:0;">
+          <div id="book-list"></div>
+        </div>
       </div>
 
-      <!-- Stats rapides -->
-      <div class="stats-grid-4" style="margin:0 1.25rem 0.875rem;">
-        <div class="stat-card-sm"><div class="stat-value-sm" id="book-stat-total">0</div><div class="stat-label-sm">Total</div></div>
-        <div class="stat-card-sm"><div class="stat-value-sm" id="book-stat-reading">0</div><div class="stat-label-sm">En cours</div></div>
-        <div class="stat-card-sm"><div class="stat-value-sm" id="book-stat-done">0</div><div class="stat-label-sm">Terminés</div></div>
-        <div class="stat-card-sm"><div class="stat-value-sm" id="book-stat-pages">0</div><div class="stat-label-sm">Pages lues</div></div>
-      </div>
-
-      <!-- Liste des livres -->
-      <div class="card" style="padding:0;">
-        <div id="book-list"></div>
+      <!-- VUE STATS -->
+      <div id="book-stats-view" style="display:none;">
+        <div class="card">
+          <div class="card-title">Objectifs de lecture</div>
+          <div style="display:flex;gap:1rem;margin-bottom:1rem;">
+            <div style="flex:1;">
+              <div class="form-label" style="margin-bottom:0.375rem;">Par mois</div>
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <input class="form-input" type="number" id="book-goal-month" min="1" max="50" style="width:80px;" placeholder="Ex: 2" />
+                <span style="font-size:0.8125rem;color:var(--text-muted);">livres</span>
+              </div>
+            </div>
+            <div style="flex:1;">
+              <div class="form-label" style="margin-bottom:0.375rem;">Par an</div>
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <input class="form-input" type="number" id="book-goal-year" min="1" max="500" style="width:80px;" placeholder="Ex: 24" />
+                <span style="font-size:0.8125rem;color:var(--text-muted);">livres</span>
+              </div>
+            </div>
+          </div>
+          <button class="btn-primary" style="width:100%;" id="btn-save-book-goals">Enregistrer les objectifs</button>
+        </div>
+        <div class="stats-grid-4" style="margin:0 1.25rem 0.875rem;">
+          <div class="stat-card-sm"><div class="stat-value-sm" id="book-goal-month-done">0</div><div class="stat-label-sm">Ce mois</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="book-goal-month-pct">—</div><div class="stat-label-sm">Obj. mois</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="book-goal-year-done">0</div><div class="stat-label-sm">Cette année</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="book-goal-year-pct">—</div><div class="stat-label-sm">Obj. an</div></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Livres terminés par mois</span></div>
+          <div id="book-monthly-chart"></div>
+        </div>
       </div>
     </div>
     <div class="module" id="module-plants">
@@ -4890,6 +4930,7 @@
     let editingBookId = null
     let selectedBookEmoji = '📖'
     let selectedBookRating = 0
+    let bookGoals = { month: null, year: null }
 
     const BOOK_EMOJIS = ['📖','📚','📕','📗','📘','📙','📓','📔','📒','📃','📜','🔖','✍️','🖊️','🖋️','📝','🗒️','🗓️','💡','🧠','🎭','🏰','🌍','🚀','🔬','🎨','🎵','⚔️','🌿','❤️']
 
@@ -4900,6 +4941,8 @@
       books = data || []
       renderBooks()
       updateBookStats()
+      renderBookGoalStats()
+      renderBookMonthlyChart()
     }
 
     function getBooksFiltered() {
@@ -5062,6 +5105,103 @@
 
     document.getElementById('modal-book-close').addEventListener('click', closeBookModal)
     document.getElementById('modal-book').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeBookModal() })
+    // ── Stats + Objectifs ──
+    function loadBookGoals() {
+      const s = localStorage.getItem('tdv_bookgoals_' + profile.id)
+      if (s) {
+        bookGoals = JSON.parse(s)
+        document.getElementById('book-goal-month').value = bookGoals.month || ''
+        document.getElementById('book-goal-year').value = bookGoals.year || ''
+      }
+    }
+    document.getElementById('btn-save-book-goals').addEventListener('click', function() {
+      bookGoals.month = parseInt(document.getElementById('book-goal-month').value) || null
+      bookGoals.year = parseInt(document.getElementById('book-goal-year').value) || null
+      localStorage.setItem('tdv_bookgoals_' + profile.id, JSON.stringify(bookGoals))
+      renderBookGoalStats()
+      renderBookMonthlyChart()
+      showToast('Objectifs enregistrés')
+    })
+
+    function renderBookGoalStats() {
+      var now = new Date()
+      var thisMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0')
+      var thisYear = String(now.getFullYear())
+      var doneBooks = books.filter(function(b) { return b.status === 'done' && b.finished_at })
+      var doneThisMonth = doneBooks.filter(function(b) { return b.finished_at && b.finished_at.startsWith(thisMonth) }).length
+      var doneThisYear = doneBooks.filter(function(b) { return b.finished_at && b.finished_at.startsWith(thisYear) }).length
+      document.getElementById('book-goal-month-done').textContent = doneThisMonth
+      document.getElementById('book-goal-year-done').textContent = doneThisYear
+      if (bookGoals.month) {
+        document.getElementById('book-goal-month-pct').textContent = Math.round((doneThisMonth / bookGoals.month) * 100) + '%'
+      } else document.getElementById('book-goal-month-pct').textContent = '—'
+      if (bookGoals.year) {
+        document.getElementById('book-goal-year-pct').textContent = Math.round((doneThisYear / bookGoals.year) * 100) + '%'
+      } else document.getElementById('book-goal-year-pct').textContent = '—'
+    }
+
+    function renderBookMonthlyChart() {
+      var el = document.getElementById('book-monthly-chart')
+      var now = new Date()
+      var months = []
+      for (var i = 11; i >= 0; i--) {
+        var d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        var key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+        var label = d.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' })
+        var count = books.filter(function(b) { return b.status === 'done' && b.finished_at && b.finished_at.startsWith(key) }).length
+        months.push({ label: label, count: count })
+      }
+      var maxCount = Math.max(1, bookGoals.month || 1, Math.max.apply(null, months.map(function(m) { return m.count })))
+      var goalPct = bookGoals.month ? Math.min(100, Math.round((bookGoals.month / maxCount) * 100)) : null
+      el.innerHTML = ''
+      months.forEach(function(m) {
+        var barPct = Math.round((m.count / maxCount) * 100)
+        var row = document.createElement('div')
+        row.className = 'book-monthly-row'
+        var label = document.createElement('div')
+        label.className = 'book-monthly-label'
+        label.textContent = m.label
+        var barWrap = document.createElement('div')
+        barWrap.className = 'book-monthly-bar-wrap'
+        var bar = document.createElement('div')
+        bar.className = 'book-monthly-bar'
+        bar.style.width = barPct + '%'
+        barWrap.appendChild(bar)
+        if (goalPct) {
+          var line = document.createElement('div')
+          line.className = 'book-monthly-goal-line'
+          line.style.left = goalPct + '%'
+          barWrap.appendChild(line)
+        }
+        var count = document.createElement('div')
+        count.className = 'book-monthly-count'
+        count.textContent = m.count || ''
+        row.appendChild(label)
+        row.appendChild(barWrap)
+        row.appendChild(count)
+        el.appendChild(row)
+      })
+    }
+
+    // ── Onglet Stats ──
+    document.getElementById('btn-book-stats').addEventListener('click', function() {
+      ;['btn-book-all','btn-book-reading','btn-book-toread','btn-book-done','btn-book-stats'].forEach(function(id) {
+        document.getElementById(id).classList.remove('active')
+      })
+      document.getElementById('btn-book-stats').classList.add('active')
+      document.getElementById('book-list-view').style.display = 'none'
+      document.getElementById('book-stats-view').style.display = ''
+      loadBookGoals()
+      renderBookGoalStats()
+      renderBookMonthlyChart()
+    })
+    ;['btn-book-all','btn-book-reading','btn-book-toread','btn-book-done'].forEach(function(id) {
+      document.getElementById(id).addEventListener('click', function() {
+        document.getElementById('book-list-view').style.display = ''
+        document.getElementById('book-stats-view').style.display = 'none'
+      })
+    })
+
     document.getElementById('btn-new-book').addEventListener('click', openNewBook)
 
 
