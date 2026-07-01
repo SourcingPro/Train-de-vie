@@ -5055,10 +5055,19 @@
         const stars = b.rating ? '⭐'.repeat(b.rating) : ''
         const div = document.createElement('div')
         div.className = 'book-item'
-        const coverHtml = b.cover_url
-          ? '<div class="book-cover"><img src="' + b.cover_url + '" alt="' + b.title + '" onerror="this.parentNode.innerHTML='' + (b.cover_emoji || '📖') + ''" /></div>'
-          : '<div class="book-cover">' + (b.cover_emoji || '📖') + '</div>'
-        div.innerHTML = coverHtml +
+        const coverEl = document.createElement('div')
+        coverEl.className = 'book-cover'
+        if (b.cover_url) {
+          const img = document.createElement('img')
+          img.src = b.cover_url
+          img.alt = b.title
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:6px;'
+          img.addEventListener('error', function() { coverEl.innerHTML = b.cover_emoji || '📖' })
+          coverEl.appendChild(img)
+        } else {
+          coverEl.textContent = b.cover_emoji || '📖'
+        }
+        div.innerHTML =
           '<div class="book-info">' +
           '<div class="book-title">' + b.title + '</div>' +
           (b.author ? '<div class="book-author">' + b.author + '</div>' : '') +
@@ -5068,6 +5077,7 @@
           (b.status === 'done' && b.total_pages ? '<span class="book-progress-label">' + b.total_pages + ' p.</span>' : '') +
           (stars ? '<span class="book-rating-stars">' + stars + '</span>' : '') +
           '</div></div>'
+        div.insertBefore(coverEl, div.firstChild)
         div.addEventListener('click', function() { openEditBook(b) })
         el.appendChild(div)
       })
