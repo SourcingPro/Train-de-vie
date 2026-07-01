@@ -2743,7 +2743,6 @@
       const range = buildDateRangeLabels(days)
       let labels, data
       if (taskStatsPeriod === 'year') {
-        // Agréger par mois
         const monthMap = {}
         range.forEach(function(r) {
           const mKey = r.dateObj.getFullYear() + '-' + r.dateObj.getMonth()
@@ -2764,7 +2763,7 @@
       }
       taskCharts['tasksDay'] = new Chart(ctx, {
         type: 'bar',
-        data: { labels: labels, datasets: [{ data: data, backgroundColor: 'var(--accent)', borderRadius: 5, borderSkipped: false }] },
+        data: { labels: labels, datasets: [{ data: data, backgroundColor: '#1C1A17', borderRadius: 5, borderSkipped: false }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, stepSize: 1, font: { size: 10 } }, beginAtZero: true } } }
       })
     }
@@ -2802,12 +2801,12 @@
       }
       taskCharts['tasksPct'] = new Chart(ctx, {
         type: 'line',
-        data: { labels: labels, datasets: [{ data: data, borderColor: 'var(--accent)', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, pointBackgroundColor: 'var(--accent)' }] },
+        data: { labels: labels, datasets: [{ data: data, borderColor: '#1C1A17', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, pointBackgroundColor: '#1C1A17' }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, callback: function(v) { return v + '%' } }, min: 0, max: 100 } } }
       })
     }
 
-    // 3. Répartition par catégorie
+    // 3. Répartition par catégorie — couleurs des tags hex
     function renderTasksCatChart() {
       dtc('tasksCat')
       const ctx = document.getElementById('chart-tasks-cat')
@@ -2841,7 +2840,7 @@
       })
     }
 
-    // 4. Comparaison des tâches
+    // 4. Comparaison des tâches — couleur par tag
     function renderTasksCompareChart() {
       dtc('tasksCompare')
       const ctx = document.getElementById('chart-tasks-compare')
@@ -2850,7 +2849,12 @@
       const days = getStatsDayRange(taskStatsPeriod)
       const range = buildDateRangeLabels(days)
       const counts = {}
-      tasks.forEach(function(t) { if (t.active) counts[t.id] = { name: t.emoji + ' ' + t.name, count: 0 } })
+      tasks.forEach(function(t) {
+        if (t.active) {
+          const tagColor = (t.tag_ids && t.tag_ids.length) ? (tagById(t.tag_ids[0]) || {}).color || '#1C1A17' : '#1C1A17'
+          counts[t.id] = { name: t.emoji + ' ' + t.name, count: 0, color: tagColor }
+        }
+      })
       range.forEach(function(r) {
         tasks.forEach(function(t) {
           if (!t.active) return
@@ -2858,11 +2862,9 @@
         })
       })
       const entries = Object.values(counts).sort(function(a, b) { return b.count - a.count }).slice(0, 8)
-      const labels = entries.map(function(e) { return e.name })
-      const data = entries.map(function(e) { return e.count })
       taskCharts['tasksCompare'] = new Chart(ctx, {
         type: 'bar',
-        data: { labels: labels, datasets: [{ data: data, backgroundColor: 'var(--accent)', borderRadius: 5, borderSkipped: false }] },
+        data: { labels: entries.map(function(e) { return e.name }), datasets: [{ data: entries.map(function(e) { return e.count }), backgroundColor: entries.map(function(e) { return e.color }), borderRadius: 5, borderSkipped: false }] },
         options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, stepSize: 1, font: { size: 10 } }, beginAtZero: true }, y: { grid: { display: false }, ticks: { color: c.text, font: { size: 10 } } } } }
       })
     }
@@ -3765,7 +3767,7 @@
       const data = buckets.map(function(b) { return workoutHistory.filter(function(w) { return w.date >= b.start && w.date <= b.end }).length })
       sportCharts['sportSessions'] = new Chart(ctx, {
         type: 'bar',
-        data: { labels: buckets.map(function(b){return b.label}), datasets: [{ data: data, backgroundColor: 'var(--accent)', borderRadius: 5, borderSkipped: false }] },
+        data: { labels: buckets.map(function(b){return b.label}), datasets: [{ data: data, backgroundColor: '#1C1A17', borderRadius: 5, borderSkipped: false }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, stepSize: 1, font: { size: 10 } }, beginAtZero: true } } }
       })
     }
@@ -3782,7 +3784,7 @@
       })
       sportCharts['sportVolume'] = new Chart(ctx, {
         type: 'line',
-        data: { labels: buckets.map(function(b){return b.label}), datasets: [{ data: data, borderColor: 'var(--pastel-purple-text)', backgroundColor: 'transparent', tension: 0.3, pointRadius: 2, pointBackgroundColor: 'var(--pastel-purple-text)' }] },
+        data: { labels: buckets.map(function(b){return b.label}), datasets: [{ data: data, borderColor: '#7C5CC2', backgroundColor: 'transparent', tension: 0.3, pointRadius: 2, pointBackgroundColor: '#7C5CC2' }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } }, beginAtZero: true } } }
       })
     }
@@ -3799,7 +3801,7 @@
       })
       sportCharts['sportCalories'] = new Chart(ctx, {
         type: 'bar',
-        data: { labels: buckets.map(function(b){return b.label}), datasets: [{ data: data, backgroundColor: 'var(--pastel-amber-text)', borderRadius: 5, borderSkipped: false }] },
+        data: { labels: buckets.map(function(b){return b.label}), datasets: [{ data: data, backgroundColor: '#C2832E', borderRadius: 5, borderSkipped: false }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 } }, beginAtZero: true } } }
       })
     }
@@ -3837,7 +3839,7 @@
       const entries = Object.keys(counts).map(function(k){ return { name: k, count: counts[k] } }).sort(function(a,b){return b.count-a.count}).slice(0,8)
       sportCharts['sportTopEx'] = new Chart(ctx, {
         type: 'bar',
-        data: { labels: entries.map(function(e){return e.name}), datasets: [{ data: entries.map(function(e){return e.count}), backgroundColor: 'var(--accent)', borderRadius: 5, borderSkipped: false }] },
+        data: { labels: entries.map(function(e){return e.name}), datasets: [{ data: entries.map(function(e){return e.count}), backgroundColor: '#1C1A17', borderRadius: 5, borderSkipped: false }] },
         options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, stepSize: 1, font: { size: 10 } }, beginAtZero: true }, y: { grid: { display: false }, ticks: { color: c.text, font: { size: 10 } } } } }
       })
     }
@@ -3877,7 +3879,7 @@
         })
       sportCharts['sportPR'] = new Chart(ctx, {
         type: 'line',
-        data: { labels: points.map(function(p){ return new Date(p.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) }), datasets: [{ data: points.map(function(p){return p.weight}), borderColor: 'var(--pastel-amber-text)', backgroundColor: 'transparent', tension: 0.3, pointRadius: 3, pointBackgroundColor: 'var(--pastel-amber-text)' }] },
+        data: { labels: points.map(function(p){ return new Date(p.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) }), datasets: [{ data: points.map(function(p){return p.weight}), borderColor: '#C2832E', backgroundColor: 'transparent', tension: 0.3, pointRadius: 3, pointBackgroundColor: '#C2832E' }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, stepSize: 10, callback: function(v){return v+' kg'} }, beginAtZero: true } } }
       })
     }
@@ -3944,7 +3946,7 @@
       })
       sportCharts['sportCardioDuration'] = new Chart(ctx, {
         type: 'bar',
-        data: { labels: buckets.map(function(b){return b.label}), datasets: [{ data: data, backgroundColor: 'var(--pastel-green-text)', borderRadius: 5, borderSkipped: false }] },
+        data: { labels: buckets.map(function(b){return b.label}), datasets: [{ data: data, backgroundColor: '#3F9B5C', borderRadius: 5, borderSkipped: false }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 0, autoSkip: true } }, y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 10 }, callback: function(v){return v+' min'} }, beginAtZero: true } } }
       })
     }
