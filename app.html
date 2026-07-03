@@ -5009,7 +5009,7 @@
           (b.genre ? '<div class="book-author" style="color:var(--text-muted);font-style:italic;">' + b.genre + '</div>' : '') +
           '<div class="book-meta">' +
           '<span class="book-status-badge ' + b.status + '">' + STATUS_LABELS[b.status] + '</span>' +
-          (b.status === 'reading' && b.total_pages ? '<div class="book-progress-wrap"><div class="book-progress-fill" style="width:' + pct + '%;"></div></div><span class="book-progress-label">' + (b.current_page || 0) + ' / ' + b.total_pages + ' p.</span>' : '') +
+          (b.status === 'reading' && b.total_pages ? '<div class="book-progress-wrap"><div class="book-progress-fill" style="width:' + pct + '%;"></div></div><span class="book-progress-label">' + (b.current_page || 0) + ' / ' + b.total_pages + ' p. · ' + pct + '%</span>' : '') +
           (b.status === 'done' && b.total_pages ? '<span class="book-progress-label">' + b.total_pages + ' p.</span>' : '') +
           (stars ? '<span class="book-rating-stars">' + stars + '</span>' : '') +
           '</div></div>'
