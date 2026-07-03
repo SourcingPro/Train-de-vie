@@ -1817,6 +1817,10 @@
           <div class="chart-header"><span class="chart-title">Livres terminés par mois</span></div>
           <div id="book-monthly-chart"></div>
         </div>
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Répartition par genre</span></div>
+          <div class="chart-canvas-wrap" style="height:220px;"><canvas id="chart-book-genre"></canvas></div>
+        </div>
       </div>
     </div>
     <div class="module" id="module-plants">
@@ -1995,6 +1999,30 @@
           <option value="reading">En cours</option>
           <option value="done">Terminé</option>
         </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Genre</label>
+        <input class="form-input" id="book-genre-input" placeholder="Roman, SF, Essai…" list="book-genre-list" maxlength="50" />
+        <datalist id="book-genre-list">
+          <option value="Roman"></option>
+          <option value="Policier"></option>
+          <option value="Thriller"></option>
+          <option value="Science-fiction"></option>
+          <option value="Fantasy"></option>
+          <option value="Essai"></option>
+          <option value="Biographie"></option>
+          <option value="Histoire"></option>
+          <option value="Développement personnel"></option>
+          <option value="Philosophie"></option>
+          <option value="Économie"></option>
+          <option value="Science"></option>
+          <option value="Voyage"></option>
+          <option value="Humour"></option>
+          <option value="Bande dessinée"></option>
+          <option value="Manga"></option>
+          <option value="Poésie"></option>
+          <option value="Cuisine"></option>
+        </datalist>
       </div>
       <div class="form-group">
         <label class="form-label">Nombre de pages</label>
@@ -4978,6 +5006,7 @@
           '<div class="book-info">' +
           '<div class="book-title">' + b.title + '</div>' +
           (b.author ? '<div class="book-author">' + b.author + '</div>' : '') +
+          (b.genre ? '<div class="book-author" style="color:var(--text-muted);font-style:italic;">' + b.genre + '</div>' : '') +
           '<div class="book-meta">' +
           '<span class="book-status-badge ' + b.status + '">' + STATUS_LABELS[b.status] + '</span>' +
           (b.status === 'reading' && b.total_pages ? '<div class="book-progress-wrap"><div class="book-progress-fill" style="width:' + pct + '%;"></div></div><span class="book-progress-label">' + (b.current_page || 0) + ' / ' + b.total_pages + ' p.</span>' : '') +
@@ -5030,6 +5059,7 @@
       document.getElementById('book-title-input').value = ''
       document.getElementById('book-author-input').value = ''
       document.getElementById('book-status-input').value = 'to_read'
+      document.getElementById('book-genre-input').value = ''
       document.getElementById('book-pages-input').value = ''
       document.getElementById('book-current-input').value = ''
       document.getElementById('book-notes-input').value = ''
@@ -5049,6 +5079,7 @@
       document.getElementById('book-title-input').value = b.title
       document.getElementById('book-author-input').value = b.author || ''
       document.getElementById('book-status-input').value = b.status
+      document.getElementById('book-genre-input').value = b.genre || ''
       document.getElementById('book-pages-input').value = b.total_pages || ''
       document.getElementById('book-current-input').value = b.current_page || ''
       document.getElementById('book-notes-input').value = b.notes || ''
@@ -5067,7 +5098,7 @@
       document.getElementById('book-delete')?.addEventListener('click', async function() {
         await db.from('books').delete().eq('id', editingBookId)
         books = books.filter(function(b) { return b.id !== editingBookId })
-        closeBookModal(); renderBooks(); updateBookStats(); showToast('Livre supprimé')
+        closeBookModal(); renderBooks(); updateBookStats(); renderBookGenreChart(); showToast('Livre supprimé')
       })
       document.getElementById('book-save').addEventListener('click', saveBook)
     }
@@ -5083,6 +5114,7 @@
         title: title,
         author: document.getElementById('book-author-input').value.trim() || null,
         cover_emoji: selectedBookEmoji,
+        genre: document.getElementById('book-genre-input').value.trim() || null,
         status: status,
         total_pages: totalPages,
         current_page: status === 'reading' ? currentPage : (status === 'done' ? (totalPages || 0) : 0),
@@ -5100,7 +5132,7 @@
         if (data) books.unshift(data)
         showToast('Livre ajouté')
       }
-      closeBookModal(); renderBooks(); updateBookStats()
+      closeBookModal(); renderBooks(); updateBookStats(); renderBookGenreChart()
     }
 
     document.getElementById('modal-book-close').addEventListener('click', closeBookModal)
@@ -5184,6 +5216,51 @@
     }
 
     // ── Onglet Stats ──
+    let bookGenreChart = null
+    function renderBookGenreChart() {
+      if (typeof Chart === 'undefined') return
+      const canvas = document.getElementById('chart-book-genre')
+      if (!canvas) return
+      if (bookGenreChart) { bookGenreChart.destroy(); bookGenreChart = null }
+      const counts = {}
+      books.filter(function(b) { return b.genre }).forEach(function(b) {
+        var g = b.genre.trim()
+        counts[g] = (counts[g] || 0) + 1
+      })
+      const labels = Object.keys(counts)
+      if (!labels.length) {
+        var ctx2 = canvas.getContext('2d')
+        ctx2.clearRect(0, 0, canvas.width, canvas.height)
+        return
+      }
+      const data = labels.map(function(l) { return counts[l] })
+      const palette = ['#DCEAFB','#FBE3EC','#DFF3E3','#FBEAD2','#EBE2FB','#E0F4F4','#FFF3CD','#F4E0FB','#E0F0E0','#FBE0E0','#E0E8FB','#F0FBE0']
+      var ctx = canvas.getContext('2d')
+      bookGenreChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{ data: data, backgroundColor: palette.slice(0, labels.length), borderWidth: 0 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { padding: 10, font: { size: 11 }, color: '#1C1A17' } },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) {
+                  var total = ctx.dataset.data.reduce(function(a, b) { return a + b }, 0)
+                  var pct = Math.round((ctx.parsed / total) * 100)
+                  return ctx.label + ' : ' + ctx.parsed + ' (' + pct + '%)'
+                }
+              }
+            }
+          }
+        }
+      })
+    }
+
     document.getElementById('btn-book-stats').addEventListener('click', function() {
       ;['btn-book-all','btn-book-reading','btn-book-toread','btn-book-done','btn-book-stats'].forEach(function(id) {
         document.getElementById(id).classList.remove('active')
@@ -5194,6 +5271,7 @@
       loadBookGoals()
       renderBookGoalStats()
       renderBookMonthlyChart()
+      renderBookGenreChart()
     })
     ;['btn-book-all','btn-book-reading','btn-book-toread','btn-book-done'].forEach(function(id) {
       document.getElementById(id).addEventListener('click', function() {
