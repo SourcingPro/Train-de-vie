@@ -1276,6 +1276,21 @@
     .session-set-check.done svg { opacity: 1; }
 
     /* ══════════════════════════════════════
+       ARTICLES — PRESSE
+    ══════════════════════════════════════ */
+    .art-item { display:flex;flex-direction:column;gap:0.25rem;padding:0.875rem 1.25rem;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background var(--transition); }
+    .art-item:last-child { border-bottom:none; }
+    .art-item:hover { background:var(--surface-2); }
+    .art-title { font-size:0.9rem;font-weight:600;line-height:1.35; }
+    .art-meta { display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;font-size:0.75rem;color:var(--text-muted); }
+    .art-source { font-weight:600;color:var(--text-secondary); }
+    .art-tag { font-size:0.625rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:100px;background:var(--surface-2);color:var(--text-secondary); }
+    .art-tag-option { display:inline-flex;align-items:center;gap:0.25rem;padding:0.35rem 0.75rem;border-radius:100px;border:1.5px solid var(--border);font-size:0.8125rem;cursor:pointer;transition:all var(--transition);background:var(--surface);color:var(--text-secondary); }
+    .art-tag-option.selected { background:var(--accent);color:var(--bg);border-color:var(--accent); }
+    .art-tag-manage { display:flex;align-items:center;justify-content:space-between;padding:0.625rem 0;border-bottom:0.5px solid var(--border); }
+    .art-tag-manage:last-child { border-bottom:none; }
+
+    /* ══════════════════════════════════════
        LECTURE — LIVRES
     ══════════════════════════════════════ */
     .book-item {
@@ -1823,6 +1838,65 @@
         </div>
       </div>
     </div>
+<!-- MODULE : ARTICLES -->
+    <div class="module" id="module-articles">
+      <div class="page-header">
+        <div class="page-title">Presse</div>
+        <div class="page-subtitle">Articles lus</div>
+      </div>
+
+      <!-- Onglets : Liste | Tags | Stats -->
+      <div class="task-view-toggle" style="overflow-x:auto;scrollbar-width:none;">
+        <button class="task-view-btn active" id="btn-art-list">Articles</button>
+        <button class="task-view-btn" id="btn-art-tags">Tags</button>
+        <button class="task-view-btn" id="btn-art-stats">Stats</button>
+      </div>
+
+      <!-- VUE LISTE -->
+      <div id="art-list-view">
+        <div class="ex-lib-search-row">
+          <input class="form-input" style="flex:1;" placeholder="Rechercher…" id="art-search" />
+          <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-art">+ Ajouter</button>
+        </div>
+        <!-- Filtres catégorie -->
+        <div class="ex-filter-row" id="art-filter-cats"></div>
+        <!-- Filtres tags -->
+        <div class="ex-filter-row" id="art-filter-tags" style="padding-top:0;"></div>
+        <!-- Stats rapides -->
+        <div class="stats-grid-4" style="margin:0 1.25rem 0.875rem;">
+          <div class="stat-card-sm"><div class="stat-value-sm" id="art-stat-total">0</div><div class="stat-label-sm">Total</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="art-stat-week">0</div><div class="stat-label-sm">Cette semaine</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="art-stat-month">0</div><div class="stat-label-sm">Ce mois</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="art-stat-sources">0</div><div class="stat-label-sm">Sources</div></div>
+        </div>
+        <div class="card" style="padding:0;"><div id="art-list"></div></div>
+      </div>
+
+      <!-- VUE TAGS -->
+      <div id="art-tags-view" style="display:none;">
+        <div class="card">
+          <div class="card-title">Gérer les tags</div>
+          <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;">
+            <input class="form-input" style="flex:1;" id="art-new-tag-name" placeholder="Nom du tag…" maxlength="30" />
+            <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-add-art-tag">Ajouter</button>
+          </div>
+          <div id="art-tags-list"></div>
+        </div>
+      </div>
+
+      <!-- VUE STATS -->
+      <div id="art-stats-view" style="display:none;">
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Répartition par catégorie</span></div>
+          <div class="chart-canvas-wrap" style="height:220px;"><canvas id="chart-art-cats"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Répartition par source</span></div>
+          <div class="chart-canvas-wrap" style="height:220px;"><canvas id="chart-art-sources"></canvas></div>
+        </div>
+      </div>
+    </div>
+
     <div class="module" id="module-plants">
       <div class="coming-soon"><div class="coming-soon-icon">🌿</div><h2>Plantes</h2><p>Suivi d'arrosage et<br/>calendrier de tes plantes.</p></div>
     </div>
@@ -1969,6 +2043,60 @@
       </div>
       <input type="hidden" id="tlib-editing-id" />
       <div class="modal-actions" id="tlib-edit-actions"></div>
+    </div>
+  </div>
+
+  <!-- MODAL ARTICLE -->
+  <div class="modal-overlay" id="modal-article">
+    <div class="modal" style="max-height:90dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-art-title">Nouvel article</div>
+        <button class="modal-close" id="modal-art-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Titre</label>
+        <input class="form-input" id="art-title-input" placeholder="Titre de l'article" maxlength="200" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Auteur</label>
+        <input class="form-input" id="art-author-input" placeholder="Nom de l'auteur" maxlength="100" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Source (journal)</label>
+        <input class="form-input" id="art-source-input" placeholder="Le Monde, NYT, The Economist…" maxlength="100" list="art-source-list" />
+        <datalist id="art-source-list"></datalist>
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL</label>
+        <input class="form-input" id="art-url-input" placeholder="https://…" type="url" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date de lecture</label>
+        <input class="form-input" id="art-date-input" type="date" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catégorie</label>
+        <input class="form-input" id="art-cat-input" placeholder="Politique, Économie, Tech…" maxlength="50" list="art-cat-list" />
+        <datalist id="art-cat-list">
+          <option value="Politique"></option>
+          <option value="Économie"></option>
+          <option value="Technologie"></option>
+          <option value="Science"></option>
+          <option value="Environnement"></option>
+          <option value="Culture"></option>
+          <option value="Sport"></option>
+          <option value="International"></option>
+          <option value="Société"></option>
+          <option value="Santé"></option>
+          <option value="Business"></option>
+          <option value="Justice"></option>
+        </datalist>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tags</label>
+        <div id="art-modal-tag-picker"></div>
+      </div>
+      <div class="modal-actions" id="art-modal-actions"></div>
     </div>
   </div>
 
@@ -2333,6 +2461,7 @@
       { id: 'tasks',      label: 'Tâches',    icon: '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>' },
       { id: 'sport',      label: 'Sport',     icon: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>' },
       { id: 'reading',    label: 'Lecture',   icon: '<path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>' },
+      { id: 'articles',   label: 'Presse',    icon: '<path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6z"/>' },
       { id: 'plants',     label: 'Plantes',   icon: '<path d="M12 22V12"/><path d="M5 12C5 7 8 4 12 4c4 0 7 3 7 8-2 0-4-1-5-2-1 2-2 3-4 3s-5-1-5-1z"/>' },
       { id: 'wishlist',   label: 'Wishlist',  icon: '<path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>' },
       { id: 'chores',     label: 'Ménage',    icon: '<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>' },
@@ -5283,6 +5412,313 @@
     document.getElementById('btn-new-book').addEventListener('click', openNewBook)
 
 
+// ══════════════════════════════════════
+    // ARTICLES — PRESSE
+    // ══════════════════════════════════════
+    let articles = []
+    let articleTags = []
+    let artSearch = ''
+    let artFilterCat = 'Tous'
+    let artFilterTagId = null
+    let editingArtId = null
+    let selectedArtTagIds = []
+    let artCatChart = null
+    let artSrcChart = null
+
+    async function loadArticles() {
+      const { data } = await db.from('articles').select('*').eq('profile_id', profile.id).order('read_at', { ascending: false })
+      articles = data || []
+      renderArticles()
+      updateArtStats()
+    }
+
+    async function loadArticleTags() {
+      const { data } = await db.from('article_tags').select('*').eq('profile_id', profile.id).order('created_at')
+      articleTags = data || []
+    }
+
+    function getArtFiltered() {
+      return articles.filter(function(a) {
+        var ms = !artSearch || a.title.toLowerCase().includes(artSearch.toLowerCase()) || (a.source && a.source.toLowerCase().includes(artSearch.toLowerCase())) || (a.author && a.author.toLowerCase().includes(artSearch.toLowerCase()))
+        var mc = artFilterCat === 'Tous' || a.category === artFilterCat
+        var mt = !artFilterTagId || (a.tag_ids && a.tag_ids.includes(artFilterTagId))
+        return ms && mc && mt
+      })
+    }
+
+    function updateArtStats() {
+      var now = new Date()
+      var weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7)
+      var monthStart = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0')
+      document.getElementById('art-stat-total').textContent = articles.length
+      document.getElementById('art-stat-week').textContent = articles.filter(function(a) { return a.read_at && new Date(a.read_at) >= weekAgo }).length
+      document.getElementById('art-stat-month').textContent = articles.filter(function(a) { return a.read_at && a.read_at.startsWith(monthStart) }).length
+      var sources = new Set(articles.map(function(a) { return a.source }).filter(Boolean))
+      document.getElementById('art-stat-sources').textContent = sources.size
+    }
+
+    function renderArtFilters() {
+      var cats = ['Tous'].concat([...new Set(articles.map(function(a) { return a.category }).filter(Boolean))].sort())
+      var el = document.getElementById('art-filter-cats')
+      el.innerHTML = ''
+      cats.forEach(function(c) {
+        var btn = document.createElement('button')
+        btn.className = 'filter-chip' + (c === artFilterCat ? ' active' : '')
+        btn.textContent = c
+        btn.addEventListener('click', function() { artFilterCat = c; renderArtFilters(); renderArticles() })
+        el.appendChild(btn)
+      })
+      var tel = document.getElementById('art-filter-tags')
+      tel.innerHTML = ''
+      if (articleTags.length) {
+        var allBtn = document.createElement('button')
+        allBtn.className = 'filter-chip' + (!artFilterTagId ? ' active' : '')
+        allBtn.textContent = 'Tous les tags'
+        allBtn.addEventListener('click', function() { artFilterTagId = null; renderArtFilters(); renderArticles() })
+        tel.appendChild(allBtn)
+        articleTags.forEach(function(t) {
+          var btn = document.createElement('button')
+          btn.className = 'filter-chip' + (artFilterTagId === t.id ? ' active' : '')
+          btn.textContent = t.name
+          btn.style.borderColor = t.color || 'var(--border)'
+          btn.style.color = t.color || 'var(--text-secondary)'
+          if (artFilterTagId === t.id) btn.style.background = (t.color || '#000') + '22'
+          btn.addEventListener('click', function() { artFilterTagId = t.id; renderArtFilters(); renderArticles() })
+          tel.appendChild(btn)
+        })
+      }
+    }
+
+    function renderArticles() {
+      var el = document.getElementById('art-list')
+      var filtered = getArtFiltered()
+      if (!filtered.length) {
+        el.innerHTML = '<div class="empty-state" style="padding:2.5rem;"><p>' + (artSearch ? 'Aucun résultat.' : 'Aucun article pour l\'instant.') + '</p></div>'
+        return
+      }
+      el.innerHTML = ''
+      filtered.forEach(function(a) {
+        var div = document.createElement('div')
+        div.className = 'art-item'
+        var tagsHtml = (a.tag_ids || []).map(function(id) {
+          var t = articleTags.find(function(x) { return x.id === id })
+          return t ? '<span class="art-tag" style="color:' + (t.color || 'inherit') + ';background:' + (t.color || '#000') + '22;">' + t.name + '</span>' : ''
+        }).join('')
+        var dateStr = a.read_at ? new Date(a.read_at + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : ''
+        div.innerHTML = '<div class="art-title">' + a.title + '</div>' +
+          '<div class="art-meta">' +
+          (a.source ? '<span class="art-source">' + a.source + '</span>' : '') +
+          (a.author ? '<span>· ' + a.author + '</span>' : '') +
+          (dateStr ? '<span>· ' + dateStr + '</span>' : '') +
+          (a.category ? '<span>· ' + a.category + '</span>' : '') +
+          '</div>' +
+          (tagsHtml ? '<div style="display:flex;gap:0.25rem;flex-wrap:wrap;margin-top:0.25rem;">' + tagsHtml + '</div>' : '')
+        if (a.url) {
+          var link = document.createElement('a')
+          link.href = a.url
+          link.target = '_blank'
+          link.rel = 'noopener'
+          link.style.cssText = 'font-size:0.75rem;color:var(--text-muted);text-decoration:none;'
+          link.textContent = a.url.replace(/^https?:\/\//, '').split('/')[0]
+          div.appendChild(link)
+        }
+        div.addEventListener('click', function(e) { if (e.target.tagName !== 'A') openEditArt(a) })
+        el.appendChild(div)
+      })
+    }
+
+    // ── Autocomplete sources ──
+    function updateArtSourceList() {
+      var dl = document.getElementById('art-source-list')
+      if (!dl) return
+      var sources = [...new Set(articles.map(function(a) { return a.source }).filter(Boolean))]
+      dl.innerHTML = sources.map(function(s) { return '<option value="' + s + '"></option>' }).join('')
+    }
+
+    // ── Modal ──
+    function renderArtTagPicker() {
+      var el = document.getElementById('art-modal-tag-picker')
+      if (!articleTags.length) { el.innerHTML = '<span style="font-size:0.8125rem;color:var(--text-muted);">Crée des tags dans l\'onglet Tags.</span>'; return }
+      el.innerHTML = ''
+      articleTags.forEach(function(t) {
+        var btn = document.createElement('button')
+        btn.type = 'button'
+        btn.className = 'art-tag-option' + (selectedArtTagIds.includes(t.id) ? ' selected' : '')
+        btn.textContent = t.name
+        if (t.color) { btn.style.borderColor = t.color; btn.style.color = selectedArtTagIds.includes(t.id) ? '#fff' : t.color; if (selectedArtTagIds.includes(t.id)) btn.style.background = t.color }
+        btn.addEventListener('click', function() {
+          if (selectedArtTagIds.includes(t.id)) selectedArtTagIds = selectedArtTagIds.filter(function(x) { return x !== t.id })
+          else selectedArtTagIds.push(t.id)
+          renderArtTagPicker()
+        })
+        el.appendChild(btn)
+      })
+    }
+
+    function openNewArt() {
+      editingArtId = null; selectedArtTagIds = []
+      document.getElementById('modal-art-title').textContent = 'Nouvel article'
+      document.getElementById('art-title-input').value = ''
+      document.getElementById('art-author-input').value = ''
+      document.getElementById('art-source-input').value = ''
+      document.getElementById('art-url-input').value = ''
+      document.getElementById('art-date-input').value = new Date().toISOString().split('T')[0]
+      document.getElementById('art-cat-input').value = ''
+      document.getElementById('art-modal-actions').innerHTML = '<button class="btn-secondary" id="art-cancel">Annuler</button><button class="btn-primary" id="art-save">Ajouter</button>'
+      updateArtSourceList()
+      renderArtTagPicker()
+      bindArtModalButtons()
+      document.getElementById('modal-article').classList.add('open')
+    }
+
+    function openEditArt(a) {
+      editingArtId = a.id; selectedArtTagIds = (a.tag_ids || []).slice()
+      document.getElementById('modal-art-title').textContent = 'Modifier l\'article'
+      document.getElementById('art-title-input').value = a.title
+      document.getElementById('art-author-input').value = a.author || ''
+      document.getElementById('art-source-input').value = a.source || ''
+      document.getElementById('art-url-input').value = a.url || ''
+      document.getElementById('art-date-input').value = a.read_at || new Date().toISOString().split('T')[0]
+      document.getElementById('art-cat-input').value = a.category || ''
+      document.getElementById('art-modal-actions').innerHTML = '<button class="btn-danger" id="art-delete">Supprimer</button><button class="btn-primary" id="art-save">Enregistrer</button>'
+      updateArtSourceList()
+      renderArtTagPicker()
+      bindArtModalButtons()
+      document.getElementById('modal-article').classList.add('open')
+    }
+
+    function closeArtModal() { document.getElementById('modal-article').classList.remove('open') }
+
+    function bindArtModalButtons() {
+      document.getElementById('art-cancel')?.addEventListener('click', closeArtModal)
+      document.getElementById('art-delete')?.addEventListener('click', async function() {
+        await db.from('articles').delete().eq('id', editingArtId)
+        articles = articles.filter(function(a) { return a.id !== editingArtId })
+        closeArtModal(); renderArticles(); updateArtStats(); renderArtFilters(); showToast('Article supprimé')
+      })
+      document.getElementById('art-save').addEventListener('click', saveArt)
+    }
+
+    async function saveArt() {
+      var title = document.getElementById('art-title-input').value.trim()
+      if (!title) return
+      var payload = {
+        profile_id: profile.id,
+        title: title,
+        author: document.getElementById('art-author-input').value.trim() || null,
+        source: document.getElementById('art-source-input').value.trim() || null,
+        url: document.getElementById('art-url-input').value.trim() || null,
+        read_at: document.getElementById('art-date-input').value || new Date().toISOString().split('T')[0],
+        category: document.getElementById('art-cat-input').value.trim() || null,
+        tag_ids: selectedArtTagIds.slice()
+      }
+      if (editingArtId) {
+        await db.from('articles').update(payload).eq('id', editingArtId)
+        articles = articles.map(function(a) { return a.id === editingArtId ? { ...a, ...payload, id: editingArtId } : a })
+        showToast('Article modifié')
+      } else {
+        var { data } = await db.from('articles').insert(payload).select().single()
+        if (data) articles.unshift(data)
+        showToast('Article ajouté')
+      }
+      closeArtModal(); renderArticles(); updateArtStats(); renderArtFilters()
+    }
+
+    document.getElementById('modal-art-close').addEventListener('click', closeArtModal)
+    document.getElementById('modal-article').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeArtModal() })
+    document.getElementById('btn-new-art').addEventListener('click', openNewArt)
+    document.getElementById('art-search').addEventListener('input', function(e) { artSearch = e.target.value; renderArticles() })
+
+    // ── Tags management ──
+    function renderArtTagsList() {
+      var el = document.getElementById('art-tags-list')
+      if (!articleTags.length) { el.innerHTML = '<p style="font-size:0.875rem;color:var(--text-muted);">Aucun tag. Crée-en un ci-dessus.</p>'; return }
+      el.innerHTML = ''
+      var colors = ['#4A7FC2','#C24A7F','#7FC24A','#C2832E','#7C5CC2','#2EC2B8','#C2C24A']
+      articleTags.forEach(function(t, i) {
+        var row = document.createElement('div')
+        row.className = 'art-tag-manage'
+        var left = document.createElement('div')
+        left.style.cssText = 'display:flex;align-items:center;gap:0.5rem;'
+        var dot = document.createElement('div')
+        dot.style.cssText = 'width:10px;height:10px;border-radius:50%;background:' + (t.color || '#ccc') + ';'
+        var name = document.createElement('span')
+        name.style.fontSize = '0.875rem'
+        name.textContent = t.name
+        left.appendChild(dot); left.appendChild(name)
+        var del = document.createElement('button')
+        del.className = 'btn-icon'
+        del.style.cssText = 'width:28px;height:28px;'
+        del.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>'
+        del.addEventListener('click', async function() {
+          await db.from('article_tags').delete().eq('id', t.id)
+          articleTags = articleTags.filter(function(x) { return x.id !== t.id })
+          renderArtTagsList(); renderArtFilters(); showToast('Tag supprimé')
+        })
+        row.appendChild(left); row.appendChild(del)
+        el.appendChild(row)
+      })
+    }
+
+    document.getElementById('btn-add-art-tag').addEventListener('click', async function() {
+      var name = document.getElementById('art-new-tag-name').value.trim()
+      if (!name) return
+      var colors = ['#4A7FC2','#C24A7F','#7FC24A','#C2832E','#7C5CC2','#2EC2B8','#C2C24A']
+      var color = colors[articleTags.length % colors.length]
+      var tag = { id: 'atag' + Date.now(), name: name, color: color }
+      await db.from('article_tags').insert({ id: tag.id, profile_id: profile.id, name: tag.name, color: tag.color })
+      articleTags.push(tag)
+      document.getElementById('art-new-tag-name').value = ''
+      renderArtTagsList(); renderArtFilters(); showToast('Tag créé')
+    })
+
+    // ── Stats charts ──
+    function renderArtCharts() {
+      if (typeof Chart === 'undefined') { setTimeout(renderArtCharts, 300); return }
+      if (artCatChart) { artCatChart.destroy(); artCatChart = null }
+      if (artSrcChart) { artSrcChart.destroy(); artSrcChart = null }
+      var palette = ['#DCEAFB','#FBE3EC','#DFF3E3','#FBEAD2','#EBE2FB','#E0F4F4','#FFF3CD','#F4E0FB','#E0F0E0','#FBE0E0']
+      var catCounts = {}
+      articles.forEach(function(a) { if (a.category) catCounts[a.category] = (catCounts[a.category] || 0) + 1 })
+      var catLabels = Object.keys(catCounts)
+      if (catLabels.length) {
+        var ctx = document.getElementById('chart-art-cats').getContext('2d')
+        artCatChart = new Chart(ctx, { type: 'doughnut', data: { labels: catLabels, datasets: [{ data: catLabels.map(function(l) { return catCounts[l] }), backgroundColor: palette.slice(0, catLabels.length), borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, color: '#1C1A17', padding: 10 } }, tooltip: { callbacks: { label: function(c) { var t = c.dataset.data.reduce(function(a,b){return a+b},0); return c.label + ' : ' + c.parsed + ' (' + Math.round(c.parsed/t*100) + '%)' } } } } } })
+      }
+      var srcCounts = {}
+      articles.forEach(function(a) { if (a.source) srcCounts[a.source] = (srcCounts[a.source] || 0) + 1 })
+      var srcLabels = Object.keys(srcCounts).sort(function(a,b){return srcCounts[b]-srcCounts[a]}).slice(0,10)
+      if (srcLabels.length) {
+        var ctx2 = document.getElementById('chart-art-sources').getContext('2d')
+        artSrcChart = new Chart(ctx2, { type: 'doughnut', data: { labels: srcLabels, datasets: [{ data: srcLabels.map(function(l) { return srcCounts[l] }), backgroundColor: palette.slice(0, srcLabels.length), borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, color: '#1C1A17', padding: 10 } }, tooltip: { callbacks: { label: function(c) { var t = c.dataset.data.reduce(function(a,b){return a+b},0); return c.label + ' : ' + c.parsed + ' (' + Math.round(c.parsed/t*100) + '%)' } } } } } })
+      }
+    }
+
+    // ── Nav ──
+    document.getElementById('btn-art-list').addEventListener('click', function() {
+      ;['btn-art-list','btn-art-tags','btn-art-stats'].forEach(function(id) { document.getElementById(id).classList.remove('active') })
+      document.getElementById('btn-art-list').classList.add('active')
+      document.getElementById('art-list-view').style.display = ''
+      document.getElementById('art-tags-view').style.display = 'none'
+      document.getElementById('art-stats-view').style.display = 'none'
+    })
+    document.getElementById('btn-art-tags').addEventListener('click', function() {
+      ;['btn-art-list','btn-art-tags','btn-art-stats'].forEach(function(id) { document.getElementById(id).classList.remove('active') })
+      document.getElementById('btn-art-tags').classList.add('active')
+      document.getElementById('art-list-view').style.display = 'none'
+      document.getElementById('art-tags-view').style.display = ''
+      document.getElementById('art-stats-view').style.display = 'none'
+      renderArtTagsList()
+    })
+    document.getElementById('btn-art-stats').addEventListener('click', function() {
+      ;['btn-art-list','btn-art-tags','btn-art-stats'].forEach(function(id) { document.getElementById(id).classList.remove('active') })
+      document.getElementById('btn-art-stats').classList.add('active')
+      document.getElementById('art-list-view').style.display = 'none'
+      document.getElementById('art-tags-view').style.display = 'none'
+      document.getElementById('art-stats-view').style.display = ''
+      renderArtCharts()
+    })
+
     // ── HEADER ──
     function renderHeader() {
       const colors = ['#DBEAFE','#FCE4EC','#DCEDC8','#FFE0B2','#EDE7F6']
@@ -5318,13 +5754,14 @@
         btn.classList.toggle('active', TABS[i].id === id)
       })
       const titles = {
-        tasks:'Tâches', sport:'Sport', reading:'Lecture', plants:'Plantes',
+        tasks:'Tâches', sport:'Sport', reading:'Lecture', articles:'Presse', plants:'Plantes',
         wishlist:'Wishlist', chores:'Ménage', shopping:'À acheter', gifts:'Cadeaux',
         social:'Proches', media:'Séries & Films', cooking:'Cuisine', activities:'Sorties'
       }
       document.getElementById('header-title').textContent = titles[id] || id
       document.getElementById('fab').style.display = (id === 'tasks') ? 'flex' : 'none'
       if (id === 'reading') loadBooks()
+      if (id === 'articles') { loadArticleTags().then(function() { loadArticles().then(function() { renderArtFilters() }) }) }
     }
 
     // (renderDateStrip remplacé par renderWeekBig, voir plus bas)
