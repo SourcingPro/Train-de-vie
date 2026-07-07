@@ -2241,6 +2241,27 @@
         <button type="button" class="btn-secondary" style="width:100%;margin-top:0.5rem;font-size:0.8125rem;" id="btn-add-step">+ Ajouter une étape</button>
       </div>
       <div class="form-group">
+        <label class="form-label">Valeurs nutritives (pour 100g)</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+          <div>
+            <div class="form-label" style="font-size:0.75rem;margin-bottom:0.25rem;">🔥 Calories (kcal)</div>
+            <input class="form-input" type="number" id="recipe-kcal-input" min="0" placeholder="Ex : 150" />
+          </div>
+          <div>
+            <div class="form-label" style="font-size:0.75rem;margin-bottom:0.25rem;">🍞 Glucides (g)</div>
+            <input class="form-input" type="number" id="recipe-carbs-input" min="0" placeholder="Ex : 20" />
+          </div>
+          <div>
+            <div class="form-label" style="font-size:0.75rem;margin-bottom:0.25rem;">🥩 Protéines (g)</div>
+            <input class="form-input" type="number" id="recipe-protein-input" min="0" placeholder="Ex : 15" />
+          </div>
+          <div>
+            <div class="form-label" style="font-size:0.75rem;margin-bottom:0.25rem;">🧈 Lipides (g)</div>
+            <input class="form-input" type="number" id="recipe-fat-input" min="0" placeholder="Ex : 5" />
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
         <label class="form-label">Notes</label>
         <textarea class="form-input" id="recipe-notes-input" rows="2" style="resize:none;" placeholder="Astuces, variantes…"></textarea>
       </div>
@@ -5836,6 +5857,25 @@
       if (r.default_portions) html += '<div class="stat-card-sm"><div class="stat-value-sm">' + r.default_portions + '</div><div class="stat-label-sm">Portions</div></div>'
       html += '<div class="stat-card-sm"><div class="stat-value-sm"><span class="recipe-badge ' + (r.category || 'classique') + '">' + (r.category || 'classique') + '</span></div><div class="stat-label-sm">Type</div></div>'
       html += '</div>'
+
+      // Nutrition section
+      var n = r.nutrition || {}
+      var hasNutrition = n.kcal || n.carbs || n.protein || n.fat
+      if (hasNutrition) {
+        html += '<div class="card-title">Valeurs nutritives</div>'
+        html += '<div class="card" style="margin-bottom:0.875rem;">'
+        html += '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">'
+        html += '<span style="font-size:0.8125rem;color:var(--text-muted);">Pour</span>'
+        html += '<input type="number" id="nutrition-weight-input" value="100" min="1" style="width:75px;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0.35rem 0.5rem;font-size:0.875rem;font-weight:600;background:var(--surface);color:var(--text);" />'
+        html += '<span style="font-size:0.8125rem;color:var(--text-muted);">g</span></div>'
+        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;" id="nutrition-values">'
+        html += '<div class="stat-card-sm"><div class="stat-value-sm" id="n-kcal">' + (n.kcal || 0) + '</div><div class="stat-label-sm">🔥 kcal</div></div>'
+        html += '<div class="stat-card-sm"><div class="stat-value-sm" id="n-carbs">' + (n.carbs || 0) + '</div><div class="stat-label-sm">🍞 Glucides (g)</div></div>'
+        html += '<div class="stat-card-sm"><div class="stat-value-sm" id="n-protein">' + (n.protein || 0) + '</div><div class="stat-label-sm">🥩 Protéines (g)</div></div>'
+        html += '<div class="stat-card-sm"><div class="stat-value-sm" id="n-fat">' + (n.fat || 0) + '</div><div class="stat-label-sm">🧈 Lipides (g)</div></div>'
+        html += '</div></div>'
+      }
+
       if ((r.ingredients || []).length) {
         html += '<div class="card-title">Ingrédients</div><div class="card" style="padding:0.75rem 1.25rem;margin-bottom:0.875rem;">'
         r.ingredients.forEach(function(i) {
@@ -5854,6 +5894,19 @@
       }
       if (r.notes) html += '<div class="card-title">Notes</div><div class="card" style="font-size:0.875rem;color:var(--text-secondary);">' + r.notes + '</div>'
       body.innerHTML = html
+
+      // Bind nutrition calculator
+      if (hasNutrition) {
+        document.getElementById('nutrition-weight-input').addEventListener('input', function() {
+          var w = parseFloat(this.value) || 100
+          var ratio = w / 100
+          document.getElementById('n-kcal').textContent = Math.round((n.kcal || 0) * ratio)
+          document.getElementById('n-carbs').textContent = Math.round((n.carbs || 0) * ratio * 10) / 10
+          document.getElementById('n-protein').textContent = Math.round((n.protein || 0) * ratio * 10) / 10
+          document.getElementById('n-fat').textContent = Math.round((n.fat || 0) * ratio * 10) / 10
+        })
+      }
+
       document.getElementById('modal-recipe-detail').classList.add('open')
     }
 
@@ -5961,6 +6014,10 @@
       document.getElementById('recipe-cook-input').value = ''
       document.getElementById('recipe-portions-input').value = '2'
       document.getElementById('recipe-notes-input').value = ''
+      document.getElementById('recipe-kcal-input').value = ''
+      document.getElementById('recipe-carbs-input').value = ''
+      document.getElementById('recipe-protein-input').value = ''
+      document.getElementById('recipe-fat-input').value = ''
       setRecipeCat('healthy')
       renderIngredientRows(); renderStepRows()
       document.getElementById('recipe-modal-actions').innerHTML = '<button class="btn-secondary" id="recipe-cancel">Annuler</button><button class="btn-primary" id="recipe-save">Créer</button>'
@@ -5973,12 +6030,17 @@
       recipeIngredients = JSON.parse(JSON.stringify(r.ingredients || []))
       recipeSteps = JSON.parse(JSON.stringify(r.steps || []))
       selectedRecipeCat = r.category || 'classique'
+      var n = r.nutrition || {}
       document.getElementById('modal-recipe-title').textContent = 'Modifier la recette'
       document.getElementById('recipe-title-input').value = r.title
       document.getElementById('recipe-prep-input').value = r.prep_time || ''
       document.getElementById('recipe-cook-input').value = r.cook_time || ''
       document.getElementById('recipe-portions-input').value = r.default_portions || 2
       document.getElementById('recipe-notes-input').value = r.notes || ''
+      document.getElementById('recipe-kcal-input').value = n.kcal || ''
+      document.getElementById('recipe-carbs-input').value = n.carbs || ''
+      document.getElementById('recipe-protein-input').value = n.protein || ''
+      document.getElementById('recipe-fat-input').value = n.fat || ''
       setRecipeCat(selectedRecipeCat)
       renderIngredientRows(); renderStepRows()
       document.getElementById('recipe-modal-actions').innerHTML = '<button class="btn-danger" id="recipe-delete">Supprimer</button><button class="btn-primary" id="recipe-save">Enregistrer</button>'
@@ -6001,6 +6063,11 @@
     async function saveRecipe() {
       var title = document.getElementById('recipe-title-input').value.trim()
       if (!title) return
+      var kcal = parseFloat(document.getElementById('recipe-kcal-input').value) || null
+      var carbs = parseFloat(document.getElementById('recipe-carbs-input').value) || null
+      var protein = parseFloat(document.getElementById('recipe-protein-input').value) || null
+      var fat = parseFloat(document.getElementById('recipe-fat-input').value) || null
+      var nutrition = (kcal || carbs || protein || fat) ? { kcal: kcal, carbs: carbs, protein: protein, fat: fat } : null
       var payload = {
         household_id: householdId,
         title: title,
@@ -6010,7 +6077,8 @@
         default_portions: parseInt(document.getElementById('recipe-portions-input').value) || 2,
         ingredients: recipeIngredients.filter(function(i) { return i.name }),
         steps: recipeSteps.filter(function(s) { return s.trim() }),
-        notes: document.getElementById('recipe-notes-input').value.trim() || null
+        notes: document.getElementById('recipe-notes-input').value.trim() || null,
+        nutrition: nutrition
       }
       if (editingRecipeId) {
         await db.from('recipes').update(payload).eq('id', editingRecipeId)
