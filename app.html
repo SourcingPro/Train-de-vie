@@ -1278,6 +1278,47 @@
     /* ══════════════════════════════════════
        PLANTES
     ══════════════════════════════════════ */
+/* ══════════════════════════════════════
+       CUISINE
+    ══════════════════════════════════════ */
+    .recipe-card { display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background var(--transition); }
+    .recipe-card:last-child { border-bottom:none; }
+    .recipe-card:hover { background:var(--surface-2); }
+    .recipe-emoji { width:44px;height:44px;border-radius:10px;background:var(--surface-2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem; }
+    .recipe-info { flex:1;min-width:0; }
+    .recipe-title { font-size:0.9375rem;font-weight:600; }
+    .recipe-meta { font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem; }
+    .recipe-badge { font-size:0.625rem;font-weight:700;padding:0.2rem 0.5rem;border-radius:100px;text-transform:uppercase; }
+    .recipe-badge.healthy { background:#DFF3E3;color:#3F9B5C; }
+    .recipe-badge.classique { background:#DCEAFB;color:#4A7FC2; }
+    .recipe-badge.cheat { background:#FEE2E2;color:#DC2626; }
+    .ingredient-row { display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem; }
+    .ingredient-row input { flex:1; }
+    .ingredient-qty { width:80px !important;flex:none !important; }
+    .ingredient-unit { width:70px !important;flex:none !important; }
+    .step-row { display:flex;gap:0.5rem;align-items:flex-start;margin-bottom:0.5rem; }
+    .step-num { width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--bg);font-size:0.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:0.6rem; }
+    .plan-card { border-radius:var(--radius);border:0.5px solid var(--border);background:var(--surface);margin-bottom:0.875rem;overflow:hidden; }
+    .plan-card-header { padding:0.875rem 1.25rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
+    .plan-card-title { font-size:0.9375rem;font-weight:700; }
+    .plan-card-dates { font-size:0.75rem;color:var(--text-muted); }
+    .plan-meal-row { display:flex;align-items:center;gap:0.75rem;padding:0.625rem 1.25rem;border-bottom:0.5px solid var(--border); }
+    .plan-meal-row:last-child { border-bottom:none; }
+    .plan-meal-row.done { opacity:0.5; }
+    .plan-meal-check { width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition); }
+    .plan-meal-check.done { background:var(--accent);border-color:var(--accent); }
+    .plan-meal-name { flex:1;font-size:0.875rem;font-weight:500; }
+    .plan-meal-portions { font-size:0.75rem;color:var(--text-muted); }
+    .shopping-section { margin-bottom:1rem; }
+    .shopping-section-title { font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);padding:0.5rem 1.25rem;background:var(--surface-2);border-radius:var(--radius-sm);margin-bottom:0.25rem; }
+    .shopping-item { display:flex;align-items:center;gap:0.75rem;padding:0.625rem 1.25rem;border-bottom:0.5px solid var(--border);cursor:pointer; }
+    .shopping-item:last-child { border-bottom:none; }
+    .shopping-item.checked { opacity:0.45;text-decoration:line-through; }
+    .shopping-check { width:20px;height:20px;border-radius:4px;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all var(--transition); }
+    .shopping-check.done { background:var(--accent);border-color:var(--accent); }
+    .shopping-name { flex:1;font-size:0.875rem; }
+    .shopping-qty { font-size:0.8125rem;color:var(--text-muted); }
+
     .plant-card { display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background var(--transition); }
     .plant-card:last-child { border-bottom:none; }
     .plant-card:hover { background:var(--surface-2); }
@@ -1977,7 +2018,59 @@
       <div class="coming-soon"><div class="coming-soon-icon">🎬</div><h2>Séries & Films</h2><p>Ce que vous regardez<br/>et voulez voir.</p></div>
     </div>
     <div class="module" id="module-cooking">
-      <div class="coming-soon"><div class="coming-soon-icon">🍳</div><h2>Cuisine</h2><p>Recettes, planning repas<br/>et liste de courses.</p></div>
+      <div class="page-header">
+        <div class="page-title">Cuisine</div>
+        <div class="page-subtitle">Recettes & Planning commun</div>
+      </div>
+
+      <div class="task-view-toggle" style="overflow-x:auto;scrollbar-width:none;">
+        <button class="task-view-btn active" id="btn-cook-recipes">Recettes</button>
+        <button class="task-view-btn" id="btn-cook-plan">Planning</button>
+        <button class="task-view-btn" id="btn-cook-shopping">Courses</button>
+      </div>
+
+      <!-- ── VUE RECETTES ── -->
+      <div id="cook-recipes-view">
+        <div class="ex-lib-search-row">
+          <input class="form-input" style="flex:1;" placeholder="Rechercher par nom ou ingrédient…" id="cook-search" />
+          <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-recipe">+ Recette</button>
+        </div>
+        <div class="ex-filter-row" id="cook-cat-filters"></div>
+        <div class="stats-grid-4" style="margin:0 1.25rem 0.875rem;">
+          <div class="stat-card-sm"><div class="stat-value-sm" id="cook-stat-total">0</div><div class="stat-label-sm">Recettes</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="cook-stat-healthy">0</div><div class="stat-label-sm">Healthy</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="cook-stat-classic">0</div><div class="stat-label-sm">Classique</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="cook-stat-cheat">0</div><div class="stat-label-sm">Cheat</div></div>
+        </div>
+        <div class="card" style="padding:0;"><div id="cook-recipe-list"></div></div>
+      </div>
+
+      <!-- ── VUE PLANNING ── -->
+      <div id="cook-plan-view" style="display:none;">
+        <div class="card">
+          <div class="card-title">Nouveau planning</div>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.75rem;">
+            <div style="flex:1;min-width:120px;">
+              <div class="form-label" style="margin-bottom:0.375rem;">Du</div>
+              <input class="form-input" type="date" id="plan-date-from" />
+            </div>
+            <div style="flex:1;min-width:120px;">
+              <div class="form-label" style="margin-bottom:0.375rem;">Au</div>
+              <input class="form-input" type="date" id="plan-date-to" />
+            </div>
+          </div>
+          <button class="btn-primary" style="width:100%;" id="btn-create-plan">Créer ce planning</button>
+        </div>
+
+        <div id="cook-plans-list"></div>
+      </div>
+
+      <!-- ── VUE COURSES ── -->
+      <div id="cook-shopping-view" style="display:none;">
+        <div id="cook-shopping-content">
+          <div class="empty-state" style="padding:2.5rem;"><p>Crée un planning et coche des plats pour générer ta liste de courses.</p></div>
+        </div>
+      </div>
     </div>
     <div class="module" id="module-activities">
       <div class="coming-soon"><div class="coming-soon-icon">🗺️</div><h2>Activités</h2><p>Sorties, restaurants, bars<br/>et carte interactive.</p></div>
@@ -2101,6 +2194,110 @@
       </div>
       <input type="hidden" id="tlib-editing-id" />
       <div class="modal-actions" id="tlib-edit-actions"></div>
+    </div>
+  </div>
+
+  <!-- MODAL RECETTE (création/édition) -->
+  <div class="modal-overlay" id="modal-recipe">
+    <div class="modal" style="max-height:92dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-recipe-title">Nouvelle recette</div>
+        <button class="modal-close" id="modal-recipe-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Titre</label>
+        <input class="form-input" id="recipe-title-input" placeholder="Ex : Poulet rôti, Risotto…" maxlength="100" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <div class="task-view-toggle" style="margin:0;">
+          <button type="button" class="task-view-btn active" id="recipe-cat-healthy">🥗 Healthy</button>
+          <button type="button" class="task-view-btn" id="recipe-cat-classique">🍽️ Classique</button>
+          <button type="button" class="task-view-btn" id="recipe-cat-cheat">🍔 Cheat</button>
+        </div>
+      </div>
+      <div class="form-group" style="display:flex;gap:0.75rem;">
+        <div style="flex:1;">
+          <label class="form-label">Préparation (min)</label>
+          <input class="form-input" type="number" id="recipe-prep-input" min="0" placeholder="15" />
+        </div>
+        <div style="flex:1;">
+          <label class="form-label">Cuisson (min)</label>
+          <input class="form-input" type="number" id="recipe-cook-input" min="0" placeholder="30" />
+        </div>
+        <div style="flex:1;">
+          <label class="form-label">Portions</label>
+          <input class="form-input" type="number" id="recipe-portions-input" min="1" placeholder="2" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ingrédients</label>
+        <div id="recipe-ingredients-list"></div>
+        <button type="button" class="btn-secondary" style="width:100%;margin-top:0.5rem;font-size:0.8125rem;" id="btn-add-ingredient">+ Ajouter un ingrédient</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Étapes</label>
+        <div id="recipe-steps-list"></div>
+        <button type="button" class="btn-secondary" style="width:100%;margin-top:0.5rem;font-size:0.8125rem;" id="btn-add-step">+ Ajouter une étape</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-input" id="recipe-notes-input" rows="2" style="resize:none;" placeholder="Astuces, variantes…"></textarea>
+      </div>
+      <div class="modal-actions" id="recipe-modal-actions"></div>
+    </div>
+  </div>
+
+  <!-- MODAL DÉTAIL RECETTE -->
+  <div class="modal-overlay" id="modal-recipe-detail">
+    <div class="modal" style="max-height:92dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title" id="detail-recipe-title"></div>
+        <button class="modal-close" id="modal-recipe-detail-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div id="recipe-detail-body"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btn-recipe-detail-edit">✏️ Modifier</button>
+        <button class="btn-primary" id="btn-recipe-detail-add-plan">📅 Ajouter au planning</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL AJOUTER AU PLANNING -->
+  <div class="modal-overlay" id="modal-add-to-plan">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Ajouter au planning</div>
+        <button class="modal-close" id="modal-add-to-plan-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div id="add-to-plan-recipe-name" style="font-size:0.9375rem;font-weight:600;margin-bottom:1rem;"></div>
+      <div class="form-group">
+        <label class="form-label">Planning</label>
+        <select class="form-select" id="add-to-plan-select"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nombre de portions</label>
+        <input class="form-input" type="number" id="add-to-plan-portions" min="1" value="2" style="width:100px;" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="add-to-plan-cancel">Annuler</button>
+        <button class="btn-primary" id="add-to-plan-confirm">Ajouter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL GARDE-MANGER -->
+  <div class="modal-overlay" id="modal-pantry">
+    <div class="modal" style="max-height:90dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title">Ce que j'ai déjà</div>
+        <button class="modal-close" id="modal-pantry-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <p style="font-size:0.8125rem;color:var(--text-muted);margin-bottom:0.875rem;">Coche les ingrédients que tu as déjà — ils seront retirés de la liste de courses.</p>
+      <div id="pantry-list"></div>
+      <div class="modal-actions">
+        <button class="btn-primary" id="pantry-confirm">Enregistrer</button>
+      </div>
     </div>
   </div>
 
@@ -5542,6 +5739,575 @@
 // ══════════════════════════════════════
     // PLANTES
     // ══════════════════════════════════════
+// ══════════════════════════════════════
+    // CUISINE
+    // ══════════════════════════════════════
+    let recipes = []
+    let mealPlans = []
+    let cookSearch = ''
+    let cookCatFilter = 'tous'
+    let editingRecipeId = null
+    let selectedRecipeCat = 'healthy'
+    let recipeIngredients = []
+    let recipeSteps = []
+    let viewingRecipeId = null
+    let activePlanId = null
+    let shoppingChecked = {}
+    let pantryItems = {}
+
+    const CAT_LABELS = { healthy: '🥗 Healthy', classique: '🍽️ Classique', cheat: '🍔 Cheat' }
+    const UNIT_SUGGESTIONS = ['g','kg','ml','L','cl','tsp','tbsp','pièce(s)','tranche(s)','gousse(s)','branche(s)','poignée(s)','bol(s)']
+
+    async function loadRecipes() {
+      if (!householdId) return
+      const { data } = await db.from('recipes').select('*').eq('household_id', householdId).order('title')
+      recipes = data || []
+      renderRecipeList()
+      updateCookStats()
+    }
+
+    async function loadMealPlans() {
+      if (!householdId) return
+      const { data } = await db.from('meal_plans').select('*').eq('household_id', householdId).order('created_at', { ascending: false })
+      mealPlans = data || []
+      renderMealPlans()
+    }
+
+    function updateCookStats() {
+      document.getElementById('cook-stat-total').textContent = recipes.length
+      document.getElementById('cook-stat-healthy').textContent = recipes.filter(r => r.category === 'healthy').length
+      document.getElementById('cook-stat-classic').textContent = recipes.filter(r => r.category === 'classique').length
+      document.getElementById('cook-stat-cheat').textContent = recipes.filter(r => r.category === 'cheat').length
+    }
+
+    function renderCookCatFilters() {
+      var el = document.getElementById('cook-cat-filters')
+      el.innerHTML = ''
+      ;['tous','healthy','classique','cheat'].forEach(function(c) {
+        var btn = document.createElement('button')
+        btn.className = 'filter-chip' + (c === cookCatFilter ? ' active' : '')
+        btn.textContent = c === 'tous' ? 'Tous' : CAT_LABELS[c]
+        btn.addEventListener('click', function() { cookCatFilter = c; renderCookCatFilters(); renderRecipeList() })
+        el.appendChild(btn)
+      })
+    }
+
+    function getRecipesFiltered() {
+      return recipes.filter(function(r) {
+        var mc = cookCatFilter === 'tous' || r.category === cookCatFilter
+        var ms = !cookSearch || r.title.toLowerCase().includes(cookSearch.toLowerCase()) ||
+          (r.ingredients || []).some(function(i) { return i.name && i.name.toLowerCase().includes(cookSearch.toLowerCase()) })
+        return mc && ms
+      })
+    }
+
+    function renderRecipeList() {
+      var el = document.getElementById('cook-recipe-list')
+      var filtered = getRecipesFiltered()
+      if (!filtered.length) { el.innerHTML = '<div class="empty-state" style="padding:2.5rem;"><p>' + (cookSearch ? 'Aucun résultat.' : 'Aucune recette. Ajoute-en une !') + '</p></div>'; return }
+      el.innerHTML = ''
+      filtered.forEach(function(r) {
+        var div = document.createElement('div')
+        div.className = 'recipe-card'
+        var totalTime = (r.prep_time || 0) + (r.cook_time || 0)
+        var lastPlanned = r.last_planned ? 'Planifié le ' + new Date(r.last_planned + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : ''
+        div.innerHTML = '<div class="recipe-emoji">🍳</div>' +
+          '<div class="recipe-info">' +
+          '<div class="recipe-title">' + r.title + '</div>' +
+          '<div class="recipe-meta">' + (totalTime ? '⏱ ' + totalTime + ' min' : '') + (r.default_portions ? ' · ' + r.default_portions + ' portions' : '') + (lastPlanned ? ' · ' + lastPlanned : '') + '</div>' +
+          '</div>' +
+          '<span class="recipe-badge ' + (r.category || 'classique') + '">' + (r.category || 'classique') + '</span>'
+        div.addEventListener('click', function() { openRecipeDetail(r) })
+        el.appendChild(div)
+      })
+    }
+
+    document.getElementById('cook-search').addEventListener('input', function(e) { cookSearch = e.target.value; renderRecipeList() })
+
+    // ── Détail recette ──
+    function openRecipeDetail(r) {
+      viewingRecipeId = r.id
+      document.getElementById('detail-recipe-title').textContent = r.title
+      var body = document.getElementById('recipe-detail-body')
+      var totalTime = (r.prep_time || 0) + (r.cook_time || 0)
+      var html = '<div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1rem;">'
+      if (r.prep_time) html += '<div class="stat-card-sm"><div class="stat-value-sm">' + r.prep_time + '</div><div class="stat-label-sm">Prép. (min)</div></div>'
+      if (r.cook_time) html += '<div class="stat-card-sm"><div class="stat-value-sm">' + r.cook_time + '</div><div class="stat-label-sm">Cuisson (min)</div></div>'
+      if (r.default_portions) html += '<div class="stat-card-sm"><div class="stat-value-sm">' + r.default_portions + '</div><div class="stat-label-sm">Portions</div></div>'
+      html += '<div class="stat-card-sm"><div class="stat-value-sm"><span class="recipe-badge ' + (r.category || 'classique') + '">' + (r.category || 'classique') + '</span></div><div class="stat-label-sm">Type</div></div>'
+      html += '</div>'
+      if ((r.ingredients || []).length) {
+        html += '<div class="card-title">Ingrédients</div><div class="card" style="padding:0.75rem 1.25rem;margin-bottom:0.875rem;">'
+        r.ingredients.forEach(function(i) {
+          html += '<div style="display:flex;justify-content:space-between;padding:0.25rem 0;border-bottom:0.5px solid var(--border);">' +
+            '<span style="font-size:0.875rem;">' + i.name + '</span>' +
+            '<span style="font-size:0.875rem;color:var(--text-muted);">' + (i.qty || '') + ' ' + (i.unit || '') + '</span></div>'
+        })
+        html += '</div>'
+      }
+      if ((r.steps || []).length) {
+        html += '<div class="card-title">Étapes</div><div style="margin-bottom:0.875rem;">'
+        r.steps.forEach(function(s, i) {
+          html += '<div class="step-row"><div class="step-num">' + (i+1) + '</div><div style="flex:1;font-size:0.875rem;padding-top:0.5rem;">' + s + '</div></div>'
+        })
+        html += '</div>'
+      }
+      if (r.notes) html += '<div class="card-title">Notes</div><div class="card" style="font-size:0.875rem;color:var(--text-secondary);">' + r.notes + '</div>'
+      body.innerHTML = html
+      document.getElementById('modal-recipe-detail').classList.add('open')
+    }
+
+    document.getElementById('modal-recipe-detail-close').addEventListener('click', function() { document.getElementById('modal-recipe-detail').classList.remove('open') })
+    document.getElementById('modal-recipe-detail').addEventListener('click', function(e) { if (e.target === e.currentTarget) document.getElementById('modal-recipe-detail').classList.remove('open') })
+
+    document.getElementById('btn-recipe-detail-edit').addEventListener('click', function() {
+      document.getElementById('modal-recipe-detail').classList.remove('open')
+      var r = recipes.find(function(x) { return x.id === viewingRecipeId })
+      if (r) openEditRecipe(r)
+    })
+    document.getElementById('btn-recipe-detail-add-plan').addEventListener('click', function() {
+      document.getElementById('modal-recipe-detail').classList.remove('open')
+      openAddToPlan(viewingRecipeId)
+    })
+
+    // ── Modal recette ──
+    function renderIngredientRows() {
+      var el = document.getElementById('recipe-ingredients-list')
+      el.innerHTML = ''
+      recipeIngredients.forEach(function(ing, idx) {
+        var row = document.createElement('div')
+        row.className = 'ingredient-row'
+        var nameInput = document.createElement('input')
+        nameInput.className = 'form-input'
+        nameInput.placeholder = 'Ingrédient'
+        nameInput.value = ing.name || ''
+        nameInput.addEventListener('input', function() { recipeIngredients[idx].name = nameInput.value })
+        var qtyInput = document.createElement('input')
+        qtyInput.className = 'form-input ingredient-qty'
+        qtyInput.type = 'number'
+        qtyInput.placeholder = 'Qté'
+        qtyInput.min = '0'
+        qtyInput.value = ing.qty || ''
+        qtyInput.addEventListener('input', function() { recipeIngredients[idx].qty = parseFloat(qtyInput.value) || null })
+        var unitInput = document.createElement('input')
+        unitInput.className = 'form-input ingredient-unit'
+        unitInput.placeholder = 'Unité'
+        unitInput.value = ing.unit || ''
+        unitInput.setAttribute('list', 'unit-suggestions')
+        unitInput.addEventListener('input', function() { recipeIngredients[idx].unit = unitInput.value })
+        var delBtn = document.createElement('button')
+        delBtn.type = 'button'
+        delBtn.className = 'btn-icon'
+        delBtn.style.cssText = 'width:32px;height:32px;flex-shrink:0;'
+        delBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+        delBtn.addEventListener('click', function() { recipeIngredients.splice(idx, 1); renderIngredientRows() })
+        row.appendChild(nameInput); row.appendChild(qtyInput); row.appendChild(unitInput); row.appendChild(delBtn)
+        el.appendChild(row)
+      })
+    }
+
+    function renderStepRows() {
+      var el = document.getElementById('recipe-steps-list')
+      el.innerHTML = ''
+      recipeSteps.forEach(function(step, idx) {
+        var row = document.createElement('div')
+        row.className = 'step-row'
+        var num = document.createElement('div')
+        num.className = 'step-num'
+        num.textContent = idx + 1
+        var ta = document.createElement('textarea')
+        ta.className = 'form-input'
+        ta.style.cssText = 'flex:1;resize:none;min-height:60px;'
+        ta.placeholder = 'Décris cette étape…'
+        ta.value = step || ''
+        ta.addEventListener('input', function() { recipeSteps[idx] = ta.value })
+        var delBtn = document.createElement('button')
+        delBtn.type = 'button'
+        delBtn.className = 'btn-icon'
+        delBtn.style.cssText = 'width:32px;height:32px;flex-shrink:0;margin-top:0.4rem;'
+        delBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+        delBtn.addEventListener('click', function() { recipeSteps.splice(idx, 1); renderStepRows() })
+        row.appendChild(num); row.appendChild(ta); row.appendChild(delBtn)
+        el.appendChild(row)
+      })
+    }
+
+    document.getElementById('btn-add-ingredient').addEventListener('click', function() {
+      recipeIngredients.push({ name: '', qty: null, unit: '' })
+      renderIngredientRows()
+    })
+    document.getElementById('btn-add-step').addEventListener('click', function() {
+      recipeSteps.push('')
+      renderStepRows()
+    })
+
+    // Cat toggle
+    function setRecipeCat(cat) {
+      selectedRecipeCat = cat
+      ;['healthy','classique','cheat'].forEach(function(c) {
+        document.getElementById('recipe-cat-' + c).classList.toggle('active', c === cat)
+      })
+    }
+    document.getElementById('recipe-cat-healthy').addEventListener('click', function() { setRecipeCat('healthy') })
+    document.getElementById('recipe-cat-classique').addEventListener('click', function() { setRecipeCat('classique') })
+    document.getElementById('recipe-cat-cheat').addEventListener('click', function() { setRecipeCat('cheat') })
+
+    function openNewRecipe() {
+      editingRecipeId = null; recipeIngredients = []; recipeSteps = []
+      selectedRecipeCat = 'healthy'
+      document.getElementById('modal-recipe-title').textContent = 'Nouvelle recette'
+      document.getElementById('recipe-title-input').value = ''
+      document.getElementById('recipe-prep-input').value = ''
+      document.getElementById('recipe-cook-input').value = ''
+      document.getElementById('recipe-portions-input').value = '2'
+      document.getElementById('recipe-notes-input').value = ''
+      setRecipeCat('healthy')
+      renderIngredientRows(); renderStepRows()
+      document.getElementById('recipe-modal-actions').innerHTML = '<button class="btn-secondary" id="recipe-cancel">Annuler</button><button class="btn-primary" id="recipe-save">Créer</button>'
+      bindRecipeModalButtons()
+      document.getElementById('modal-recipe').classList.add('open')
+    }
+
+    function openEditRecipe(r) {
+      editingRecipeId = r.id
+      recipeIngredients = JSON.parse(JSON.stringify(r.ingredients || []))
+      recipeSteps = JSON.parse(JSON.stringify(r.steps || []))
+      selectedRecipeCat = r.category || 'classique'
+      document.getElementById('modal-recipe-title').textContent = 'Modifier la recette'
+      document.getElementById('recipe-title-input').value = r.title
+      document.getElementById('recipe-prep-input').value = r.prep_time || ''
+      document.getElementById('recipe-cook-input').value = r.cook_time || ''
+      document.getElementById('recipe-portions-input').value = r.default_portions || 2
+      document.getElementById('recipe-notes-input').value = r.notes || ''
+      setRecipeCat(selectedRecipeCat)
+      renderIngredientRows(); renderStepRows()
+      document.getElementById('recipe-modal-actions').innerHTML = '<button class="btn-danger" id="recipe-delete">Supprimer</button><button class="btn-primary" id="recipe-save">Enregistrer</button>'
+      bindRecipeModalButtons()
+      document.getElementById('modal-recipe').classList.add('open')
+    }
+
+    function closeRecipeModal() { document.getElementById('modal-recipe').classList.remove('open') }
+
+    function bindRecipeModalButtons() {
+      document.getElementById('recipe-cancel')?.addEventListener('click', closeRecipeModal)
+      document.getElementById('recipe-delete')?.addEventListener('click', async function() {
+        await db.from('recipes').delete().eq('id', editingRecipeId)
+        recipes = recipes.filter(function(r) { return r.id !== editingRecipeId })
+        closeRecipeModal(); renderRecipeList(); updateCookStats(); showToast('Recette supprimée')
+      })
+      document.getElementById('recipe-save').addEventListener('click', saveRecipe)
+    }
+
+    async function saveRecipe() {
+      var title = document.getElementById('recipe-title-input').value.trim()
+      if (!title) return
+      var payload = {
+        household_id: householdId,
+        title: title,
+        category: selectedRecipeCat,
+        prep_time: parseInt(document.getElementById('recipe-prep-input').value) || null,
+        cook_time: parseInt(document.getElementById('recipe-cook-input').value) || null,
+        default_portions: parseInt(document.getElementById('recipe-portions-input').value) || 2,
+        ingredients: recipeIngredients.filter(function(i) { return i.name }),
+        steps: recipeSteps.filter(function(s) { return s.trim() }),
+        notes: document.getElementById('recipe-notes-input').value.trim() || null
+      }
+      if (editingRecipeId) {
+        await db.from('recipes').update(payload).eq('id', editingRecipeId)
+        recipes = recipes.map(function(r) { return r.id === editingRecipeId ? { ...r, ...payload, id: editingRecipeId } : r })
+        showToast('Recette modifiée')
+      } else {
+        var { data } = await db.from('recipes').insert(payload).select().single()
+        if (data) recipes.push(data)
+        showToast('Recette créée')
+      }
+      closeRecipeModal(); renderRecipeList(); updateCookStats()
+    }
+
+    document.getElementById('modal-recipe-close').addEventListener('click', closeRecipeModal)
+    document.getElementById('modal-recipe').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeRecipeModal() })
+    document.getElementById('btn-new-recipe').addEventListener('click', openNewRecipe)
+
+    // ── Planning ──
+    document.getElementById('plan-date-from').value = new Date().toISOString().split('T')[0]
+    var nextWeek = new Date(); nextWeek.setDate(nextWeek.getDate() + 6)
+    document.getElementById('plan-date-to').value = nextWeek.toISOString().split('T')[0]
+
+    document.getElementById('btn-create-plan').addEventListener('click', async function() {
+      var from = document.getElementById('plan-date-from').value
+      var to = document.getElementById('plan-date-to').value
+      if (!from || !to || from > to) { showToast('Dates invalides'); return }
+      var title = new Date(from + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' – ' + new Date(to + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      var { data } = await db.from('meal_plans').insert({ household_id: householdId, title: title, date_from: from, date_to: to, meals: [], pantry: [] }).select().single()
+      if (data) { mealPlans.unshift(data); renderMealPlans(); showToast('Planning créé') }
+    })
+
+    function renderMealPlans() {
+      var el = document.getElementById('cook-plans-list')
+      if (!mealPlans.length) { el.innerHTML = '<div class="empty-state" style="padding:2rem;"><p>Aucun planning. Crée-en un ci-dessus.</p></div>'; return }
+      el.innerHTML = ''
+      mealPlans.forEach(function(plan) {
+        var card = document.createElement('div')
+        card.className = 'plan-card'
+        var doneCount = (plan.meals || []).filter(function(m) { return m.done }).length
+        var total = (plan.meals || []).length
+        var hdr = document.createElement('div')
+        hdr.className = 'plan-card-header'
+        hdr.innerHTML = '<div><div class="plan-card-title">' + plan.title + '</div><div class="plan-card-dates">' + doneCount + ' / ' + total + ' plats faits</div></div>' +
+          '<div style="display:flex;gap:0.5rem;">' +
+          '<button class="btn-secondary" style="font-size:0.75rem;padding:0.3rem 0.6rem;" data-plan-add="' + plan.id + '">+ Plat</button>' +
+          '<button class="btn-secondary" style="font-size:0.75rem;padding:0.3rem 0.6rem;" data-plan-pantry="' + plan.id + '">🧺 Frigo</button>' +
+          '<button class="btn-secondary" style="font-size:0.75rem;padding:0.3rem 0.6rem;" data-plan-shop="' + plan.id + '">🛒 Courses</button>' +
+          '<button class="btn-icon" style="width:28px;height:28px;" data-plan-del="' + plan.id + '"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>' +
+          '</div>'
+        card.appendChild(hdr)
+        ;(plan.meals || []).forEach(function(meal, mIdx) {
+          var row = document.createElement('div')
+          row.className = 'plan-meal-row' + (meal.done ? ' done' : '')
+          var check = document.createElement('div')
+          check.className = 'plan-meal-check' + (meal.done ? ' done' : '')
+          if (meal.done) check.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>'
+          check.addEventListener('click', async function() {
+            plan.meals[mIdx].done = !plan.meals[mIdx].done
+            await db.from('meal_plans').update({ meals: plan.meals }).eq('id', plan.id)
+            if (plan.meals[mIdx].done) {
+              var rec = recipes.find(function(r) { return r.id === plan.meals[mIdx].recipeId })
+              if (rec) await db.from('recipes').update({ last_planned: new Date().toISOString().split('T')[0] }).eq('id', rec.id)
+            }
+            renderMealPlans()
+          })
+          var name = document.createElement('div')
+          name.className = 'plan-meal-name'
+          name.textContent = meal.title
+          var portions = document.createElement('div')
+          portions.className = 'plan-meal-portions'
+          portions.textContent = meal.portions + ' portion' + (meal.portions > 1 ? 's' : '')
+          var delMeal = document.createElement('button')
+          delMeal.className = 'btn-icon'
+          delMeal.style.cssText = 'width:24px;height:24px;'
+          delMeal.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+          delMeal.addEventListener('click', async function() {
+            plan.meals.splice(mIdx, 1)
+            await db.from('meal_plans').update({ meals: plan.meals }).eq('id', plan.id)
+            renderMealPlans()
+          })
+          row.appendChild(check); row.appendChild(name); row.appendChild(portions); row.appendChild(delMeal)
+          card.appendChild(row)
+        })
+        hdr.querySelector('[data-plan-add]').addEventListener('click', function() { openAddToPlan(null, plan.id) })
+        hdr.querySelector('[data-plan-pantry]').addEventListener('click', function() { openPantry(plan) })
+        hdr.querySelector('[data-plan-shop]').addEventListener('click', function() { openShopping(plan) })
+        hdr.querySelector('[data-plan-del]').addEventListener('click', async function() {
+          await db.from('meal_plans').delete().eq('id', plan.id)
+          mealPlans = mealPlans.filter(function(p) { return p.id !== plan.id })
+          renderMealPlans(); showToast('Planning supprimé')
+        })
+        el.appendChild(card)
+      })
+    }
+
+    // ── Ajouter au planning ──
+    function openAddToPlan(recipeId, forcePlanId) {
+      var sel = document.getElementById('add-to-plan-select')
+      sel.innerHTML = mealPlans.map(function(p) { return '<option value="' + p.id + '">' + p.title + '</option>' }).join('')
+      if (forcePlanId) sel.value = forcePlanId
+      var rec = recipeId ? recipes.find(function(r) { return r.id === recipeId }) : null
+      document.getElementById('add-to-plan-recipe-name').textContent = rec ? rec.title : ''
+      document.getElementById('add-to-plan-portions').value = rec ? rec.default_portions || 2 : 2
+      document.getElementById('add-to-plan-confirm').onclick = async function() {
+        var planId = document.getElementById('add-to-plan-select').value
+        var portions = parseInt(document.getElementById('add-to-plan-portions').value) || 1
+        var plan = mealPlans.find(function(p) { return p.id === planId })
+        if (!plan) return
+        if (recipeId) {
+          var r = recipes.find(function(x) { return x.id === recipeId })
+          plan.meals.push({ recipeId: r.id, title: r.title, portions: portions, done: false })
+        } else {
+          var rSel = document.getElementById('add-to-plan-select').value
+          plan.meals.push({ title: 'Plat libre', portions: portions, done: false })
+        }
+        await db.from('meal_plans').update({ meals: plan.meals }).eq('id', plan.id)
+        document.getElementById('modal-add-to-plan').classList.remove('open')
+        renderMealPlans(); showToast('Ajouté au planning')
+      }
+      document.getElementById('modal-add-to-plan').classList.add('open')
+    }
+
+    // Si pas de recette, montrer un sélecteur
+    function openAddToPlan(recipeId, forcePlanId) {
+      if (!mealPlans.length) { showToast('Crée d\'abord un planning'); return }
+      var sel = document.getElementById('add-to-plan-select')
+      sel.innerHTML = mealPlans.map(function(p) { return '<option value="' + p.id + '">' + p.title + '</option>' }).join('')
+      if (forcePlanId) sel.value = forcePlanId
+      var rec = recipeId ? recipes.find(function(r) { return r.id === recipeId }) : null
+      var nameEl = document.getElementById('add-to-plan-recipe-name')
+      if (rec) {
+        nameEl.textContent = rec.title
+        nameEl.style.display = ''
+      } else {
+        nameEl.style.display = 'none'
+        var existing = document.getElementById('add-to-plan-recipe-sel')
+        if (!existing) {
+          var label = document.createElement('div')
+          label.className = 'form-label'
+          label.style.marginBottom = '0.375rem'
+          label.textContent = 'Recette'
+          var recSel = document.createElement('select')
+          recSel.className = 'form-select'
+          recSel.id = 'add-to-plan-recipe-sel'
+          recSel.style.marginBottom = '1rem'
+          recSel.innerHTML = recipes.map(function(r) { return '<option value="' + r.id + '">' + r.title + '</option>' }).join('')
+          nameEl.parentNode.insertBefore(label, nameEl.nextSibling)
+          nameEl.parentNode.insertBefore(recSel, label.nextSibling)
+        }
+      }
+      document.getElementById('add-to-plan-portions').value = rec ? (rec.default_portions || 2) : 2
+      document.getElementById('add-to-plan-confirm').onclick = async function() {
+        var planId = document.getElementById('add-to-plan-select').value
+        var portions = parseInt(document.getElementById('add-to-plan-portions').value) || 1
+        var plan = mealPlans.find(function(p) { return p.id === planId })
+        if (!plan) return
+        var finalRecipeId = recipeId || (document.getElementById('add-to-plan-recipe-sel') && document.getElementById('add-to-plan-recipe-sel').value)
+        var r = finalRecipeId ? recipes.find(function(x) { return x.id === finalRecipeId }) : null
+        plan.meals.push({ recipeId: r ? r.id : null, title: r ? r.title : 'Plat libre', portions: portions, done: false })
+        await db.from('meal_plans').update({ meals: plan.meals }).eq('id', plan.id)
+        document.getElementById('modal-add-to-plan').classList.remove('open')
+        renderMealPlans(); showToast('Ajouté au planning')
+      }
+      document.getElementById('modal-add-to-plan').classList.add('open')
+    }
+
+    document.getElementById('add-to-plan-cancel').addEventListener('click', function() { document.getElementById('modal-add-to-plan').classList.remove('open') })
+    document.getElementById('modal-add-to-plan-close').addEventListener('click', function() { document.getElementById('modal-add-to-plan').classList.remove('open') })
+    document.getElementById('modal-add-to-plan').addEventListener('click', function(e) { if (e.target === e.currentTarget) document.getElementById('modal-add-to-plan').classList.remove('open') })
+
+    // ── Garde-manger ──
+    function openPantry(plan) {
+      activePlanId = plan.id
+      var allIngredients = {}
+      ;(plan.meals || []).forEach(function(meal) {
+        var rec = meal.recipeId ? recipes.find(function(r) { return r.id === meal.recipeId }) : null
+        if (!rec) return
+        var ratio = meal.portions / (rec.default_portions || 1)
+        ;(rec.ingredients || []).forEach(function(ing) {
+          var key = ing.name.toLowerCase()
+          if (!allIngredients[key]) allIngredients[key] = { name: ing.name, qty: 0, unit: ing.unit }
+          allIngredients[key].qty += (ing.qty || 0) * ratio
+        })
+      })
+      var el = document.getElementById('pantry-list')
+      el.innerHTML = ''
+      Object.values(allIngredients).forEach(function(ing) {
+        var row = document.createElement('div')
+        row.style.cssText = 'display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:0.5px solid var(--border);'
+        var cb = document.createElement('input')
+        cb.type = 'checkbox'
+        cb.style.cssText = 'width:18px;height:18px;cursor:pointer;'
+        cb.checked = !!(plan.pantry || []).includes(ing.name.toLowerCase())
+        var label = document.createElement('label')
+        label.style.cssText = 'flex:1;font-size:0.875rem;cursor:pointer;'
+        label.textContent = ing.name + (ing.qty ? ' (' + Math.round(ing.qty * 10) / 10 + ' ' + (ing.unit || '') + ')' : '')
+        cb.addEventListener('change', function() {})
+        row.appendChild(cb); row.appendChild(label)
+        el.appendChild(row)
+      })
+      document.getElementById('pantry-confirm').onclick = async function() {
+        var checked = []
+        el.querySelectorAll('input[type=checkbox]').forEach(function(cb, i) {
+          if (cb.checked) checked.push(Object.values(allIngredients)[i].name.toLowerCase())
+        })
+        var plan = mealPlans.find(function(p) { return p.id === activePlanId })
+        if (plan) {
+          plan.pantry = checked
+          await db.from('meal_plans').update({ pantry: checked }).eq('id', activePlanId)
+        }
+        document.getElementById('modal-pantry').classList.remove('open')
+        showToast('Garde-manger mis à jour')
+      }
+      document.getElementById('modal-pantry').classList.add('open')
+    }
+
+    document.getElementById('modal-pantry-close').addEventListener('click', function() { document.getElementById('modal-pantry').classList.remove('open') })
+    document.getElementById('modal-pantry').addEventListener('click', function(e) { if (e.target === e.currentTarget) document.getElementById('modal-pantry').classList.remove('open') })
+
+    // ── Liste de courses ──
+    function openShopping(plan) {
+      switchCookTab('shopping')
+      var el = document.getElementById('cook-shopping-content')
+      var allIngredients = {}
+      ;(plan.meals || []).forEach(function(meal) {
+        var rec = meal.recipeId ? recipes.find(function(r) { return r.id === meal.recipeId }) : null
+        if (!rec) return
+        var ratio = meal.portions / (rec.default_portions || 1)
+        ;(rec.ingredients || []).forEach(function(ing) {
+          var key = ing.name.toLowerCase()
+          if (!allIngredients[key]) allIngredients[key] = { name: ing.name, qty: 0, unit: ing.unit }
+          allIngredients[key].qty += (ing.qty || 0) * ratio
+        })
+      })
+      var pantrySet = new Set(plan.pantry || [])
+      var needed = Object.values(allIngredients).filter(function(i) { return !pantrySet.has(i.name.toLowerCase()) })
+      var have = Object.values(allIngredients).filter(function(i) { return pantrySet.has(i.name.toLowerCase()) })
+      el.innerHTML = ''
+      var title = document.createElement('div')
+      title.style.cssText = 'font-size:0.9375rem;font-weight:700;padding:0.875rem 1.25rem 0.5rem;'
+      title.textContent = 'Liste de courses — ' + plan.title
+      el.appendChild(title)
+      if (needed.length) {
+        var sec = document.createElement('div'); sec.className = 'shopping-section'
+        var sh = document.createElement('div'); sh.className = 'shopping-section-title'; sh.textContent = 'À acheter (' + needed.length + ')'
+        sec.appendChild(sh)
+        var card = document.createElement('div'); card.className = 'card'; card.style.padding = '0'
+        needed.forEach(function(ing) {
+          var key = plan.id + '_' + ing.name.toLowerCase()
+          var row = document.createElement('div')
+          row.className = 'shopping-item' + (shoppingChecked[key] ? ' checked' : '')
+          var check = document.createElement('div')
+          check.className = 'shopping-check' + (shoppingChecked[key] ? ' done' : '')
+          if (shoppingChecked[key]) check.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>'
+          row.addEventListener('click', function() {
+            shoppingChecked[key] = !shoppingChecked[key]
+            openShopping(plan)
+          })
+          var name = document.createElement('div'); name.className = 'shopping-name'; name.textContent = ing.name
+          var qty = document.createElement('div'); qty.className = 'shopping-qty'
+          qty.textContent = ing.qty ? Math.round(ing.qty * 10) / 10 + ' ' + (ing.unit || '') : ''
+          row.appendChild(check); row.appendChild(name); row.appendChild(qty)
+          card.appendChild(row)
+        })
+        sec.appendChild(card); el.appendChild(sec)
+      }
+      if (have.length) {
+        var sec2 = document.createElement('div'); sec2.className = 'shopping-section'
+        var sh2 = document.createElement('div'); sh2.className = 'shopping-section-title'; sh2.textContent = 'Déjà disponible (' + have.length + ')'
+        sec2.appendChild(sh2)
+        var card2 = document.createElement('div'); card2.className = 'card'; card2.style.cssText = 'padding:0;opacity:0.6;'
+        have.forEach(function(ing) {
+          var row = document.createElement('div'); row.className = 'shopping-item'
+          var name = document.createElement('div'); name.className = 'shopping-name'; name.textContent = '✓ ' + ing.name
+          var qty = document.createElement('div'); qty.className = 'shopping-qty'
+          qty.textContent = ing.qty ? Math.round(ing.qty * 10) / 10 + ' ' + (ing.unit || '') : ''
+          row.appendChild(name); row.appendChild(qty); card2.appendChild(row)
+        })
+        sec2.appendChild(card2); el.appendChild(sec2)
+      }
+      if (!needed.length && !have.length) {
+        el.innerHTML += '<div class="empty-state" style="padding:2rem;"><p>Aucun ingrédient trouvé dans ce planning.</p></div>'
+      }
+    }
+
+    // ── Navigation tabs cuisine ──
+    function switchCookTab(tab) {
+      ;['recipes','plan','shopping'].forEach(function(t) {
+        document.getElementById('cook-' + t + '-view').style.display = t === tab ? '' : 'none'
+        document.getElementById('btn-cook-' + (t === 'recipes' ? 'recipes' : t === 'plan' ? 'plan' : 'shopping')).classList.toggle('active', t === tab)
+      })
+    }
+    document.getElementById('btn-cook-recipes').addEventListener('click', function() { switchCookTab('recipes') })
+    document.getElementById('btn-cook-plan').addEventListener('click', function() { switchCookTab('plan') })
+    document.getElementById('btn-cook-shopping').addEventListener('click', function() { switchCookTab('shopping') })
+
+    // ══════════════════════════════════════
     let plants = []
     let plantSearch = ''
     let editingPlantId = null
@@ -6193,6 +6959,7 @@
       document.getElementById('fab').style.display = (id === 'tasks') ? 'flex' : 'none'
       if (id === 'reading') loadBooks()
       if (id === 'plants') loadPlants()
+      if (id === 'cooking') { renderCookCatFilters(); loadRecipes(); loadMealPlans() }
       if (id === 'articles') { loadArticleTags().then(function() { loadArticles().then(function() { renderArtFilters() }) }) }
     }
 
