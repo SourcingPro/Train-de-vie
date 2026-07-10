@@ -1964,9 +1964,10 @@
       <!-- VUE À DÉVELOPPER -->
       <div id="art-develop-view" style="display:none;">
         <div class="ex-lib-search-row">
-          <input class="form-input" style="flex:1;" placeholder="Nouveau sujet à explorer…" id="develop-new-input" maxlength="120" />
-          <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-add-develop">+ Ajouter</button>
+          <input class="form-input" style="flex:1;" placeholder="Rechercher un sujet…" id="develop-search" />
+          <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-develop">+ Sujet</button>
         </div>
+        <div class="ex-filter-row" id="develop-tag-filters"></div>
         <div class="card" style="padding:0;"><div id="develop-list"></div></div>
       </div>
     </div>
@@ -2397,6 +2398,30 @@
         <textarea class="form-input" id="plant-notes-input" placeholder="Conseils, besoins particuliers…" rows="2" style="resize:none;"></textarea>
       </div>
       <div class="modal-actions" id="plant-modal-actions"></div>
+    </div>
+  </div>
+
+  <!-- MODAL SUJET À DÉVELOPPER -->
+  <div class="modal-overlay" id="modal-develop">
+    <div class="modal" style="max-height:90dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-develop-title">Nouveau sujet</div>
+        <button class="modal-close" id="modal-develop-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sujet</label>
+        <input class="form-input" id="develop-topic-input" placeholder="Ex : Géopolitique du Sahel, IA générative…" maxlength="120" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tags</label>
+        <div id="develop-tag-picker"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Liens utiles</label>
+        <div id="develop-links-list"></div>
+        <button type="button" class="btn-secondary" style="width:100%;margin-top:0.5rem;font-size:0.8125rem;" id="btn-add-develop-link">+ Ajouter un lien</button>
+      </div>
+      <div class="modal-actions" id="develop-modal-actions"></div>
     </div>
   </div>
 
@@ -6983,49 +7008,183 @@
     document.getElementById('btn-art-list').addEventListener('click', function() { switchArtTab('btn-art-list', 'art-list-view') })
     document.getElementById('btn-art-tags').addEventListener('click', function() { switchArtTab('btn-art-tags', 'art-tags-view', renderArtTagsList) })
     document.getElementById('btn-art-stats').addEventListener('click', function() { switchArtTab('btn-art-stats', 'art-stats-view', renderArtCharts) })
-    document.getElementById('btn-art-develop').addEventListener('click', function() { switchArtTab('btn-art-develop', 'art-develop-view', renderDevelopList) })
+    document.getElementById('btn-art-develop').addEventListener('click', function() { switchArtTab('btn-art-develop', 'art-develop-view', function() { renderDevelopTagFilters(); renderDevelopList() }) })
 
     // ── À développer ──
     var developTopics = JSON.parse(localStorage.getItem('tdv_develop_' + profile.id) || '[]')
+    var editingDevelopId = null
+    var developLinks = []
+    var selectedDevelopTagIds = []
+    var developSearch = ''
+    var developTagFilter = null
 
     function saveDevelopTopics() { localStorage.setItem('tdv_develop_' + profile.id, JSON.stringify(developTopics)) }
 
+    function renderDevelopTagFilters() {
+      var el = document.getElementById('develop-tag-filters')
+      el.innerHTML = ''
+      var allBtn = document.createElement('button')
+      allBtn.className = 'filter-chip' + (!developTagFilter ? ' active' : '')
+      allBtn.textContent = 'Tous'
+      allBtn.addEventListener('click', function() { developTagFilter = null; renderDevelopTagFilters(); renderDevelopList() })
+      el.appendChild(allBtn)
+      articleTags.forEach(function(t) {
+        var btn = document.createElement('button')
+        btn.className = 'filter-chip' + (developTagFilter === t.id ? ' active' : '')
+        btn.textContent = t.name
+        btn.style.borderColor = t.color || 'var(--border)'
+        btn.style.color = t.color || 'var(--text-secondary)'
+        if (developTagFilter === t.id) btn.style.background = (t.color || '#000') + '22'
+        btn.addEventListener('click', function() { developTagFilter = t.id; renderDevelopTagFilters(); renderDevelopList() })
+        el.appendChild(btn)
+      })
+    }
+
     function renderDevelopList() {
       var el = document.getElementById('develop-list')
-      if (!developTopics.length) {
-        el.innerHTML = '<div class="empty-state" style="padding:2.5rem;"><p>Aucun sujet pour l\'instant.<br/>Ajoute des thèmes à creuser !</p></div>'
+      var filtered = developTopics.filter(function(t) {
+        var ms = !developSearch || t.topic.toLowerCase().includes(developSearch.toLowerCase())
+        var mt = !developTagFilter || (t.tagIds || []).includes(developTagFilter)
+        return ms && mt
+      })
+      if (!filtered.length) {
+        el.innerHTML = '<div class="empty-state" style="padding:2.5rem;"><p>' + (developSearch || developTagFilter ? 'Aucun résultat.' : 'Aucun sujet pour l\'instant.') + '</p></div>'
         return
       }
       el.innerHTML = ''
-      developTopics.forEach(function(topic, idx) {
+      filtered.forEach(function(t) {
+        var div = document.createElement('div')
+        div.style.cssText = 'padding:0.875rem 1.25rem;border-bottom:0.5px solid var(--border);cursor:pointer;'
+        div.addEventListener('click', function() { openEditDevelop(t) })
+        // Titre
+        var titleRow = document.createElement('div')
+        titleRow.style.cssText = 'display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;'
+        var title = document.createElement('div')
+        title.style.cssText = 'font-size:0.9375rem;font-weight:600;flex:1;'
+        title.textContent = t.topic
+        titleRow.appendChild(title)
+        div.appendChild(titleRow)
+        // Tags
+        if ((t.tagIds || []).length) {
+          var tagsRow = document.createElement('div')
+          tagsRow.style.cssText = 'display:flex;gap:0.25rem;flex-wrap:wrap;margin-top:0.375rem;'
+          t.tagIds.forEach(function(id) {
+            var tag = articleTags.find(function(x) { return x.id === id })
+            if (!tag) return
+            var span = document.createElement('span')
+            span.className = 'art-tag'
+            span.style.cssText = 'color:' + (tag.color || 'inherit') + ';background:' + (tag.color || '#000') + '22;'
+            span.textContent = tag.name
+            tagsRow.appendChild(span)
+          })
+          div.appendChild(tagsRow)
+        }
+        // Liens
+        if ((t.links || []).length) {
+          var linksRow = document.createElement('div')
+          linksRow.style.cssText = 'margin-top:0.375rem;display:flex;flex-direction:column;gap:0.2rem;'
+          t.links.forEach(function(link) {
+            if (!link) return
+            var a = document.createElement('a')
+            a.href = link
+            a.target = '_blank'
+            a.rel = 'noopener'
+            a.style.cssText = 'font-size:0.75rem;color:var(--text-muted);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;'
+            a.textContent = '🔗 ' + link.replace(/^https?:\/\//, '').split('/')[0]
+            a.addEventListener('click', function(e) { e.stopPropagation() })
+            linksRow.appendChild(a)
+          })
+          div.appendChild(linksRow)
+        }
+        el.appendChild(div)
+      })
+    }
+
+    function renderDevelopLinksList() {
+      var el = document.getElementById('develop-links-list')
+      el.innerHTML = ''
+      developLinks.forEach(function(link, idx) {
         var row = document.createElement('div')
-        row.style.cssText = 'display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1.25rem;border-bottom:0.5px solid var(--border);'
-        var dot = document.createElement('div')
-        dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;'
-        var text = document.createElement('div')
-        text.style.cssText = 'flex:1;font-size:0.875rem;'
-        text.textContent = topic
+        row.style.cssText = 'display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;'
+        var input = document.createElement('input')
+        input.className = 'form-input'
+        input.type = 'url'
+        input.placeholder = 'https://…'
+        input.value = link || ''
+        input.addEventListener('input', function() { developLinks[idx] = input.value })
         var del = document.createElement('button')
+        del.type = 'button'
         del.className = 'btn-icon'
-        del.style.cssText = 'width:28px;height:28px;flex-shrink:0;'
-        del.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
-        del.addEventListener('click', function() { developTopics.splice(idx, 1); saveDevelopTopics(); renderDevelopList() })
-        row.appendChild(dot); row.appendChild(text); row.appendChild(del)
+        del.style.cssText = 'width:32px;height:32px;flex-shrink:0;'
+        del.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+        del.addEventListener('click', function() { developLinks.splice(idx, 1); renderDevelopLinksList() })
+        row.appendChild(input); row.appendChild(del)
         el.appendChild(row)
       })
     }
 
-    document.getElementById('btn-add-develop').addEventListener('click', function() {
-      var val = document.getElementById('develop-new-input').value.trim()
-      if (!val) return
-      developTopics.unshift(val)
-      saveDevelopTopics()
-      document.getElementById('develop-new-input').value = ''
-      renderDevelopList()
-    })
-    document.getElementById('develop-new-input').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') document.getElementById('btn-add-develop').click()
-    })
+    function renderDevelopTagPicker() {
+      var el = document.getElementById('develop-tag-picker')
+      if (!articleTags.length) { el.innerHTML = '<span style="font-size:0.8125rem;color:var(--text-muted);">Crée des tags dans l\'onglet Tags.</span>'; return }
+      el.innerHTML = ''
+      articleTags.forEach(function(t) {
+        var btn = document.createElement('button')
+        btn.type = 'button'
+        btn.className = 'art-tag-option' + (selectedDevelopTagIds.includes(t.id) ? ' selected' : '')
+        btn.textContent = t.name
+        if (t.color) { btn.style.borderColor = t.color; btn.style.color = selectedDevelopTagIds.includes(t.id) ? '#fff' : t.color; if (selectedDevelopTagIds.includes(t.id)) btn.style.background = t.color }
+        btn.addEventListener('click', function() {
+          if (selectedDevelopTagIds.includes(t.id)) selectedDevelopTagIds = selectedDevelopTagIds.filter(function(x) { return x !== t.id })
+          else selectedDevelopTagIds.push(t.id)
+          renderDevelopTagPicker()
+        })
+        el.appendChild(btn)
+      })
+    }
+
+    function openNewDevelop() {
+      editingDevelopId = null; developLinks = []; selectedDevelopTagIds = []
+      document.getElementById('modal-develop-title').textContent = 'Nouveau sujet'
+      document.getElementById('develop-topic-input').value = ''
+      document.getElementById('develop-modal-actions').innerHTML = '<button class="btn-secondary" id="develop-cancel">Annuler</button><button class="btn-primary" id="develop-save">Créer</button>'
+      renderDevelopTagPicker(); renderDevelopLinksList(); bindDevelopModalButtons()
+      document.getElementById('modal-develop').classList.add('open')
+    }
+
+    function openEditDevelop(t) {
+      editingDevelopId = t.id
+      developLinks = (t.links || []).slice()
+      selectedDevelopTagIds = (t.tagIds || []).slice()
+      document.getElementById('modal-develop-title').textContent = 'Modifier le sujet'
+      document.getElementById('develop-topic-input').value = t.topic
+      document.getElementById('develop-modal-actions').innerHTML = '<button class="btn-danger" id="develop-delete">Supprimer</button><button class="btn-primary" id="develop-save">Enregistrer</button>'
+      renderDevelopTagPicker(); renderDevelopLinksList(); bindDevelopModalButtons()
+      document.getElementById('modal-develop').classList.add('open')
+    }
+
+    function closeDevelopModal() { document.getElementById('modal-develop').classList.remove('open') }
+
+    function bindDevelopModalButtons() {
+      document.getElementById('develop-cancel')?.addEventListener('click', closeDevelopModal)
+      document.getElementById('develop-delete')?.addEventListener('click', function() {
+        developTopics = developTopics.filter(function(t) { return t.id !== editingDevelopId })
+        saveDevelopTopics(); closeDevelopModal(); renderDevelopList(); showToast('Sujet supprimé')
+      })
+      document.getElementById('develop-save').addEventListener('click', function() {
+        var topic = document.getElementById('develop-topic-input').value.trim()
+        if (!topic) return
+        var entry = { id: editingDevelopId || ('dev' + Date.now()), topic: topic, tagIds: selectedDevelopTagIds.slice(), links: developLinks.filter(function(l) { return l.trim() }) }
+        if (editingDevelopId) developTopics = developTopics.map(function(t) { return t.id === editingDevelopId ? entry : t })
+        else developTopics.unshift(entry)
+        saveDevelopTopics(); closeDevelopModal(); renderDevelopList(); showToast('Sujet enregistré')
+      })
+    }
+
+    document.getElementById('btn-add-develop-link').addEventListener('click', function() { developLinks.push(''); renderDevelopLinksList() })
+    document.getElementById('modal-develop-close').addEventListener('click', closeDevelopModal)
+    document.getElementById('modal-develop').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeDevelopModal() })
+    document.getElementById('btn-new-develop').addEventListener('click', openNewDevelop)
+    document.getElementById('develop-search').addEventListener('input', function(e) { developSearch = e.target.value; renderDevelopList() })
 
     // ── HEADER ──
     function renderHeader() {
