@@ -1914,6 +1914,7 @@
         <button class="task-view-btn active" id="btn-art-list">Articles</button>
         <button class="task-view-btn" id="btn-art-tags">Tags</button>
         <button class="task-view-btn" id="btn-art-stats">Stats</button>
+        <button class="task-view-btn" id="btn-art-develop">À développer</button>
       </div>
 
       <!-- VUE LISTE -->
@@ -1958,6 +1959,15 @@
           <div class="chart-header"><span class="chart-title">Répartition par source</span></div>
           <div class="chart-canvas-wrap" style="height:220px;"><canvas id="chart-art-sources"></canvas></div>
         </div>
+      </div>
+
+      <!-- VUE À DÉVELOPPER -->
+      <div id="art-develop-view" style="display:none;">
+        <div class="ex-lib-search-row">
+          <input class="form-input" style="flex:1;" placeholder="Nouveau sujet à explorer…" id="develop-new-input" maxlength="120" />
+          <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-add-develop">+ Ajouter</button>
+        </div>
+        <div class="card" style="padding:0;"><div id="develop-list"></div></div>
       </div>
     </div>
 
@@ -6960,28 +6970,61 @@
     }
 
     // ── Nav ──
-    document.getElementById('btn-art-list').addEventListener('click', function() {
-      ;['btn-art-list','btn-art-tags','btn-art-stats'].forEach(function(id) { document.getElementById(id).classList.remove('active') })
-      document.getElementById('btn-art-list').classList.add('active')
-      document.getElementById('art-list-view').style.display = ''
-      document.getElementById('art-tags-view').style.display = 'none'
-      document.getElementById('art-stats-view').style.display = 'none'
+    // ── Nav ──
+    const ART_TABS = ['btn-art-list','btn-art-tags','btn-art-stats','btn-art-develop']
+    const ART_VIEWS = ['art-list-view','art-tags-view','art-stats-view','art-develop-view']
+    function switchArtTab(activeBtn, activeView, callback) {
+      ART_TABS.forEach(function(id) { document.getElementById(id).classList.remove('active') })
+      document.getElementById(activeBtn).classList.add('active')
+      ART_VIEWS.forEach(function(id) { document.getElementById(id).style.display = 'none' })
+      document.getElementById(activeView).style.display = ''
+      if (callback) callback()
+    }
+    document.getElementById('btn-art-list').addEventListener('click', function() { switchArtTab('btn-art-list', 'art-list-view') })
+    document.getElementById('btn-art-tags').addEventListener('click', function() { switchArtTab('btn-art-tags', 'art-tags-view', renderArtTagsList) })
+    document.getElementById('btn-art-stats').addEventListener('click', function() { switchArtTab('btn-art-stats', 'art-stats-view', renderArtCharts) })
+    document.getElementById('btn-art-develop').addEventListener('click', function() { switchArtTab('btn-art-develop', 'art-develop-view', renderDevelopList) })
+
+    // ── À développer ──
+    var developTopics = JSON.parse(localStorage.getItem('tdv_develop_' + profile.id) || '[]')
+
+    function saveDevelopTopics() { localStorage.setItem('tdv_develop_' + profile.id, JSON.stringify(developTopics)) }
+
+    function renderDevelopList() {
+      var el = document.getElementById('develop-list')
+      if (!developTopics.length) {
+        el.innerHTML = '<div class="empty-state" style="padding:2.5rem;"><p>Aucun sujet pour l\'instant.<br/>Ajoute des thèmes à creuser !</p></div>'
+        return
+      }
+      el.innerHTML = ''
+      developTopics.forEach(function(topic, idx) {
+        var row = document.createElement('div')
+        row.style.cssText = 'display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1.25rem;border-bottom:0.5px solid var(--border);'
+        var dot = document.createElement('div')
+        dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;'
+        var text = document.createElement('div')
+        text.style.cssText = 'flex:1;font-size:0.875rem;'
+        text.textContent = topic
+        var del = document.createElement('button')
+        del.className = 'btn-icon'
+        del.style.cssText = 'width:28px;height:28px;flex-shrink:0;'
+        del.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+        del.addEventListener('click', function() { developTopics.splice(idx, 1); saveDevelopTopics(); renderDevelopList() })
+        row.appendChild(dot); row.appendChild(text); row.appendChild(del)
+        el.appendChild(row)
+      })
+    }
+
+    document.getElementById('btn-add-develop').addEventListener('click', function() {
+      var val = document.getElementById('develop-new-input').value.trim()
+      if (!val) return
+      developTopics.unshift(val)
+      saveDevelopTopics()
+      document.getElementById('develop-new-input').value = ''
+      renderDevelopList()
     })
-    document.getElementById('btn-art-tags').addEventListener('click', function() {
-      ;['btn-art-list','btn-art-tags','btn-art-stats'].forEach(function(id) { document.getElementById(id).classList.remove('active') })
-      document.getElementById('btn-art-tags').classList.add('active')
-      document.getElementById('art-list-view').style.display = 'none'
-      document.getElementById('art-tags-view').style.display = ''
-      document.getElementById('art-stats-view').style.display = 'none'
-      renderArtTagsList()
-    })
-    document.getElementById('btn-art-stats').addEventListener('click', function() {
-      ;['btn-art-list','btn-art-tags','btn-art-stats'].forEach(function(id) { document.getElementById(id).classList.remove('active') })
-      document.getElementById('btn-art-stats').classList.add('active')
-      document.getElementById('art-list-view').style.display = 'none'
-      document.getElementById('art-tags-view').style.display = 'none'
-      document.getElementById('art-stats-view').style.display = ''
-      renderArtCharts()
+    document.getElementById('develop-new-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('btn-add-develop').click()
     })
 
     // ── HEADER ──
