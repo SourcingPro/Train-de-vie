@@ -1379,6 +1379,7 @@
       border-radius: 100px; text-transform: uppercase; letter-spacing: 0.04em;
     }
     .book-status-badge.to_read { background: var(--surface-2); color: var(--text-muted); }
+    .book-status-badge.to_buy { background: #FEF3C7; color: #D97706; }
     .book-status-badge.reading { background: #DCEAFB; color: #4A7FC2; }
     .book-status-badge.done { background: #DFF3E3; color: #3F9B5C; }
     .book-progress-wrap { flex: 1; height: 4px; background: var(--surface-2); border-radius: 100px; overflow: hidden; min-width: 60px; }
@@ -1843,6 +1844,7 @@
         <button class="task-view-btn active" id="btn-book-all">Tous</button>
         <button class="task-view-btn" id="btn-book-reading">En cours</button>
         <button class="task-view-btn" id="btn-book-toread">À lire</button>
+        <button class="task-view-btn" id="btn-book-tobuy">À acheter</button>
         <button class="task-view-btn" id="btn-book-done">Terminés</button>
         <button class="task-view-btn" id="btn-book-stats">Stats</button>
       </div>
@@ -2503,6 +2505,7 @@
         <label class="form-label">Statut</label>
         <select class="form-select" id="book-status-input">
           <option value="to_read">À lire</option>
+          <option value="to_buy">À acheter</option>
           <option value="reading">En cours</option>
           <option value="done">Terminé</option>
         </select>
@@ -5470,7 +5473,7 @@
 
     const BOOK_EMOJIS = ['📖','📚','📕','📗','📘','📙','📓','📔','📒','📃','📜','🔖','✍️','🖊️','🖋️','📝','🗒️','🗓️','💡','🧠','🎭','🏰','🌍','🚀','🔬','🎨','🎵','⚔️','🌿','❤️']
 
-    const STATUS_LABELS = { to_read: 'À lire', reading: 'En cours', done: 'Terminé' }
+    const STATUS_LABELS = { to_read: 'À lire', to_buy: 'À acheter', reading: 'En cours', done: 'Terminé' }
 
     async function loadBooks() {
       const { data } = await db.from('books').select('*').eq('profile_id', profile.id).order('created_at', { ascending: false })
@@ -5530,13 +5533,17 @@
     document.getElementById('book-search').addEventListener('input', function(e) { bookSearch = e.target.value; renderBooks() })
     function setBookFilter(f) {
       bookFilter = f
-      ;['btn-book-all','btn-book-reading','btn-book-toread','btn-book-done'].forEach(function(id) { document.getElementById(id).classList.remove('active') })
-      document.getElementById({ all:'btn-book-all', reading:'btn-book-reading', to_read:'btn-book-toread', done:'btn-book-done' }[f]).classList.add('active')
+      document.getElementById('book-stats-view').style.display = 'none'
+      document.getElementById('book-list-view').style.display = ''
+      ;['btn-book-all','btn-book-reading','btn-book-toread','btn-book-tobuy','btn-book-done','btn-book-stats'].forEach(function(id) { document.getElementById(id).classList.remove('active') })
+      var map = { all:'btn-book-all', reading:'btn-book-reading', to_read:'btn-book-toread', to_buy:'btn-book-tobuy', done:'btn-book-done' }
+      document.getElementById(map[f]).classList.add('active')
       renderBooks()
     }
     document.getElementById('btn-book-all').addEventListener('click', function() { setBookFilter('all') })
     document.getElementById('btn-book-reading').addEventListener('click', function() { setBookFilter('reading') })
     document.getElementById('btn-book-toread').addEventListener('click', function() { setBookFilter('to_read') })
+    document.getElementById('btn-book-tobuy').addEventListener('click', function() { setBookFilter('to_buy') })
     document.getElementById('btn-book-done').addEventListener('click', function() { setBookFilter('done') })
 
     // ── Modal ──
@@ -5770,7 +5777,7 @@
     }
 
     document.getElementById('btn-book-stats').addEventListener('click', function() {
-      ;['btn-book-all','btn-book-reading','btn-book-toread','btn-book-done','btn-book-stats'].forEach(function(id) {
+      ;['btn-book-all','btn-book-reading','btn-book-toread','btn-book-tobuy','btn-book-done','btn-book-stats'].forEach(function(id) {
         document.getElementById(id).classList.remove('active')
       })
       document.getElementById('btn-book-stats').classList.add('active')
