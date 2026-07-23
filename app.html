@@ -1276,6 +1276,31 @@
     .session-set-check.done svg { opacity: 1; }
 
     /* ══════════════════════════════════════
+       CADEAUX
+    ══════════════════════════════════════ */
+    .gift-person-card { display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background var(--transition); }
+    .gift-person-card:last-child { border-bottom:none; }
+    .gift-person-card:hover { background:var(--surface-2); }
+    .gift-person-avatar { width:40px;height:40px;border-radius:50%;background:var(--surface-2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:var(--text-secondary); }
+    .gift-person-info { flex:1; }
+    .gift-person-name { font-size:0.9375rem;font-weight:600; }
+    .gift-person-meta { font-size:0.75rem;color:var(--text-muted);margin-top:0.15rem; }
+    .gift-person-count { font-size:0.75rem;color:var(--text-muted);flex-shrink:0; }
+    .gift-idea-card { padding:0.875rem 1.25rem;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background var(--transition); }
+    .gift-idea-card:last-child { border-bottom:none; }
+    .gift-idea-card:hover { background:var(--surface-2); }
+    .gift-idea-title-row { display:flex;align-items:center;gap:0.5rem; }
+    .gift-idea-name { font-size:0.9375rem;font-weight:600;flex:1; }
+    .gift-idea-price-badge { font-size:0.8125rem;font-weight:700;color:var(--text-secondary); }
+    .gift-idea-meta { font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem;display:flex;gap:0.5rem;flex-wrap:wrap; }
+    .gift-status-badge { font-size:0.625rem;font-weight:700;padding:0.2rem 0.5rem;border-radius:100px;text-transform:uppercase; }
+    .gift-status-badge.idee { background:var(--surface-2);color:var(--text-muted); }
+    .gift-status-badge.a_acheter { background:#FEF3C7;color:#D97706; }
+    .gift-status-badge.achete { background:#DFF3E3;color:#3F9B5C; }
+    .gift-status-badge.offert { background:#DCEAFB;color:#4A7FC2; }
+    .gift-occ-badge { font-size:0.75rem; }
+
+    /* ══════════════════════════════════════
        PLANTES
     ══════════════════════════════════════ */
 /* ══════════════════════════════════════
@@ -2022,7 +2047,42 @@
       <div class="coming-soon"><div class="coming-soon-icon">🛍️</div><h2>À acheter</h2><p>Liste d'achats communs<br/>par catégorie.</p></div>
     </div>
     <div class="module" id="module-gifts">
-      <div class="coming-soon"><div class="coming-soon-icon">🎁</div><h2>Cadeaux</h2><p>Idées et planning<br/>de cadeaux.</p></div>
+      <div class="page-header">
+        <div class="page-title">Cadeaux</div>
+        <div class="page-subtitle">Idées & planning commun</div>
+      </div>
+
+      <div class="task-view-toggle" style="overflow-x:auto;scrollbar-width:none;">
+        <button class="task-view-btn active" id="btn-gift-people">Personnes</button>
+        <button class="task-view-btn" id="btn-gift-ideas">Idées</button>
+      </div>
+
+      <!-- VUE PERSONNES -->
+      <div id="gift-people-view">
+        <div class="ex-lib-search-row">
+          <input class="form-input" style="flex:1;" placeholder="Rechercher une personne…" id="gift-people-search" />
+          <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-person">+ Personne</button>
+        </div>
+        <div class="card" style="padding:0;"><div id="gift-people-list"></div></div>
+      </div>
+
+      <!-- VUE IDÉES -->
+      <div id="gift-ideas-view" style="display:none;">
+        <div class="ex-lib-search-row">
+          <input class="form-input" style="flex:1;" placeholder="Rechercher une idée…" id="gift-ideas-search" />
+          <button class="btn-primary" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.8125rem;white-space:nowrap;" id="btn-new-idea">+ Idée</button>
+        </div>
+        <div class="ex-filter-row" id="gift-person-filters"></div>
+        <div class="ex-filter-row" id="gift-occasion-filters" style="padding-top:0;"></div>
+        <div class="ex-filter-row" id="gift-status-filters" style="padding-top:0;"></div>
+        <div class="stats-grid-4" style="margin:0 1.25rem 0.875rem;">
+          <div class="stat-card-sm"><div class="stat-value-sm" id="gift-stat-total">0</div><div class="stat-label-sm">Idées</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="gift-stat-budget">0€</div><div class="stat-label-sm">Budget total</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="gift-stat-bought">0€</div><div class="stat-label-sm">Acheté</div></div>
+          <div class="stat-card-sm"><div class="stat-value-sm" id="gift-stat-remaining">0€</div><div class="stat-label-sm">Restant</div></div>
+        </div>
+        <div class="card" style="padding:0;"><div id="gift-ideas-list"></div></div>
+      </div>
     </div>
     <div class="module" id="module-social">
       <div class="coming-soon"><div class="coming-soon-icon">👥</div><h2>Personnes à voir</h2><p>Tes amis et proches,<br/>dernières visites.</p></div>
@@ -2332,6 +2392,73 @@
       <div class="modal-actions">
         <button class="btn-primary" id="pantry-confirm">Enregistrer</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL PERSONNE -->
+  <div class="modal-overlay" id="modal-gift-person">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-gift-person-title">Nouvelle personne</div>
+        <button class="modal-close" id="modal-gift-person-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nom</label>
+        <input class="form-input" id="gift-person-name" placeholder="Ex : Maman, Audrey…" maxlength="60" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date d'anniversaire</label>
+        <input class="form-input" type="date" id="gift-person-birthday" />
+      </div>
+      <div class="modal-actions" id="gift-person-actions"></div>
+    </div>
+  </div>
+
+  <!-- MODAL IDÉE CADEAU -->
+  <div class="modal-overlay" id="modal-gift-idea">
+    <div class="modal" style="max-height:90dvh;overflow-y:auto;">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-gift-idea-title">Nouvelle idée</div>
+        <button class="modal-close" id="modal-gift-idea-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Idée cadeau</label>
+        <input class="form-input" id="gift-idea-title" placeholder="Ex : Livre, Montre…" maxlength="120" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pour qui</label>
+        <select class="form-select" id="gift-idea-person"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Occasion</label>
+        <div class="task-view-toggle" style="margin:0;">
+          <button type="button" class="task-view-btn active" id="gift-occ-anniversaire">🎂 Anniversaire</button>
+          <button type="button" class="task-view-btn" id="gift-occ-noel">🎄 Noël</button>
+          <button type="button" class="task-view-btn" id="gift-occ-autre">🎁 Autre</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Statut</label>
+        <select class="form-select" id="gift-idea-status">
+          <option value="idee">💡 Idée</option>
+          <option value="a_acheter">🛒 À acheter</option>
+          <option value="achete">✅ Acheté</option>
+          <option value="offert">🎁 Offert</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Prix estimé (€)</label>
+        <input class="form-input" type="number" id="gift-idea-price" min="0" placeholder="Ex : 30" style="width:120px;" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Lien</label>
+        <input class="form-input" type="url" id="gift-idea-url" placeholder="https://…" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-input" id="gift-idea-notes" rows="2" style="resize:none;" placeholder="Taille, couleur, variante…"></textarea>
+      </div>
+      <div class="modal-actions" id="gift-idea-actions"></div>
     </div>
   </div>
 
@@ -6417,6 +6544,293 @@
     document.getElementById('btn-cook-plan').addEventListener('click', function() { switchCookTab('plan') })
     document.getElementById('btn-cook-shopping').addEventListener('click', function() { switchCookTab('shopping') })
 
+// ══════════════════════════════════════
+    // CADEAUX
+    // ══════════════════════════════════════
+    let giftPeople = []
+    let giftIdeas = []
+    let giftSearch = ''
+    let giftPersonFilter = null
+    let giftOccasionFilter = null
+    let giftStatusFilter = null
+    let editingPersonId = null
+    let editingIdeaId = null
+    let selectedGiftOccasion = 'anniversaire'
+
+    const GIFT_STATUS_LABELS = { idee: '💡 Idée', a_acheter: '🛒 À acheter', achete: '✅ Acheté', offert: '🎁 Offert' }
+    const GIFT_OCC_LABELS = { anniversaire: '🎂 Anniversaire', noel: '🎄 Noël', autre: '🎁 Autre' }
+
+    async function loadGifts() {
+      if (!householdId) return
+      const [{ data: people }, { data: ideas }] = await Promise.all([
+        db.from('gift_people').select('*').eq('household_id', householdId).order('name'),
+        db.from('gift_ideas').select('*').eq('household_id', householdId).order('created_at', { ascending: false })
+      ])
+      giftPeople = people || []
+      giftIdeas = ideas || []
+      renderGiftPeople()
+      renderGiftPersonFilters()
+      renderGiftIdeas()
+      updateGiftStats()
+    }
+
+    // ── Personnes ──
+    function renderGiftPeople() {
+      var el = document.getElementById('gift-people-list')
+      var search = document.getElementById('gift-people-search').value.toLowerCase()
+      var filtered = giftPeople.filter(function(p) { return !search || p.name.toLowerCase().includes(search) })
+      if (!filtered.length) { el.innerHTML = '<div class="empty-state" style="padding:2.5rem;"><p>' + (search ? 'Aucun résultat.' : 'Aucune personne. Ajoutes-en une !') + '</p></div>'; return }
+      el.innerHTML = ''
+      filtered.forEach(function(p) {
+        var ideaCount = giftIdeas.filter(function(i) { return i.person_id === p.id }).length
+        var div = document.createElement('div')
+        div.className = 'gift-person-card'
+        var initials = p.name.split(' ').map(function(w) { return w[0] }).join('').toUpperCase().slice(0, 2)
+        var birthday = p.birthday ? new Date(p.birthday + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }) : null
+        div.innerHTML = '<div class="gift-person-avatar">' + initials + '</div>' +
+          '<div class="gift-person-info"><div class="gift-person-name">' + p.name + '</div>' +
+          (birthday ? '<div class="gift-person-meta">🎂 ' + birthday + '</div>' : '') + '</div>' +
+          '<div class="gift-person-count">' + ideaCount + ' idée' + (ideaCount > 1 ? 's' : '') + '</div>'
+        div.addEventListener('click', function() { openEditPerson(p) })
+        el.appendChild(div)
+      })
+    }
+
+    document.getElementById('gift-people-search').addEventListener('input', renderGiftPeople)
+    document.getElementById('btn-gift-people').addEventListener('click', function() {
+      document.getElementById('btn-gift-people').classList.add('active')
+      document.getElementById('btn-gift-ideas').classList.remove('active')
+      document.getElementById('gift-people-view').style.display = ''
+      document.getElementById('gift-ideas-view').style.display = 'none'
+    })
+    document.getElementById('btn-gift-ideas').addEventListener('click', function() {
+      document.getElementById('btn-gift-ideas').classList.add('active')
+      document.getElementById('btn-gift-people').classList.remove('active')
+      document.getElementById('gift-ideas-view').style.display = ''
+      document.getElementById('gift-people-view').style.display = 'none'
+      renderGiftPersonFilters()
+      renderGiftIdeas()
+      updateGiftStats()
+    })
+
+    function openNewPerson() {
+      editingPersonId = null
+      document.getElementById('modal-gift-person-title').textContent = 'Nouvelle personne'
+      document.getElementById('gift-person-name').value = ''
+      document.getElementById('gift-person-birthday').value = ''
+      document.getElementById('gift-person-actions').innerHTML = '<button class="btn-secondary" id="gift-person-cancel">Annuler</button><button class="btn-primary" id="gift-person-save">Créer</button>'
+      bindPersonModalButtons()
+      document.getElementById('modal-gift-person').classList.add('open')
+    }
+
+    function openEditPerson(p) {
+      editingPersonId = p.id
+      document.getElementById('modal-gift-person-title').textContent = 'Modifier'
+      document.getElementById('gift-person-name').value = p.name
+      document.getElementById('gift-person-birthday').value = p.birthday || ''
+      document.getElementById('gift-person-actions').innerHTML = '<button class="btn-danger" id="gift-person-delete">Supprimer</button><button class="btn-primary" id="gift-person-save">Enregistrer</button>'
+      bindPersonModalButtons()
+      document.getElementById('modal-gift-person').classList.add('open')
+    }
+
+    function closePersonModal() { document.getElementById('modal-gift-person').classList.remove('open') }
+
+    function bindPersonModalButtons() {
+      document.getElementById('gift-person-cancel')?.addEventListener('click', closePersonModal)
+      document.getElementById('gift-person-delete')?.addEventListener('click', async function() {
+        await db.from('gift_people').delete().eq('id', editingPersonId)
+        giftPeople = giftPeople.filter(function(p) { return p.id !== editingPersonId })
+        closePersonModal(); renderGiftPeople(); showToast('Personne supprimée')
+      })
+      document.getElementById('gift-person-save').addEventListener('click', async function() {
+        var name = document.getElementById('gift-person-name').value.trim()
+        if (!name) return
+        var payload = { household_id: householdId, name: name, birthday: document.getElementById('gift-person-birthday').value || null }
+        if (editingPersonId) {
+          await db.from('gift_people').update(payload).eq('id', editingPersonId)
+          giftPeople = giftPeople.map(function(p) { return p.id === editingPersonId ? { ...p, ...payload, id: editingPersonId } : p })
+          showToast('Modifié')
+        } else {
+          var { data } = await db.from('gift_people').insert(payload).select().single()
+          if (data) giftPeople.push(data)
+          showToast('Personne créée')
+        }
+        closePersonModal(); renderGiftPeople(); renderGiftPersonFilters()
+      })
+    }
+
+    document.getElementById('modal-gift-person-close').addEventListener('click', closePersonModal)
+    document.getElementById('modal-gift-person').addEventListener('click', function(e) { if (e.target === e.currentTarget) closePersonModal() })
+    document.getElementById('btn-new-person').addEventListener('click', openNewPerson)
+
+    // ── Idées ──
+    function renderGiftPersonFilters() {
+      var el = document.getElementById('gift-person-filters')
+      el.innerHTML = ''
+      var allBtn = document.createElement('button')
+      allBtn.className = 'filter-chip' + (!giftPersonFilter ? ' active' : '')
+      allBtn.textContent = 'Tous'
+      allBtn.addEventListener('click', function() { giftPersonFilter = null; renderGiftPersonFilters(); renderGiftIdeas(); updateGiftStats() })
+      el.appendChild(allBtn)
+      giftPeople.forEach(function(p) {
+        var btn = document.createElement('button')
+        btn.className = 'filter-chip' + (giftPersonFilter === p.id ? ' active' : '')
+        btn.textContent = p.name
+        btn.addEventListener('click', function() { giftPersonFilter = p.id; renderGiftPersonFilters(); renderGiftIdeas(); updateGiftStats() })
+        el.appendChild(btn)
+      })
+      // Occasion filters
+      var el2 = document.getElementById('gift-occasion-filters')
+      el2.innerHTML = ''
+      ;['tous', 'anniversaire', 'noel', 'autre'].forEach(function(occ) {
+        var btn = document.createElement('button')
+        btn.className = 'filter-chip' + ((occ === 'tous' && !giftOccasionFilter) || giftOccasionFilter === occ ? ' active' : '')
+        btn.textContent = occ === 'tous' ? 'Toutes occasions' : GIFT_OCC_LABELS[occ]
+        btn.addEventListener('click', function() { giftOccasionFilter = occ === 'tous' ? null : occ; renderGiftPersonFilters(); renderGiftIdeas(); updateGiftStats() })
+        el2.appendChild(btn)
+      })
+      // Status filters
+      var el3 = document.getElementById('gift-status-filters')
+      el3.innerHTML = ''
+      ;['tous', 'idee', 'a_acheter', 'achete', 'offert'].forEach(function(s) {
+        var btn = document.createElement('button')
+        btn.className = 'filter-chip' + ((s === 'tous' && !giftStatusFilter) || giftStatusFilter === s ? ' active' : '')
+        btn.textContent = s === 'tous' ? 'Tous statuts' : GIFT_STATUS_LABELS[s]
+        btn.addEventListener('click', function() { giftStatusFilter = s === 'tous' ? null : s; renderGiftPersonFilters(); renderGiftIdeas(); updateGiftStats() })
+        el3.appendChild(btn)
+      })
+    }
+
+    function getGiftIdeasFiltered() {
+      var search = document.getElementById('gift-ideas-search').value.toLowerCase()
+      return giftIdeas.filter(function(i) {
+        var mp = !giftPersonFilter || i.person_id === giftPersonFilter
+        var mo = !giftOccasionFilter || i.occasion === giftOccasionFilter
+        var ms = !giftStatusFilter || i.status === giftStatusFilter
+        var mq = !search || i.title.toLowerCase().includes(search)
+        return mp && mo && ms && mq
+      })
+    }
+
+    function updateGiftStats() {
+      var filtered = getGiftIdeasFiltered()
+      var budget = filtered.reduce(function(s, i) { return s + (i.price || 0) }, 0)
+      var bought = filtered.filter(function(i) { return i.status === 'achete' || i.status === 'offert' }).reduce(function(s, i) { return s + (i.price || 0) }, 0)
+      document.getElementById('gift-stat-total').textContent = filtered.length
+      document.getElementById('gift-stat-budget').textContent = budget.toFixed(0) + '€'
+      document.getElementById('gift-stat-bought').textContent = bought.toFixed(0) + '€'
+      document.getElementById('gift-stat-remaining').textContent = Math.max(0, budget - bought).toFixed(0) + '€'
+    }
+
+    function renderGiftIdeas() {
+      var el = document.getElementById('gift-ideas-list')
+      var filtered = getGiftIdeasFiltered()
+      if (!filtered.length) { el.innerHTML = '<div class="empty-state" style="padding:2.5rem;"><p>Aucune idée. Ajoutes-en une !</p></div>'; return }
+      el.innerHTML = ''
+      filtered.forEach(function(i) {
+        var person = giftPeople.find(function(p) { return p.id === i.person_id })
+        var div = document.createElement('div')
+        div.className = 'gift-idea-card'
+        div.innerHTML = '<div class="gift-idea-title-row">' +
+          '<div class="gift-idea-name">' + i.title + '</div>' +
+          (i.price ? '<div class="gift-idea-price-badge">' + i.price + '€</div>' : '') +
+          '</div>' +
+          '<div class="gift-idea-meta">' +
+          '<span class="gift-status-badge ' + i.status + '">' + GIFT_STATUS_LABELS[i.status] + '</span>' +
+          (person ? '<span>· ' + person.name + '</span>' : '') +
+          '<span class="gift-occ-badge">· ' + GIFT_OCC_LABELS[i.occasion] + '</span>' +
+          (i.url ? '<a href="' + i.url + '" target="_blank" rel="noopener" style="color:var(--text-muted);font-size:0.75rem;" onclick="event.stopPropagation()">· 🔗 Voir</a>' : '') +
+          (i.notes ? '<span>· ' + i.notes + '</span>' : '') +
+          '</div>'
+        div.addEventListener('click', function() { openEditIdea(i) })
+        el.appendChild(div)
+      })
+    }
+
+    document.getElementById('gift-ideas-search').addEventListener('input', function() { renderGiftIdeas(); updateGiftStats() })
+
+    function setGiftOccasion(occ) {
+      selectedGiftOccasion = occ
+      ;['anniversaire','noel','autre'].forEach(function(o) { document.getElementById('gift-occ-' + o).classList.toggle('active', o === occ) })
+    }
+    document.getElementById('gift-occ-anniversaire').addEventListener('click', function() { setGiftOccasion('anniversaire') })
+    document.getElementById('gift-occ-noel').addEventListener('click', function() { setGiftOccasion('noel') })
+    document.getElementById('gift-occ-autre').addEventListener('click', function() { setGiftOccasion('autre') })
+
+    function populatePersonSelect(selectedId) {
+      var sel = document.getElementById('gift-idea-person')
+      sel.innerHTML = giftPeople.map(function(p) { return '<option value="' + p.id + '"' + (p.id === selectedId ? ' selected' : '') + '>' + p.name + '</option>' }).join('')
+    }
+
+    function openNewIdea() {
+      editingIdeaId = null
+      document.getElementById('modal-gift-idea-title').textContent = 'Nouvelle idée'
+      document.getElementById('gift-idea-title').value = ''
+      document.getElementById('gift-idea-status').value = 'idee'
+      document.getElementById('gift-idea-price').value = ''
+      document.getElementById('gift-idea-url').value = ''
+      document.getElementById('gift-idea-notes').value = ''
+      setGiftOccasion('anniversaire')
+      populatePersonSelect(giftPersonFilter)
+      document.getElementById('gift-idea-actions').innerHTML = '<button class="btn-secondary" id="gift-idea-cancel">Annuler</button><button class="btn-primary" id="gift-idea-save">Créer</button>'
+      bindIdeaModalButtons()
+      document.getElementById('modal-gift-idea').classList.add('open')
+    }
+
+    function openEditIdea(i) {
+      editingIdeaId = i.id
+      document.getElementById('modal-gift-idea-title').textContent = 'Modifier l\'idée'
+      document.getElementById('gift-idea-title').value = i.title
+      document.getElementById('gift-idea-status').value = i.status
+      document.getElementById('gift-idea-price').value = i.price || ''
+      document.getElementById('gift-idea-url').value = i.url || ''
+      document.getElementById('gift-idea-notes').value = i.notes || ''
+      setGiftOccasion(i.occasion || 'anniversaire')
+      populatePersonSelect(i.person_id)
+      document.getElementById('gift-idea-actions').innerHTML = '<button class="btn-danger" id="gift-idea-delete">Supprimer</button><button class="btn-primary" id="gift-idea-save">Enregistrer</button>'
+      bindIdeaModalButtons()
+      document.getElementById('modal-gift-idea').classList.add('open')
+    }
+
+    function closeIdeaModal() { document.getElementById('modal-gift-idea').classList.remove('open') }
+
+    function bindIdeaModalButtons() {
+      document.getElementById('gift-idea-cancel')?.addEventListener('click', closeIdeaModal)
+      document.getElementById('gift-idea-delete')?.addEventListener('click', async function() {
+        await db.from('gift_ideas').delete().eq('id', editingIdeaId)
+        giftIdeas = giftIdeas.filter(function(i) { return i.id !== editingIdeaId })
+        closeIdeaModal(); renderGiftIdeas(); updateGiftStats(); showToast('Idée supprimée')
+      })
+      document.getElementById('gift-idea-save').addEventListener('click', async function() {
+        var title = document.getElementById('gift-idea-title').value.trim()
+        if (!title) return
+        var payload = {
+          household_id: householdId,
+          person_id: document.getElementById('gift-idea-person').value,
+          title: title,
+          occasion: selectedGiftOccasion,
+          status: document.getElementById('gift-idea-status').value,
+          price: parseFloat(document.getElementById('gift-idea-price').value) || null,
+          url: document.getElementById('gift-idea-url').value.trim() || null,
+          notes: document.getElementById('gift-idea-notes').value.trim() || null
+        }
+        if (editingIdeaId) {
+          await db.from('gift_ideas').update(payload).eq('id', editingIdeaId)
+          giftIdeas = giftIdeas.map(function(i) { return i.id === editingIdeaId ? { ...i, ...payload, id: editingIdeaId } : i })
+          showToast('Idée modifiée')
+        } else {
+          var { data } = await db.from('gift_ideas').insert(payload).select().single()
+          if (data) giftIdeas.unshift(data)
+          showToast('Idée créée')
+        }
+        closeIdeaModal(); renderGiftIdeas(); updateGiftStats()
+      })
+    }
+
+    document.getElementById('modal-gift-idea-close').addEventListener('click', closeIdeaModal)
+    document.getElementById('modal-gift-idea').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeIdeaModal() })
+    document.getElementById('btn-new-idea').addEventListener('click', openNewIdea)
+
     // ══════════════════════════════════════
     let plants = []
     let plantSearch = ''
@@ -7236,6 +7650,7 @@
       document.getElementById('fab').style.display = (id === 'tasks') ? 'flex' : 'none'
       if (id === 'reading') loadBooks()
       if (id === 'plants') loadPlants()
+      if (id === 'gifts') loadGifts()
       if (id === 'cooking') { renderCookCatFilters(); loadRecipes(); loadMealPlans() }
       if (id === 'articles') { loadArticleTags().then(function() { loadArticles().then(function() { renderArtFilters() }) }) }
     }
